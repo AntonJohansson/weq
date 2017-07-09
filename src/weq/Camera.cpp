@@ -120,4 +120,4 @@ glm::mat4 view(){return _view;}
 glm::mat4 projection(){return _projection;}
 glm::mat4 normal_matrix(){return _normal_matrix;}
 
-};
+}

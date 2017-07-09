@@ -3,6 +3,7 @@
 #include <functional>
 #include <algorithm>
 #include <iostream>
+#include <cassert>
 
 template<typename T>
 class FlatBuffer{
@@ -13,7 +14,7 @@ public:
   FlatBuffer(unsigned int w, unsigned int h)
     : _width(w),
       _height(h),
-      _size(_width*_height){
+      _size(w*h){
     _data = new T[_size];
   }
 
@@ -22,7 +23,12 @@ public:
       _height(buffer.height()),
       _size(buffer.size()){
     _data = new T[_size];
-    std::copy(buffer.begin(), buffer.end(), _data);
+    // copy buffer, +1 required to copy entire buffer for some reason
+    std::copy(buffer.begin(), buffer.end() + 1, _data);
+
+    for(int i = 0; i < _size; i++){
+      assert(buffer.begin()[i] == _data[i]);
+    }
   }
 
   ~FlatBuffer(){
@@ -38,9 +44,7 @@ public:
   }
 
   size_t to_index(size_t x, size_t y){
-    if(x >= _width)x = _width - 1;
-    if(y >= _height)y = _height - 1;
-
+    assert(x*_width + y < _size);
     return x*_width + y;
   }
 
@@ -72,7 +76,6 @@ public:
 
     return *this;
   }
-
 
   Iterator begin(){return &_data[0];}
   Iterator end(){return &_data[_size - 1];}

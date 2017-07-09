@@ -1,10 +1,12 @@
 #pragma once
 
+#include <string>
+
 class Node;
 
 namespace engine{
 
-void intialize();
+void initialize();
 void main_loop();
 void add_node(Node* node);
 

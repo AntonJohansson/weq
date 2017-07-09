@@ -1,6 +1,6 @@
 #pragma once
 
-#include <OpenGL/gl3.h>
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 
 #include <string>

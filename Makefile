@@ -10,7 +10,8 @@ HDR_PATH = include
 CXXFLAGS += -std=c++1z -Wall -Wextra -g
 
 INCLUDES = -I $(HDR_PATH)
-LIBS = -framework OpenGL -framework sfml-graphics -framework sfml-window -framework sfml-system
+# Cocoa and IOKit required for OSX
+LIBS = -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -framework sfml-graphics -framework sfml-window -framework sfml-system -lentityx -lglfw3
 
 SRC_EXT = cpp
 

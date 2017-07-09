@@ -1,6 +1,7 @@
 #include <weq/gl/Shader.hpp>
 
-#include <OpenGL/gl3.h>
+//#include <OpenGL/gl3.h>
+#include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
