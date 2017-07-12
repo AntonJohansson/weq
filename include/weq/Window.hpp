@@ -17,14 +17,14 @@ public:
   void make_current();
   void swap_buffers();
   void close();
+  void clear(float r, float g, float b, float a = 1.0f);
   static void poll_events();
-  static void terminate();
 
   void set_size(int w, int h);
   void set_mode(Mode mode);
 
   bool should_close();
-  GLFWmonitor* monitor();
+  static GLFWwindow* current();
   int width(){return _w;}
   int height(){return _h;}
   int x_pos(){return _x;}
@@ -32,6 +32,14 @@ public:
   int refresh_rate(){return _refresh_rate;}
 
 private:
+  /* Returns the current monitor for this window,
+     only makes sense in the context of fullscreen
+     windows */
+  GLFWmonitor* current_monitor();
+  /* Returns the monitor with a given index,
+     0 = primary monitor */
+  GLFWmonitor* monitor(int index);
+
   Mode _mode;
   int _x;
   int _y;

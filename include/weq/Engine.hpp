@@ -1,14 +1,16 @@
 #pragma once
 
-#include <string>
+#include <entityx/entityx.h>
 
 class Node;
 
-namespace engine{
+
+namespace weq::engine{
+namespace ex = entityx;
 
 void initialize();
 void main_loop();
-void add_node(Node* node);
+ex::Entity create_entity();
 
 float width();
 float height();

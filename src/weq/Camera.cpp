@@ -4,9 +4,6 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <sfml/Window/Keyboard.hpp>
-#include <sfml/Window/Mouse.hpp>
-
 #include <iostream>
 
 namespace camera{
@@ -41,8 +38,8 @@ void calculate_perspective(){
 void update(){
   // camera movement
 
-  auto right = glm::cross(_direction, _up);
-  auto l_up = glm::cross(right, _direction);
+  //auto right = glm::cross(_direction, _up);
+  //auto l_up = glm::cross(right, _direction);
   //float speed = 0.1f;
   //if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
   //  _position -= right * speed;
@@ -60,38 +57,38 @@ void update(){
 
   // orbital cam
 
-  static float radius = 10.0f;
-  static glm::vec3 target = {0.0f, 0.0f, 0.0f};
-  static glm::vec2 old_v = {0.0f, 0.0f};
-  static bool is_pressed = false;
+  //static float radius = 10.0f;
+  //static glm::vec3 target = {0.0f, 0.0f, 0.0f};
+  //static glm::vec2 old_v = {0.0f, 0.0f};
+  //static bool is_pressed = false;
 
-  if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
-    auto mouse_input = sf::Mouse::getPosition();
-    glm::vec2 v = {mouse_input.x/640.0f, mouse_input.y/480.0f};
+  //if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+  //  auto mouse_input = sf::Mouse::getPosition();
+  //  glm::vec2 v = {mouse_input.x/640.0f, mouse_input.y/480.0f};
 
-    if(!is_pressed){
-      is_pressed = true;
-      old_v = v;
-    }
+  //  if(!is_pressed){
+  //    is_pressed = true;
+  //    old_v = v;
+  //  }
 
-    auto dv = v - old_v;
-    _position += 50.0f*(-right*dv.x + l_up*dv.y);
-    _position = glm::normalize(_position) * radius;
+  //  auto dv = v - old_v;
+  //  _position += 50.0f*(-right*dv.x + l_up*dv.y);
+  //  _position = glm::normalize(_position) * radius;
 
-    old_v = v;
-  }else{
-    is_pressed = false;
-  }
+  //  old_v = v;
+  //}else{
+  //  is_pressed = false;
+  //}
 
-  _view = glm::lookAt(_position, target, _up);
-  //_view = glm::lookAt(_position, _position + _direction, _up);
+  //_view = glm::lookAt(_position, target, _up);
+  _view = glm::lookAt(_position, _position + _direction, _up);
   _normal_matrix = glm::transpose(glm::inverse(_view)); // should be view*model
 }
 
 glm::vec4 unproject(glm::mat4 model, glm::vec4 v){
   // normalize coordinates
-  v.x = v.x/engine::width()*2.0f - 1.0f;
-  v.y = (engine::height() - v.y)/engine::height()*2.0f - 1.0f;
+  v.x = v.x/weq::engine::width()*2.0f - 1.0f;
+  v.y = (weq::engine::height() - v.y)/weq::engine::height()*2.0f - 1.0f;
   v.z = v.z*2.0f - 1.0f;
   v.w = 1.0f;
 

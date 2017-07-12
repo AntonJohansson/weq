@@ -1,4 +1,6 @@
-CXX ?= clang++
+#CXX ?= clang++
+# Generate .clang_complete
+CXX = cc_args.py clang++
 
 BIN_NAME = weq.out
 
@@ -11,7 +13,7 @@ CXXFLAGS += -std=c++1z -Wall -Wextra -g
 
 INCLUDES = -I $(HDR_PATH)
 # Cocoa and IOKit required for OSX
-LIBS = -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -framework sfml-graphics -framework sfml-window -framework sfml-system -lentityx -lglfw3
+LIBS = -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -lentityx -lglfw3 -ldl
 
 SRC_EXT = cpp
 

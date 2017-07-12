@@ -1,5 +1,5 @@
 #include <weq/gl/VertexArray.hpp>
-#include <OpenGL/gl3.h>
+#include <glad/glad.h>
 #include <iostream>
 
 namespace gl{

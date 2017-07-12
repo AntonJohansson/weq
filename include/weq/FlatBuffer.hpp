@@ -26,7 +26,7 @@ public:
     // copy buffer, +1 required to copy entire buffer for some reason
     std::copy(buffer.begin(), buffer.end() + 1, _data);
 
-    for(int i = 0; i < _size; i++){
+    for(unsigned int i = 0; i < _size; i++){
       assert(buffer.begin()[i] == _data[i]);
     }
   }
@@ -36,8 +36,8 @@ public:
   }
 
   void fill(T value){
-    for(int x = 0; x < _width; x++){
-      for(int y = 0; y < _height; y++){
+    for(unsigned int x = 0; x < _width; x++){
+      for(unsigned int y = 0; y < _height; y++){
         _data[to_index(x, y)] = value;
       }
     }

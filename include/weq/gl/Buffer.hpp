@@ -1,6 +1,6 @@
 #pragma once
 
-#include <OpenGL/gl3.h>
+#include <glad/glad.h>
 
 #include <iterator>
 #include <tuple>
@@ -66,11 +66,11 @@ public:
   float& operator[](size_t index){return _data[index];}
   const float& operator[](size_t index) const {return _data[index];}
 
-  void sub_data(Iterator& begin, Iterator& end){
+  //void sub_data(Iterator& begin, Iterator& end){
     //auto offset = std::distance(_data_vector.begin(), begin);
     //auto size = std::distance(begin, end);
     //auto data_ptr = &(*begin);
-  }
+  //}
 
 private:
   Usage _usage;
