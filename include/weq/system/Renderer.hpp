@@ -6,10 +6,11 @@
 namespace ex = entityx;
 
 class Window;
+namespace event{class ActiveInput;}
 
 namespace weq::system{
 
-class Renderer : public ex::System<Renderer>{
+class Renderer : public ex::System<Renderer>, public ex::Receiver<Renderer>{
 public:
   Renderer();
   ~Renderer();
@@ -19,6 +20,8 @@ public:
   void update(ex::EntityManager& entities,
               ex::EventManager& events,
               ex::TimeDelta dt) override;
+
+  void receive(const event::ActiveInput& event);
 
 private:
   std::unique_ptr<Window> _window;

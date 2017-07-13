@@ -3,6 +3,7 @@
 #include <weq/component/Renderable.hpp>
 #include <weq/component/Transform.hpp>
 #include <weq/Window.hpp>
+#include <weq/event/RegisterInput.hpp>
 #include <glad/glad.h>
 
 #include <iostream>
@@ -22,6 +23,8 @@ Renderer::~Renderer(){
 void Renderer::configure(ex::EventManager& events){
   _window = std::make_unique<Window>();
   glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
+  events.subscribe<event::ActiveInput>(*this);
 }
 
 void Renderer::update(ex::EntityManager& entities,
@@ -50,6 +53,23 @@ void Renderer::update(ex::EntityManager& entities,
 
   _window->swap_buffers();
   Window::poll_events();
+}
+
+void Renderer::receive(const event::ActiveInput &event){
+  float speed = 0.05f;
+  if(event.has(InputState::MOVE_LEFT)){
+    camera::right(-speed);
+  }if(event.has(InputState::MOVE_RIGHT)){
+    camera::right(speed);
+  }if(event.has(InputState::MOVE_FORWARD)){
+    camera::forward(speed);
+  }if(event.has(InputState::MOVE_BACK)){
+    camera::forward(-speed);
+  }if(event.has(InputState::MOVE_UP)){
+    camera::up(speed);
+  }if(event.has(InputState::MOVE_DOWN)){
+    camera::up(-speed);
+  }
 }
 
 }

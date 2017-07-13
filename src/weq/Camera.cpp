@@ -23,6 +23,19 @@ void translate(glm::vec3 v){
   _position += _speed * v;
 }
 
+void forward(float f){
+  _position += _direction * f;
+}
+
+void right(float f){
+  auto right = glm::cross(_direction, _up);
+  _position += right * f;
+}
+
+void up(float f){
+  _position += _up * f;
+}
+
 void rotate_deg(float deg, glm::vec3 axis){
   rotate_rad(glm::radians(deg), axis);
 }

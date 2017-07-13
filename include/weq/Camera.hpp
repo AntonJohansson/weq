@@ -5,6 +5,9 @@
 namespace camera{
 
 void translate(glm::vec3 v);
+void forward(float f);
+void right(float f);
+void up(float f);
 void rotate_deg(float deg, glm::vec3 axis);
 void rotate_rad(float rad, glm::vec3 axis);
 void calculate_perspective();
