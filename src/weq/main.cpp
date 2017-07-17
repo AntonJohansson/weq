@@ -64,7 +64,7 @@ int main(){
   auto mesh = new Mesh(mesh_data, shader);
 
   auto wave = weq::engine::create_entity();
-  wave.assign<component::Wave>(resolution, resolution, size/resolution, 0.2f);
+  wave.assign<component::Wave>(resolution, resolution, size/resolution, 0.5f);
   wave.assign<component::Transform>()->translate({-size/2, -size/2, 0});
   wave.assign<component::Renderable>(mesh, shader);
 
