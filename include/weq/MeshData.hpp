@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 struct MeshData{
   std::vector<float> vertices;
   std::vector<float> color;

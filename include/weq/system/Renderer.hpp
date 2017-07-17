@@ -6,7 +6,7 @@
 namespace ex = entityx;
 
 class Window;
-namespace event{class ActiveInput;}
+namespace event{struct ActiveInput;}
 
 namespace weq::system{
 

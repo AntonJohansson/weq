@@ -3,6 +3,7 @@
 
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 #include <iostream>
 
@@ -17,22 +18,23 @@ namespace{
   glm::mat4 _view;
   glm::mat4 _projection;
   glm::mat4 _normal_matrix;
+  glm::quat _rotation;
 }
 
 void translate(glm::vec3 v){
   _position += _speed * v;
 }
 
-void forward(float f){
+void move_forward(float f){
   _position += _direction * f;
 }
 
-void right(float f){
+void move_right(float f){
   auto right = glm::cross(_direction, _up);
   _position += right * f;
 }
 
-void up(float f){
+void move_up(float f){
   _position += _up * f;
 }
 
@@ -95,7 +97,7 @@ void update(){
 
   //_view = glm::lookAt(_position, target, _up);
   _view = glm::lookAt(_position, _position + _direction, _up);
-  _normal_matrix = glm::transpose(glm::inverse(_view)); // should be view*model
+  //_normal_matrix = glm::transpose(glm::inverse(_view)); // should be view*model
 }
 
 glm::vec4 unproject(glm::mat4 model, glm::vec4 v){
@@ -129,5 +131,8 @@ void set_dir(glm::vec3 d){_direction = glm::normalize(d);}
 glm::mat4 view(){return _view;}
 glm::mat4 projection(){return _projection;}
 glm::mat4 normal_matrix(){return _normal_matrix;}
+
+glm::vec3 up(){return _up;}
+glm::vec3 direction(){return _direction;}
 
 }

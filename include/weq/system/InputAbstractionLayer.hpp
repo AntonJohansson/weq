@@ -24,7 +24,7 @@ public:
   const event::ActiveInput& get_active(){return _active_input;}
   void clear(){
     _active_input.actions.clear();
-    _active_input.states.clear();
+    //_active_input.states.clear();
     _active_input.ranges.clear();
   }
 private:

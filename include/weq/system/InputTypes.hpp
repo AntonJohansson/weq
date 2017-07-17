@@ -1,6 +1,14 @@
 #pragma once
 
 enum class InputAction{
+  SPAWN_PLANE_WAVE,
+  CLEAR,
+  SINGLE_SLIT,
+  DOUBLE_SLIT,
+  INCREASE_D,
+  DECREASE_D,
+  INCREASE_B,
+  DECREASE_B,
   UNKNOWN,
 };
 

@@ -25,10 +25,22 @@ public:
     _data = new T[_size];
     // copy buffer, +1 required to copy entire buffer for some reason
     std::copy(buffer.begin(), buffer.end() + 1, _data);
+  }
 
-    for(unsigned int i = 0; i < _size; i++){
-      assert(buffer.begin()[i] == _data[i]);
+  FlatBuffer<T>& operator=(const FlatBuffer<T>& buffer){
+    if(this != &buffer){
+      if(size() != buffer.size()){
+        delete _data;
+        _data = new T[buffer.size()];
+        _size = buffer.size();
+      }
+
+      std::copy(buffer.begin(), buffer.end() + 1, _data);
+      _width = buffer.width();
+      _height = buffer.height();
     }
+
+    return *this;
   }
 
   ~FlatBuffer(){
@@ -64,7 +76,11 @@ public:
   }
 
   T& operator()(size_t x, size_t y){
-    return _data[to_index(x, y)];
+    return at(x, y);
+  }
+
+  T& at(size_t x, size_t y){
+    return _data[to_index(x,y)];
   }
 
   FlatBuffer<T>& operator+=(const FlatBuffer<T>& rhs){

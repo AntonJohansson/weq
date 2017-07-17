@@ -12,6 +12,10 @@ MeshData solid(int w, int h, float gridsize){
       data.vertices.push_back(y * gridsize); // y
       data.vertices.push_back(0.0f);         // y
 
+      data.normals.push_back(0.0f);
+      data.normals.push_back(0.0f);
+      data.normals.push_back(1.0f);
+
       data.color.push_back(1.0f);
       data.color.push_back(1.0f);
       data.color.push_back(1.0f);

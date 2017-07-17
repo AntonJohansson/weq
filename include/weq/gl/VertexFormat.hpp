@@ -114,7 +114,7 @@ const static VertexFormat V = {{
 }};
 
 const static VertexFormat N = {{
-    {"nomal", FLOAT, 3}
+    {"normal", FLOAT, 3}
 }};
 
 const static VertexFormat C = {{

@@ -5,9 +5,9 @@
 namespace camera{
 
 void translate(glm::vec3 v);
-void forward(float f);
-void right(float f);
-void up(float f);
+void move_forward(float f);
+void move_right(float f);
+void move_up(float f);
 void rotate_deg(float deg, glm::vec3 axis);
 void rotate_rad(float rad, glm::vec3 axis);
 void calculate_perspective();
@@ -25,5 +25,7 @@ void set_dir(glm::vec3 d);
 glm::mat4 view();
 glm::mat4 projection();
 glm::mat4 normal_matrix();
+glm::vec3 up();
+glm::vec3 direction();
 
 };

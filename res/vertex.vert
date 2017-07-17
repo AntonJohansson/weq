@@ -1,7 +1,7 @@
 #version 410
 
 in vec3 position;
-in vec4 normal;
+in vec3 normal;
 in vec4 color;
 
 out vec3 V;
@@ -14,11 +14,12 @@ uniform mat4 projection;
 uniform mat4 normal_matrix;
 
 void main(){
-  //gl_Position = projection * view * model * vec4(position, 1.0);
-  gl_Position = projection * view * vec4(position, 1.0);
+  gl_Position = projection * view * model * vec4(position, 1.0);
 
+  V = vec3(projection*view*model*vec4(position, 1.0));
   //V = vec3(view * vec4(position, 1.0));
-  //N = vec3(normalize(normal_matrix * normal));
+  //N = vec3(normalize(normal_matrix * vec4(normal, 1.0)));
+  N = normal;
 
   Color = color;
   //gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;

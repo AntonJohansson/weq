@@ -1,23 +1,9 @@
-#include <weq/Window.hpp>
 #include <weq/Engine.hpp>
-#include <weq/Node.hpp>
-#include <weq/gl/VertexArray.hpp>
-#include <weq/FlatBuffer.hpp>
-#include <weq/Camera.hpp>
+#include <weq/gl/Shader.hpp>
 #include <weq/component/Renderable.hpp>
 #include <weq/component/Transform.hpp>
 #include <weq/component/Wave.hpp>
 #include <weq/primitive/Plane.hpp>
-#include <weq/Mesh.hpp>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include <cassert>
-#include <deque>
-#include <algorithm>
-#include <cmath>
-#include <iostream>
 
 //    _delta.fill(0);
 //    _height_field.fill(0);
@@ -70,17 +56,16 @@
 int main(){
   weq::engine::initialize();
 
-  float size = 100.0f;
+  float resolution = 150.0f;
+  float size = 5.0f;
 
   auto shader = new gl::Shader("vertex.vert", "fragment.frag");
-  auto mesh_data = primitive::plane::solid(size, size, 5.0f/size);
+  auto mesh_data = primitive::plane::solid(resolution, resolution, size/resolution);
   auto mesh = new Mesh(mesh_data, shader);
 
-  //_model = glm::translate(_model, {-w*gridsize/2.0f, -h*gridsize/2.0f, 0.0f});
-
   auto wave = weq::engine::create_entity();
-  //wave.assign<component::Wave>(size, size, 5.0f/size, 0.2f);
-  wave.assign<component::Transform>();
+  wave.assign<component::Wave>(resolution, resolution, size/resolution, 0.2f);
+  wave.assign<component::Transform>()->translate({-size/2, -size/2, 0});
   wave.assign<component::Renderable>(mesh, shader);
 
   weq::engine::main_loop();
