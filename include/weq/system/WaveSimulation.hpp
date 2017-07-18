@@ -11,7 +11,7 @@ namespace weq::system{
 class WaveSimulation : public ex::System<WaveSimulation>,
                        public ex::Receiver<WaveSimulation>{
 public:
-  void configure(ex::EventManager& events);
+  void configure(ex::EventManager& events) override;
 
   void update(ex::EntityManager& entities,
               ex::EventManager& events,

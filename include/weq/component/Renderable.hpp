@@ -5,11 +5,11 @@
 namespace component{
 
 struct Renderable{
-  Renderable(Mesh* m, gl::Shader* s)
+  Renderable(Mesh* m, std::shared_ptr<gl::ShaderProgram> p)
     : mesh(m),
-      shader(s){}
+      program(p){}
   Mesh* mesh;
-  gl::Shader* shader;
+  std::shared_ptr<gl::ShaderProgram> program;
 };
 
 }

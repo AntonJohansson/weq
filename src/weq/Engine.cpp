@@ -3,6 +3,7 @@
 #include <weq/system/WaveSimulation.hpp>
 #include <weq/system/Renderer.hpp>
 #include <weq/RunningAverage.hpp>
+#include <weq/resource/ResourceManager.hpp>
 
 #include <spdlog/spdlog.h>
 
@@ -14,6 +15,7 @@ namespace{
   ex::EventManager _events;
   ex::EntityManager _entities(_events);
   ex::SystemManager _systems(_entities, _events);
+  ResourceManager _res_mgr;
   auto console = spdlog::stderr_color_mt("console");
 }
 
@@ -55,6 +57,10 @@ void main_loop(){
 
 ex::Entity create_entity(){
   return _entities.create();
+}
+
+ResourceManager* resource_mgr(){
+  return &_res_mgr;
 }
 
 float width(){return (float)640;}

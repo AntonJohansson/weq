@@ -1,43 +1,25 @@
 #pragma once
 
 #include <weq/MeshData.hpp>
-#include <weq/gl/Shader.hpp>
+#include <weq/gl/ShaderProgram.hpp>
 #include <weq/gl/Buffer.hpp>
 #include <weq/gl/VertexArray.hpp>
 #include <cmath>
 
 #include <glm/glm.hpp>
 
-#include <iostream>
 #include <vector>
 
 class Mesh{
 public:
-  Mesh(MeshData data, gl::Shader* shader)
+  Mesh(MeshData data, std::shared_ptr<gl::ShaderProgram> program)
     : _data(data){
-    if(_data.has_vertices() && _data.has_vertices() && _data.has_normals()){
-      for(int i = 0; i < _data.vertices.size(); i+=3){
-        _interleaved_data.push_back(_data.vertices[i + 0]);
-        _interleaved_data.push_back(_data.vertices[i + 1]);
-        _interleaved_data.push_back(_data.vertices[i + 2]);
+    _vbo = {gl::Usage::STREAM, _data.interleaved};
+    _mapped_region = _vbo.map(gl::Access::READ_WRITE);
 
-        _interleaved_data.push_back(_data.normals[i + 0]);
-        _interleaved_data.push_back(_data.normals[i + 1]);
-        _interleaved_data.push_back(_data.normals[i + 2]);
+    _vao = {program, {{_vbo, gl::formats::VNCT}}};
 
-        _interleaved_data.push_back(_data.color[i + 0]);
-        _interleaved_data.push_back(_data.color[i + 1]);
-        _interleaved_data.push_back(_data.color[i + 2]);
-        _interleaved_data.push_back(_data.color[i + 3]);
-      }
-
-      _vbo = {gl::Usage::STREAM, _interleaved_data};
-      _mapped_region = _vbo.map(gl::Access::READ_WRITE);
-
-      _vao = {shader, {{_vbo, gl::formats::VNC}}};
-
-      _ebo = {gl::Usage::STATIC, _data.elements};
-    }
+    _ebo = {gl::Usage::STATIC, _data.elements};
   }
 
   ~Mesh(){
@@ -62,7 +44,6 @@ public:
   size_t indices(){return _ebo.size();}
 
 private:
-  std::vector<float> _interleaved_data;
   MeshData _data;
   gl::VertexArray  _vao;
   gl::VertexBuffer _vbo;

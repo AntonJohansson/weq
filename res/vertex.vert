@@ -3,10 +3,12 @@
 in vec3 position;
 in vec3 normal;
 in vec4 color;
+in vec2 texcoord;
 
 out vec3 V;
 out vec3 N;
 out vec4 Color;
+out vec2 Texcoord;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -22,6 +24,7 @@ void main(){
   N = normal;
 
   Color = color;
+  Texcoord = texcoord;
   //gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
   //gl_FrontColor = gl_Color;
 }

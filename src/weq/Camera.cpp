@@ -18,7 +18,7 @@ namespace{
   glm::mat4 _view;
   glm::mat4 _projection;
   glm::mat4 _normal_matrix;
-  glm::quat _rotation;
+  //glm::quat _rotation;
 }
 
 void translate(glm::vec3 v){

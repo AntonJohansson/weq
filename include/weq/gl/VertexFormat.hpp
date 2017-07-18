@@ -74,7 +74,7 @@ const static VertexFormat VNCT = {{
   {"position", FLOAT, 3},
   {"normal", FLOAT, 3},
   {"color", FLOAT, 4},
-  {"texcoord", FLOAT, 3}
+  {"texcoord", FLOAT, 2}
 }};
 
 const static VertexFormat VNC = {{

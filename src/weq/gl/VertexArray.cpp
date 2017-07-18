@@ -10,9 +10,9 @@ VertexArray::VertexArray()
   glGenVertexArrays(1, &_vao);
 }
 
-VertexArray::VertexArray(gl::Shader* shader,
+VertexArray::VertexArray(std::shared_ptr<ShaderProgram> program,
                          std::vector<BufferFormat> bufferformat)
-  : _shader(shader)
+  : _program(program)
   , _size(0)
 {
   glGenVertexArrays(1, &_vao);
@@ -30,7 +30,7 @@ void VertexArray::bind_attribute(BufferFormat bufferformat){
   buffer.bind();
 
   for(auto& v : format.components){
-    _shader->bind_attribute(v.attribute, v.type, v.size, format.stride, v.offset);
+    _program->bind_attribute(v.attribute, v.type, v.size, format.stride, v.offset);
   }
 
   auto size = buffer.size() / format.vertex_size;

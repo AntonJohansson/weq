@@ -13,7 +13,7 @@ CXXFLAGS += -std=c++1z -Wall -Wextra -g
 
 INCLUDES = -I $(HDR_PATH)
 # Cocoa and IOKit required for OSX
-LIBS = -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -lentityx -lglfw3 -ldl
+LIBS = -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -lentityx -lglfw3 -ldl -lSOIL
 
 SRC_EXT = cpp
 

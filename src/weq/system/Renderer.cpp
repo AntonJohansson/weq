@@ -4,15 +4,18 @@
 #include <weq/component/Transform.hpp>
 #include <weq/Window.hpp>
 #include <weq/event/RegisterInput.hpp>
+
+#include <weq/Engine.hpp> // @TEMP
+#include <weq/Texture.hpp>
+#include <weq/resource/ResourceManager.hpp>
+
 #include <glad/glad.h>
-
-
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <iostream>
 #include <thread>
 
 namespace weq::system{
+std::shared_ptr<Texture> texture;
 
 using component::Renderable;
 using component::Transform;
@@ -25,7 +28,9 @@ Renderer::~Renderer(){
 
 void Renderer::configure(ex::EventManager& events){
   _window = std::make_unique<Window>();
-  glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
+  glEnable(GL_DEPTH_TEST);
+  //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
   events.subscribe<event::ActiveInput>(*this);
 
@@ -34,6 +39,10 @@ void Renderer::configure(ex::EventManager& events){
   camera::set_pos({0, 0, 10});
   camera::set_dir({0, 0, -1});
   camera::calculate_perspective();
+
+  //texture = engine::resource_mgr()->get<Texture>("sample.png");
+  texture = engine::resource_mgr()->get<Texture>("cloudtop_bk.tga");
+  //texture->bind(); //@TEMP
 }
 
 void Renderer::update(ex::EntityManager& entities,
@@ -46,11 +55,11 @@ void Renderer::update(ex::EntityManager& entities,
   entities.each<Renderable, Transform>([dt](ex::Entity e,
                                             Renderable& r,
                                             Transform& t){
-      r.shader->use();
-      r.shader->set("model", t.transform);
-      r.shader->set("view", camera::view());
-      r.shader->set("projection", camera::projection());
-      r.shader->set("normal_matrix", glm::transpose(glm::inverse(camera::view()*t.transform)));
+      r.program->use();
+      r.program->set("model", t.transform);
+      r.program->set("view", camera::view());
+      r.program->set("projection", camera::projection());
+      r.program->set("normal_matrix", glm::transpose(glm::inverse(camera::view()*t.transform)));
 
       r.mesh->vao().bind();
       r.mesh->bind_ebo();

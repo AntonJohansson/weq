@@ -7,6 +7,7 @@ struct MeshData{
   std::vector<float> color;
   std::vector<float> normals;
   std::vector<float> texcoords;
+  std::vector<float> interleaved;
   std::vector<unsigned int> elements;
 
   bool has_vertices() const {return !vertices.empty();}

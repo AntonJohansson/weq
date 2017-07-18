@@ -63,7 +63,6 @@ void WaveSimulation::update(ex::EntityManager& entities,
   static float accumulated_time = 0.0f;
   static float l, r, n, s, f, result;
   static glm::vec3 normal;
-  static float g = 0.0f;
 
   accumulated_time += dt;
 
@@ -76,18 +75,15 @@ void WaveSimulation::update(ex::EntityManager& entities,
 
       for(int i = 0; i <= w.width; i++){
         for(int j = 0; j <= w.height; j++){
-
           // Spatial laplacian
+          // For open boundaries update invisble column according to:
+          // g_new = (c*dt*u + g*h)/(h + c*dt);
+          // where u = column hight of (i,j) and h = gridsize
+
           l = w.height_field(std::max(i-1, 0), j);
-          if(i+1 > w.width){
-            g = (w.c*dt*w.height_field(i,j) + g*w.gridsize)/(w.gridsize + w.c*dt);
-            r = g;
-          }else{
-            r = w.height_field(std::min(i+1, w.width), j);
-          }
+          r = w.height_field(std::min(i+1, w.width), j);
           n = w.height_field(i, std::min(j+1, w.height));
           s = w.height_field(i, std::max(j-1, 0));
-
 
           // Force
           f = w.r * (l + r + n + s
@@ -95,8 +91,11 @@ void WaveSimulation::update(ex::EntityManager& entities,
 
           // Change in height per unit of time
           w.delta(i,j) += f*dt;
+
           // Dampning
-          //w.delta(i,j) *= 0.999f;
+          if(false){
+            w.delta(i,j) *= 0.999f;
+          }
 
           // Normal calculation
           normal = {l - r,
@@ -115,8 +114,8 @@ void WaveSimulation::update(ex::EntityManager& entities,
               renderable.mesh->color_g(w.to_index(i,j)) = 0.0f;
               renderable.mesh->color_b(w.to_index(i,j)) = 0.0f;
 
-              //w.height_field(i,j) = 0.0f;
-              //w.delta(i,j) = 0.0f;
+              w.height_field(i,j) = 0.0f;
+              w.delta(i,j) = 0.0f;
               break;
             }else{
               result = w.height_field(i,j) + w.delta(i,j)*dt;
@@ -124,10 +123,15 @@ void WaveSimulation::update(ex::EntityManager& entities,
               auto color_val_2 = glm::abs(result/0.25f);
               auto color_val_3 = glm::abs(result/0.1f);
 
+              if(result > 0 ){
               renderable.mesh->color_r(w.to_index(i,j)) = color_val_1;
-
               renderable.mesh->color_g(w.to_index(i,j)) = color_val_2;
               renderable.mesh->color_b(w.to_index(i,j)) = color_val_3;
+              }else{
+               renderable.mesh->color_r(w.to_index(i,j)) = color_val_3;
+                renderable.mesh->color_g(w.to_index(i,j)) = color_val_2;
+                renderable.mesh->color_b(w.to_index(i,j)) = color_val_1;
+              }
             }
           }
 

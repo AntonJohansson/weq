@@ -28,6 +28,7 @@ struct Wave{
   float r;
   FlatBuffer<float> delta;
   FlatBuffer<float> height_field;
+  //FlatBuffer<float> edge;
 };
 
 }

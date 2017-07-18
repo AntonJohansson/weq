@@ -1,48 +1,38 @@
 #pragma once
 
+#include <weq/resource/Resource.hpp>
+
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
 #include <string>
-#include <unordered_map>
 
 namespace gl{
 
 enum ShaderType{
   VERTEX = GL_VERTEX_SHADER,
-  FRAGMENT = GL_FRAGMENT_SHADER
+  FRAGMENT = GL_FRAGMENT_SHADER,
+  GEOMETRY = GL_GEOMETRY_SHADER
 };
 
-class Shader{
+class Shader : public Resource{
 public:
-  Shader();
-  Shader(const std::string& v, const std::string& f);
+  Shader(const std::string& id);
   ~Shader();
 
-  void load(const std::string& s, ShaderType type);
-  void link();
+  void load() override;
+  void unload() override;
+  void compile();
 
-  void use();
-
-  void bind_attribute(const std::string& attribute,
-                      unsigned int type,
-                      unsigned int size,
-                      unsigned int stride,
-                      unsigned int offset);
-
-  void set(const std::string& name, glm::mat4 mat);
-  void set(const std::string& name, glm::vec3 vec);
-  void set(const std::string& name, glm::vec4 vec);
-  void set(const std::string& name, float f);
+  unsigned int id(){return _shader;}
+  const ShaderType& type(){return _type;}
 
 private:
-  void delete_shader(GLuint shader);
-  void delete_program();
+  void delete_shader();
   std::string read_from_file(const std::string& file);
 
-  static constexpr auto _resource_path = "/Users/antonjohansson/git/WaveEquationFDM/res/";
-  std::unordered_map<unsigned int, GLuint> _shaders;
-  GLuint _program;
+  ShaderType _type;
+  unsigned int _shader;
 };
 
 };
