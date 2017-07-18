@@ -49,7 +49,7 @@ void main_loop(){
       _systems.update_all(timestep_value);
       auto time = std::chrono::duration_cast<std::chrono::duration<double>>(Clock::now() - before).count();
       update_time.add(time);
-      console->info(update_time.average());
+      //console->info(update_time.average());
     }
     update_time.clear();
   }

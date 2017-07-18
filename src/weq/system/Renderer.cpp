@@ -30,7 +30,6 @@ void Renderer::configure(ex::EventManager& events){
   _window = std::make_unique<Window>();
 
   glEnable(GL_DEPTH_TEST);
-  //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
   events.subscribe<event::ActiveInput>(*this);
 
@@ -41,7 +40,7 @@ void Renderer::configure(ex::EventManager& events){
   camera::calculate_perspective();
 
   //texture = engine::resource_mgr()->get<Texture>("sample.png");
-  texture = engine::resource_mgr()->get<Texture>("cloudtop_bk.tga");
+  //texture = engine::resource_mgr()->get<Texture>("cloudtop_bk.tga");
   //texture->bind(); //@TEMP
 }
 
@@ -106,6 +105,10 @@ void Renderer::receive(const event::ActiveInput &event){
     camera::move_up(speed);
   }if(event.has(InputState::MOVE_DOWN)){
     camera::move_up(-speed);
+  }if(event.has(InputAction::RENDER_WIREFRAME)){
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  }if(event.has(InputAction::RENDER_SOLID)){
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   }
 }
 

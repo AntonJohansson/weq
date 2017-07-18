@@ -7,12 +7,10 @@
 Texture::Texture(const std::string& id)
   : Resource(id){
   glGenTextures(1, &_texture);
-  FreeImage_Initialise(); //@TODO MOVE
 }
 
 Texture::~Texture(){
   glDeleteTextures(1, &_texture);
-  FreeImage_DeInitialise(); //@TODO MOVE
 }
 
 void Texture::load(){
@@ -35,10 +33,13 @@ void Texture::load(){
 
   if(FreeImage_FIFSupportsReading(fif)){
     data = FreeImage_Load(fif, path.c_str());
-  }
 
-  if(!data){
-    spdlog::get("console")->error("FreeImage does not support this extension: {}", path);
+    if(!data){
+      spdlog::get("console")->error("Failed to read data for {}!", path);
+      return;
+    }
+  }else{
+    spdlog::get("console")->error("FreeImage does not support this extension: {}!", path);
     return;
   }
 

@@ -8,8 +8,18 @@
 #include <list>
 #include <string>
 
+#include <FreeImage.h>
+
 class ResourceManager{
 public:
+  ResourceManager(){
+    FreeImage_Initialise();
+  }
+
+  ~ResourceManager(){
+    FreeImage_DeInitialise();
+  }
+
   template<typename T, typename... Args>
   std::shared_ptr<T> get(std::string id, Args&&... args){
     static_assert(std::is_base_of<Resource, T>::value, "T should inherit from resource");
