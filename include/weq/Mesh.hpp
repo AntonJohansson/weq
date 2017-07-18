@@ -26,16 +26,16 @@ public:
     _vbo.unmap();
   }
 
-  float& vertex_x(int index){return _mapped_region[10*index + 0];}
-  float& vertex_y(int index){return _mapped_region[10*index + 1];}
-  float& vertex_z(int index){return _mapped_region[10*index + 2];}
-  float& normal_x(int index){return _mapped_region[10*index + 3];}
-  float& normal_y(int index){return _mapped_region[10*index + 4];}
-  float& normal_z(int index){return _mapped_region[10*index + 5];}
-  float& color_r(int index){return  _mapped_region[10*index + 6];}
-  float& color_g(int index){return  _mapped_region[10*index + 7];}
-  float& color_b(int index){return  _mapped_region[10*index + 8];}
-  float& color_a(int index){return  _mapped_region[10*index + 9];}
+  float& vertex_x(int index){return _mapped_region[12*index + 0];}
+  float& vertex_y(int index){return _mapped_region[12*index + 1];}
+  float& vertex_z(int index){return _mapped_region[12*index + 2];}
+  float& normal_x(int index){return _mapped_region[12*index + 3];}
+  float& normal_y(int index){return _mapped_region[12*index + 4];}
+  float& normal_z(int index){return _mapped_region[12*index + 5];}
+  float& color_r(int index){return  _mapped_region[12*index + 6];}
+  float& color_g(int index){return  _mapped_region[12*index + 7];}
+  float& color_b(int index){return  _mapped_region[12*index + 8];}
+  float& color_a(int index){return  _mapped_region[12*index + 9];}
 
   const gl::VertexArray& vao() const {return _vao;}
 

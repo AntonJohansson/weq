@@ -17,5 +17,5 @@ void main(){
   //frag_color = vec4(N, 1.0);
   //frag_color = vec4(red, green, blue, 1.0);
   //frag_color = Color;
-  frag_color = texture(tex, Texcoord);
+  frag_color = texture(tex, Texcoord) * Color;
 }

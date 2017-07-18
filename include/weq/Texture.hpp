@@ -13,8 +13,7 @@ public:
   void bind();
 
 private:
-  int _width;
-  int _height;
-  unsigned char* _data;
+  unsigned int _width;
+  unsigned int _height;
   unsigned int _texture;
 };
