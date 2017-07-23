@@ -13,8 +13,6 @@ void rotate_rad(float rad, glm::vec3 axis);
 void calculate_perspective();
 void update();
 
-glm::vec4 unproject(glm::mat4 model, glm::vec4 v); // should maybe be moved somewhere
-
 void set_fov(float fov);
 void set_aspect(float aspect);
 void set_speed(float speed);

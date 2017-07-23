@@ -46,9 +46,6 @@ void rotate_rad(float rad, glm::vec3 axis){
   _direction = glm::rotate(_direction, rad * _speed, axis);
 }
 
-void calculate_perspective(){
-  _projection = glm::perspective(glm::radians(_fov), _aspect, 1.0f, 100.0f);
-}
 
 void update(){
   // camera movement
@@ -98,27 +95,6 @@ void update(){
   //_view = glm::lookAt(_position, target, _up);
   _view = glm::lookAt(_position, _position + _direction, _up);
   //_normal_matrix = glm::transpose(glm::inverse(_view)); // should be view*model
-}
-
-glm::vec4 unproject(glm::mat4 model, glm::vec4 v){
-  // normalize coordinates
-  v.x = v.x/weq::engine::width()*2.0f - 1.0f;
-  v.y = (weq::engine::height() - v.y)/weq::engine::height()*2.0f - 1.0f;
-  v.z = v.z*2.0f - 1.0f;
-  v.w = 1.0f;
-
-  auto inv_mvp = glm::inverse(projection()*view()*model);
-
-  auto transformed_v = inv_mvp * v;
-  if(transformed_v.w == 0.0f){
-    return transformed_v;
-  }
-
-  transformed_v.w = 1.0f/transformed_v.w;
-  transformed_v.x = transformed_v.x*v.w;
-  transformed_v.y = transformed_v.y*v.w;
-  transformed_v.z = transformed_v.z*v.w;
-  return transformed_v;
 }
 
 void set_fov(float fov){_fov = fov;}

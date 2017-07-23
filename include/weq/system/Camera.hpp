@@ -3,23 +3,19 @@
 #include <entityx/entityx.h>
 
 namespace ex = entityx;
-
-struct GLFWwindow;
+namespace event{struct WindowUpdate;}
 
 namespace weq::system{
 
-class Input : public ex::System<Input>{
+class Camera : public ex::System<Camera>,
+               public ex::Receiver<Camera>{
 public:
-  Input(){}
-  ~Input(){}
-
-  void configure(ex::EventManager& events) override;
-
   void update(ex::EntityManager& entities,
               ex::EventManager& events,
               ex::TimeDelta dt) override;
+
+  void receive(const event::WindowUpdate& event);
 private:
-  GLFWwindow* _window_context;
 };
 
 }

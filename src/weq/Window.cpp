@@ -1,23 +1,25 @@
 #include <weq/Window.hpp>
+#include <weq/event/Window.hpp>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-#include <iostream>
+#include <entityx/entityx.h>
+#include <spdlog/spdlog.h>
 
 namespace{
   int _window_count = 0;
 
   void error_callback(int error, const char* desc){
-    std::cerr << desc << std::endl;
+    (void)error;
+    spdlog::get("console")->error("GLFW error {}", desc);
   }
 
   void window_initialize(){
     if(_window_count == 0){
-      auto str = glfwGetVersionString();
-      std::cout << "Running GLFW: " << str << std::endl;
+      spdlog::get("console")->info("Running GLFW {}", glfwGetVersionString());
 
       if(!glfwInit()){
-        std::cerr << "GLFW failed to init\n";
+        spdlog::get("console")->error("Failed to initialize GLFW!");
       }
 
       glfwSetErrorCallback(error_callback);
@@ -35,12 +37,13 @@ namespace{
   }
 }
 
-Window::Window(Mode mode)
-  : _mode(mode),
+Window::Window(entityx::EventManager& events, Mode mode)
+  : _events(events),
+    _mode(mode),
     _x(0),
     _y(0),
-    _w(640),
-    _h(480),
+    _width(1280),
+    _height(720),
     _refresh_rate(60){
   window_initialize();
 
@@ -50,20 +53,23 @@ Window::Window(Mode mode)
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-  _window = glfwCreateWindow(640, 480, "WEQ", nullptr, nullptr);
+  _window = glfwCreateWindow(_width, _height, "WEQ", nullptr, nullptr);
 
   if(!_window){
-    std::cerr << "GLFW window creation failed\n";
+    spdlog::get("console")->error("GLFW: Failed to create window!");
     window_terminate();
   }
 
   make_current();
 
   if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)){
-    std::cerr << "Failed to initialize OpenGL context" << std::endl;
+    spdlog::get("console")->error("GLAD: Failed to initialize OpenGL context");
   }
 
-  std::cout << "Using OpenGL " << GLVersion.major << "." << GLVersion.minor << std::endl;
+  spdlog::get("console")->info("Using OpenGL {}.{}", GLVersion.major, GLVersion.minor);
+
+  float aspect_ratio = static_cast<float>(_width)/static_cast<float>(_height);
+  _events.emit(event::WindowUpdate(_width, _height, _refresh_rate, aspect_ratio));
 }
 
 Window::~Window(){
@@ -98,9 +104,9 @@ void Window::poll_events(){
 // Set stuff
 
 void Window::set_size(int w, int h){
-  _w = w;
-  _h = h;
-  glfwSetWindowSize(_window, _w, _h);
+  _width = w;
+  _height = h;
+  glfwSetWindowSize(_window, _width, _height);
 }
 
 void Window::set_mode(Mode mode){
@@ -110,10 +116,10 @@ void Window::set_mode(Mode mode){
 
   switch(mode){
   case Mode::WINDOWED:
-    glfwSetWindowMonitor(_window, nullptr, 0, 0, _w, _h, 0);
+    glfwSetWindowMonitor(_window, nullptr, 0, 0, _width, _height, 0);
     break;
   case Mode::FULLSCREEN:
-    glfwSetWindowMonitor(_window, primary_monitor, 0, 0, _w, _h, _refresh_rate);
+    glfwSetWindowMonitor(_window, primary_monitor, 0, 0, _width, _height, _refresh_rate);
     break;
   case Mode::WINDOWED_FULLSCREEN:
     glfwSetWindowMonitor(_window, primary_monitor, 0, 0, vid_mode->width, vid_mode->height, vid_mode->refreshRate);

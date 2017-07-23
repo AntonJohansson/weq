@@ -3,6 +3,9 @@
 #include <weq/Window.hpp>
 #include <weq/system/InputRaw.hpp>
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw_gl3.h>
+
 #include <GLFW/glfw3.h>
 
 #include <string>
@@ -19,6 +22,8 @@ namespace{
     (void)mods;
     (void)action;
     _ial->register_key(key, action, mods);
+    // Connect to ImGui
+    ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mods);
   }
 
   static void mouse_callback(GLFWwindow* window, double x, double y){
@@ -28,9 +33,22 @@ namespace{
     _ial->register_mouse(x, y, 640, 480); //@TODO this shouldn't be hardcoded
   }
 
+  static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods){
+    _ial->register_key(button, action, mods);
+    // Connect to ImGui
+    ImGui_ImplGlfwGL3_MouseButtonCallback(window, button, action, mods);
+  }
+
+  static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
+    // Connect to ImGui
+    ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
+  }
+
   static void character_callback(GLFWwindow* window, unsigned int codepoint){
     (void)window;
     (void)codepoint;
+    // Connect to ImGui
+    ImGui_ImplGlfwGL3_CharCallback(window, codepoint);
   }
 
   static void charmods_callback(GLFWwindow* window, unsigned int codepoint, int mods){
@@ -51,10 +69,15 @@ void Input::configure(ex::EventManager& events){
   // callback?
   glfwSetKeyCallback(_window_context, key_callback);
   glfwSetCursorPosCallback(_window_context, mouse_callback);
+  glfwSetMouseButtonCallback(_window_context, mouse_button_callback);
+  glfwSetScrollCallback(_window_context, scroll_callback);
   glfwSetCharCallback(_window_context, character_callback);
-  glfwSetCharModsCallback(_window_context, charmods_callback);
+  //glfwSetCharModsCallback(_window_context, charmods_callback);
 
   glfwSetInputMode(_window_context, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+  // Setup ImGui binding
+  ImGui_ImplGlfwGL3_Init(_window_context, false);
 
   _ial = new InputAbstractionLayer({
       {

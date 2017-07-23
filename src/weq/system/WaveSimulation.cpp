@@ -18,6 +18,11 @@
 using component::Renderable;
 using component::Wave;
 
+//@TODO SLIM DOWN SIMULATION AND ENGINE DESIGN,
+//      I have a single entity, this is not requried!
+//@TODO Gaussian distribution for water droplets?
+//@TODO Split this file into smaller files
+
 namespace{
   int d = 0;
   int b = 2;

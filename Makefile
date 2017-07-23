@@ -22,9 +22,10 @@ SRC_EXT = cpp
 # Useful for debugging and adding features
 print-%: ; @echo $*=$($*)
 
-SRCS = $(shell find $(SRC_PATH) -name '*.$(SRC_EXT)')
-OBJS = $(SRCS:$(SRC_PATH)/%.$(SRC_EXT)=$(BUILD_PATH)/%.o)
-DEPS = $(OBJS:.o=.d)
+# Header path included to find external projects that requrire .cpp and .hpp in the same dir.
+SRCS =  $(shell find $(SRC_PATH) -name '*.$(SRC_EXT)')
+OBJS =  $(SRCS:$(SRC_PATH)/%.$(SRC_EXT)=$(BUILD_PATH)/%.o)
+DEPS =  $(OBJS:.o=.d)
 
 # Create directories
 .PHONY: dirs

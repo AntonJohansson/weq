@@ -1,7 +1,9 @@
 #pragma once
 
-class GLFWwindow;
-class GLFWmonitor;
+struct GLFWwindow;
+struct GLFWmonitor;
+
+namespace entityx{class EventManager;}
 
 enum class Mode{
   WINDOWED,
@@ -11,7 +13,7 @@ enum class Mode{
 
 class Window{
 public:
-  Window(Mode mode = Mode::WINDOWED);
+  Window(entityx::EventManager& events, Mode mode = Mode::WINDOWED);
   ~Window();
 
   void make_current();
@@ -25,11 +27,11 @@ public:
 
   bool should_close();
   static GLFWwindow* current();
-  int width(){return _w;}
-  int height(){return _h;}
-  int x_pos(){return _x;}
-  int y_pos(){return _y;}
-  int refresh_rate(){return _refresh_rate;}
+  unsigned int width(){return _width;}
+  unsigned int height(){return _height;}
+  unsigned int x_pos(){return _x;}
+  unsigned int y_pos(){return _y;}
+  unsigned int refresh_rate(){return _refresh_rate;}
 
 private:
   /* Returns the current monitor for this window,
@@ -40,11 +42,12 @@ private:
      0 = primary monitor */
   GLFWmonitor* monitor(int index);
 
+  entityx::EventManager& _events;
   Mode _mode;
-  int _x;
-  int _y;
-  int _w;
-  int _h;
-  int _refresh_rate;
+  unsigned int _x;
+  unsigned int _y;
+  unsigned int _width;
+  unsigned int _height;
+  unsigned int _refresh_rate;
   GLFWwindow* _window;
 };
