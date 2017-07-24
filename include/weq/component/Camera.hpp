@@ -9,24 +9,25 @@ enum class LookMode{
 
 namespace component{
 
+struct ActiveCamera{};
 
 struct Camera{
   Camera(LookMode look_mode = LookMode::DIRECTION,
          float near = 1.0f,
          float far = 100.0f,
          float fov = 45.0f,
-         glm::vec3 position = {0, 0 ,0},
-         glm::vec3 direction = {1, 0, 0},
+         glm::vec3 position = {0, 0 , 10},
+         glm::vec3 direction = {0, 0, -1},
          glm::vec3 target = {0, 0, 0})
     : look_mode(look_mode),
       near(near),
       far(far),
       fov(fov),
-      aspect_ratio(1.0f),
+      aspect_ratio(1280.0f/800.0f),
       position(position),
       direction(direction),
       target(target),
-      up({0, 0, 0}),
+      up({0, 1, 0}),
       update_projection(true){
   }
 

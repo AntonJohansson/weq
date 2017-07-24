@@ -3,6 +3,7 @@
 #include <weq/component/Renderable.hpp>
 #include <weq/component/Transform.hpp>
 #include <weq/component/ImGui.hpp>
+#include <weq/component/Camera.hpp>
 #include <weq/Window.hpp>
 #include <weq/event/RegisterInput.hpp>
 
@@ -57,18 +58,21 @@ void Renderer::update(ex::EntityManager& entities,
                       ex::TimeDelta dt){
   (void)events;
 
-  camera::update();
+  //camera::update();
 
   _window->clear(0.0f, 0.0f, 0.0f, 1.0f);
 
-  entities.each<Renderable, Transform>([dt](ex::Entity e,
-                                            Renderable& r,
-                                            Transform& t){
+  component::Camera active_camera;
+  entities.each<component::Camera, component::ActiveCamera>([&active_camera](ex::Entity e, component::Camera& c, component::ActiveCamera& a){active_camera = c;});
+
+  entities.each<Renderable, Transform>([dt, &active_camera](ex::Entity e,
+                                                            Renderable& r,
+                                                            Transform& t){
       r.program->use();
       r.program->set("model", t.transform);
-      r.program->set("view", camera::view());
-      r.program->set("projection", camera::projection());
-      r.program->set("normal_matrix", glm::transpose(glm::inverse(camera::view()*t.transform)));
+      r.program->set("view", active_camera.view);
+      r.program->set("projection", active_camera.projection);
+      r.program->set("normal_matrix", active_camera.normal_matrix);
 
       r.mesh->vao().bind();
       r.mesh->bind_ebo();
@@ -102,44 +106,8 @@ void Renderer::render_ui(ex::EntityManager& entities,
 void Renderer::receive(const event::ActiveInput &event){
   float speed = 0.05f;
   if(event.has(InputRange::CURSOR_X) && event.has(InputRange::CURSOR_Y)){
-    static float last_x = 0.0f;
-    static float last_y = 0.0f;
-
-    const float& x = event.ranges.at(InputRange::CURSOR_X);
-    const float& y = event.ranges.at(InputRange::CURSOR_Y);
-
-    auto dx = x - last_x;
-    auto dy = y - last_y;
-
-    auto up = camera::up();
-    auto dir = camera::direction();
-    auto right = glm::cross(dir, up);
-    auto local_up = glm::cross(right, dir);
-
-    camera::rotate_deg(10.0f*dx, local_up);
-    camera::rotate_deg(10.0f*dy, right);
-
-    last_x = x;
-    last_y = y;
   }
 
-  if(event.has(InputState::MOVE_LEFT)){
-    camera::move_right(-speed);
-  }if(event.has(InputState::MOVE_RIGHT)){
-    camera::move_right(speed);
-  }if(event.has(InputState::MOVE_FORWARD)){
-    camera::move_forward(speed);
-  }if(event.has(InputState::MOVE_BACK)){
-    camera::move_forward(-speed);
-  }if(event.has(InputState::MOVE_UP)){
-    camera::move_up(speed);
-  }if(event.has(InputState::MOVE_DOWN)){
-    camera::move_up(-speed);
-  }if(event.has(InputAction::RENDER_WIREFRAME)){
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  }if(event.has(InputAction::RENDER_SOLID)){
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  }
 }
 
 }

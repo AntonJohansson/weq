@@ -4,12 +4,14 @@
 #include <weq/component/Transform.hpp>
 #include <weq/component/ImGui.hpp>
 #include <weq/component/Wave.hpp>
+#include <weq/component/Camera.hpp>
 #include <weq/primitive/Plane.hpp>
 #include <weq/event/Internal.hpp>
 
 #include <weq/Application.hpp>
 #include <weq/system/Input.hpp>
 #include <weq/system/WaveSimulation.hpp>
+#include <weq/system/Camera.hpp>
 #include <weq/system/Renderer.hpp>
 
 class Simulation : public weq::Application{
@@ -18,13 +20,22 @@ public:
     : Application(){
     _systems.add<weq::system::Input>();
     _systems.add<weq::system::WaveSimulation>();
+    _systems.add<weq::system::Camera>();
     _systems.add<weq::system::Renderer>();
     _systems.configure();
   }
 
   void configure() override{
+    add_camera();
     add_wave();
     add_ui();
+  }
+
+  void add_camera(){
+    auto c = _entities.create();
+    c.assign<component::Camera>(LookMode::DIRECTION);
+    c.assign<component::Transform>();
+    c.assign<component::ActiveCamera>();
   }
 
   void add_wave(){
