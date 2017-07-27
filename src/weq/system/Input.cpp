@@ -116,6 +116,7 @@ void Input::configure(ex::EventManager& events){
 void Input::update(ex::EntityManager& entities,
             ex::EventManager& events,
             ex::TimeDelta dt){
+  glfwPollEvents();
   events.emit(_ial->get_active());
   _ial->clear();
 }

@@ -82,7 +82,7 @@ void Renderer::update(ex::EntityManager& entities,
   //render_ui(entities, events, dt);
 
   _window->swap_buffers();
-  Window::poll_events(); //TODO should you pull at the end of, or begining of frame?
+  //Window::poll_events(); //TODO should you pull at the end of, or begining of frame?
 }
 
 void Renderer::render_ui(ex::EntityManager& entities,

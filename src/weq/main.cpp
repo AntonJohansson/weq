@@ -16,13 +16,17 @@
 
 /* TODO
    I should implement sub-systems (for mt)*/
+/* TODO
+   Reimplement GLFW->IMGUI bindings so they're implemented more nicely*/
 
 class Simulation : public weq::Application{
 public:
   Simulation()
     : Application(){
     _systems.add<weq::system::Input>();
+
     _systems.add<weq::system::WaveSimulation>();
+
     _systems.add<weq::system::Camera>();
     _systems.add<weq::system::Renderer>();
     _systems.configure();
