@@ -11,6 +11,12 @@
 
 namespace weq::system{
 
+Camera::Camera(){
+}
+
+Camera::~Camera(){
+}
+
 void Camera::configure(ex::EventManager& events){
   events.subscribe<event::WindowUpdate>(*this);
   events.subscribe<event::ActiveInput>(*this);
@@ -25,16 +31,13 @@ void Camera::update(ex::EntityManager& entities,
                                          component::Transform& t){
     if(c.look_mode == LookMode::TARGET){
       update_target(c);
-      c.position = t.transform * glm::vec4(c.position, 1.0f);
-      c.direction = t.transform * glm::vec4(c.direction, 0.0f);
       c.view = glm::lookAt(c.position, c.target, c.up);
     }else if(c.look_mode == LookMode::DIRECTION){
       update_direction(c, t);
-      c.position = t.transform * glm::vec4(c.position, 1.0f);
-      c.direction = t.transform * glm::vec4(c.direction, 0.0f);
-      c.view = glm::lookAt(c.position, c.position + c.direction, c.up);
+      c.view = glm::lookAt(t._translate, t._translate + t._direction, c.up);
     }
 
+    //TODO Move this? model needs to be built before render anc camera pass
     //c.normal_matrix = glm::transpose(glm::inverse(c.view*t.transform));
 
     if(c.update_projection){
@@ -53,11 +56,17 @@ void Camera::update_direction(component::Camera& camera, component::Transform& t
   auto right    = glm::cross(camera.direction, camera.up);
   auto local_up = glm::cross(right, camera.direction);
 
-  t.transform = glm::rotate(t.transform, 10.0f*_dx, local_up);
-  t.transform = glm::rotate(t.transform, 10.0f*_dy, right);
+  t.rotate({glm::radians(_delta_cursor.y), glm::radians(_delta_cursor.x), 0});
 
-  t.transform = glm::translate(t.transform, _translate);
-  _translate = {0,0,0};
+  //t.transform = glm::rotate(t.transform, glm::radians(10.0f*_dx), local_up);
+  //t.transform = glm::rotate(t.transform, glm::radians(10.0f*_dy), right);
+  //t.transform = glm::translate(t.transform, _translate);
+
+  t._translate += (right*_movement_amount.x +
+                   local_up*_movement_amount.y +
+                   t._direction*_movement_amount.z);
+  _delta_cursor = {0,0};
+  _movement_amount = {0,0,0};
 }
 
 void Camera::receive(const event::WindowUpdate& event){
@@ -65,33 +74,24 @@ void Camera::receive(const event::WindowUpdate& event){
 }
 
 void Camera::receive(const event::ActiveInput& event){
-  if(event.has(InputRange::CURSOR_X) && event.has(InputRange::CURSOR_Y)){
-    static float last_x = 0.0f;
-    static float last_y = 0.0f;
-
-    const float& x = event.ranges.at(InputRange::CURSOR_X);
-    const float& y = event.ranges.at(InputRange::CURSOR_Y);
-
-    _dx = x - last_x;
-    _dy = y - last_y;
-
-    last_x = x;
-    last_y = y;
+  if(event.has(InputRange::CURSOR_DX) && event.has(InputRange::CURSOR_DY)){
+    _delta_cursor.x = 10.0f*event.ranges.at(InputRange::CURSOR_DX);
+    _delta_cursor.y = 10.0f*event.ranges.at(InputRange::CURSOR_DY);
   }
 
   float speed = 0.05f;
   if(event.has(InputState::MOVE_LEFT)){
-    _translate.x = -speed;
+    _movement_amount.x = -speed;
   }if(event.has(InputState::MOVE_RIGHT)){
-    _translate.x = +speed;
+    _movement_amount.x = +speed;
   }if(event.has(InputState::MOVE_FORWARD)){
-    _translate.z = +speed;
+    _movement_amount.z = +speed;
   }if(event.has(InputState::MOVE_BACK)){
-    _translate.z = -speed;
+    _movement_amount.z = -speed;
   }if(event.has(InputState::MOVE_UP)){
-    _translate.y = +speed;
+    _movement_amount.y = +speed;
   }if(event.has(InputState::MOVE_DOWN)){
-    _translate.y = -speed;
+    _movement_amount.y = -speed;
   }
 }
 

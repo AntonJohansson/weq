@@ -14,6 +14,9 @@
 #include <weq/system/Camera.hpp>
 #include <weq/system/Renderer.hpp>
 
+/* TODO
+   I should implement sub-systems (for mt)*/
+
 class Simulation : public weq::Application{
 public:
   Simulation()
@@ -35,6 +38,8 @@ public:
     auto c = _entities.create();
     c.assign<component::Camera>(LookMode::DIRECTION);
     c.assign<component::Transform>();
+    //TODO something's fishy
+    //c.component<component::Transform>()->_translate = c.component<component::Camera>()->position;
     c.assign<component::ActiveCamera>();
   }
 
@@ -51,7 +56,7 @@ public:
 
     auto wave = _entities.create();
     wave.assign<component::Wave>(resolution, resolution, size/resolution, 0.5f);
-    wave.assign<component::Transform>()->translate({-size/2, -size/2, 0});
+    wave.assign<component::Transform>()->_translate = {-size/2, -size/2, 0};
     wave.assign<component::Renderable>(mesh, p);
   }
 

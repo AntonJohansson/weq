@@ -34,5 +34,7 @@ enum class InputState{
 enum class InputRange{
   CURSOR_X,
   CURSOR_Y,
+  CURSOR_DX,
+  CURSOR_DY,
   UNKNOWN,
 };

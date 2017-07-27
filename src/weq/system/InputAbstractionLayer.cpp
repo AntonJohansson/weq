@@ -27,14 +27,23 @@ void InputAbstractionLayer::register_mouse(double x,
                                            unsigned int x_range,
                                            unsigned int y_range){
   if(_context.is_range(raw::Axes::MOUSE_X)){
-    double normalized_x = x/x_range;
-    _active_input.ranges[_context.range(raw::Axes::MOUSE_X)] = -normalized_x;
+    static double last_x = 0.0;
+    double normalized_x  = -x/x_range; // also flips axis
+    double normalized_dx = normalized_x - last_x;
+    last_x = normalized_x;
+
+    _active_input.ranges[_context.range(raw::Axes::MOUSE_X)]  = normalized_x;
+    _active_input.ranges[InputRange::CURSOR_DX] = normalized_dx;
   }
 
   if(_context.is_range(raw::Axes::MOUSE_Y)){
-    double normalized_y = y/y_range;
-    // OpenGL uses -y compared to the windows y
-    _active_input.ranges[_context.range(raw::Axes::MOUSE_Y)] = -normalized_y;
+    static double last_y = 0.0;
+    double normalized_y = -y/y_range; // also flips axis
+    double normalized_dy = normalized_y - last_y;
+    last_y = normalized_y;
+
+    _active_input.ranges[_context.range(raw::Axes::MOUSE_Y)]  = normalized_y;
+    _active_input.ranges[InputRange::CURSOR_DY] = normalized_dy;
   }
 }
 

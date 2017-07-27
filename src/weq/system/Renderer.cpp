@@ -7,7 +7,7 @@
 #include <weq/Window.hpp>
 #include <weq/event/RegisterInput.hpp>
 
-#include <weq/Engine.hpp> // @TEMP
+#include <weq/Engine.hpp> // TODO TEMP
 #include <weq/Texture.hpp>
 #include <weq/resource/ResourceManager.hpp>
 
@@ -69,7 +69,7 @@ void Renderer::update(ex::EntityManager& entities,
                                                             Renderable& r,
                                                             Transform& t){
       r.program->use();
-      r.program->set("model", t.transform);
+      r.program->set("model", t.model());
       r.program->set("view", active_camera.view);
       r.program->set("projection", active_camera.projection);
       r.program->set("normal_matrix", active_camera.normal_matrix);
@@ -79,8 +79,10 @@ void Renderer::update(ex::EntityManager& entities,
       glDrawElements(GL_TRIANGLES, r.mesh->indices(), GL_UNSIGNED_INT, 0);
     });
 
+  //render_ui(entities, events, dt);
+
   _window->swap_buffers();
-  Window::poll_events();
+  Window::poll_events(); //TODO should you pull at the end of, or begining of frame?
 }
 
 void Renderer::render_ui(ex::EntityManager& entities,

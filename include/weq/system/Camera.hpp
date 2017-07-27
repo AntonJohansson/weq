@@ -20,6 +20,9 @@ namespace weq::system{
 class Camera : public ex::System<Camera>,
                public ex::Receiver<Camera>{
 public:
+  Camera();
+  ~Camera();
+
   void configure(ex::EventManager& events) override;
   void update(ex::EntityManager& entities,
               ex::EventManager& events,
@@ -30,9 +33,10 @@ public:
 
   void receive(const event::WindowUpdate& event);
   void receive(const event::ActiveInput& event);
+
 private:
-  float _dx;
-  float _dy;
+  glm::vec2 _delta_cursor;
+  glm::vec3 _movement_amount;
   float _aspect_ratio;
   glm::vec3 _translate = {0,0,0};
 };
