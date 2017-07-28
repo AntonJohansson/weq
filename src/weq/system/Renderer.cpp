@@ -79,7 +79,7 @@ void Renderer::update(ex::EntityManager& entities,
       glDrawElements(GL_TRIANGLES, r.mesh->indices(), GL_UNSIGNED_INT, 0);
     });
 
-  render_ui(entities, events, dt);
+  //render_ui(entities, events, dt);
 
   _window->swap_buffers();
 }

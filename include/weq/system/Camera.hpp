@@ -28,7 +28,7 @@ public:
               ex::EventManager& events,
               ex::TimeDelta dt) override;
 
-  void update_target(component::Camera& camera);
+  void update_target(component::Camera& camera, component::Transform& t);
   void update_direction(component::Camera& camera, component::Transform& t);
 
   void receive(const event::WindowUpdate& event);

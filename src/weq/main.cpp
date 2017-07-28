@@ -40,7 +40,7 @@ public:
 
   void add_camera(){
     auto c = _entities.create();
-    c.assign<component::Camera>(LookMode::DIRECTION);
+    c.assign<component::Camera>(LookMode::TARGET);
     c.assign<component::Transform>();
     //TODO something's fishy
     //c.component<component::Transform>()->_translate = c.component<component::Camera>()->position;

@@ -30,8 +30,8 @@ void Camera::update(ex::EntityManager& entities,
                                          component::Camera& c,
                                          component::Transform& t){
     if(c.look_mode == LookMode::TARGET){
-      update_target(c);
-      c.view = glm::lookAt(c.position, c.target, c.up);
+      update_target(c, t);
+      c.view = glm::lookAt(t._translate, c.target, c.up);
     }else if(c.look_mode == LookMode::DIRECTION){
       update_direction(c, t);
       c.view = glm::lookAt(t._translate, t._translate + t._direction, c.up);
@@ -49,7 +49,22 @@ void Camera::update(ex::EntityManager& entities,
   entities.each<component::Camera, component::Transform>(update_perspective);
 }
 
-void Camera::update_target(component::Camera& camera){
+void Camera::update_target(component::Camera& camera, component::Transform& t){
+  static float r = 10.0f, theta = 0.0f, phi = 0.0f;
+  r     += _movement_amount.z;
+  phi   += _delta_cursor.x;
+  theta += _delta_cursor.y;
+
+  // clamp minimum sphere radius
+  if(r < 0.01f) r = 0.01f;
+
+  t._translate = camera.target;
+  t._translate.x += r*glm::sin(theta)*glm::cos(phi);
+  t._translate.y += r*glm::sin(theta)*glm::sin(phi);
+  t._translate.z += r*glm::cos(theta);
+
+  _delta_cursor = {0,0};
+  _movement_amount = {0,0,0};
 }
 
 void Camera::update_direction(component::Camera& camera, component::Transform& t){
@@ -78,18 +93,18 @@ void Camera::receive(const event::ActiveInput& event){
   if(event.has(InputState::CURSOR_DOWN)){
     // Update mouse delta position
     if(event.has(InputRange::CURSOR_DX) && event.has(InputRange::CURSOR_DY)){
-      _delta_cursor.x = 10.0f*event.ranges.at(InputRange::CURSOR_DX);
-      _delta_cursor.y = 10.0f*event.ranges.at(InputRange::CURSOR_DY);
+      _delta_cursor.x = event.ranges.at(InputRange::CURSOR_DX);
+      _delta_cursor.y = event.ranges.at(InputRange::CURSOR_DY);
     }
   }
 
   // Update camera distance with scroll
   if(event.has(InputRange::CURSOR_SCROLL_X) && event.has(InputRange::CURSOR_SCROLL_Y)){
-    double x = event.ranges.at(InputRange::CURSOR_SCROLL_X);
-    double y = event.ranges.at(InputRange::CURSOR_SCROLL_Y);
-    _movement_amount.z = y;
+    //double x = event.ranges.at(InputRange::CURSOR_SCROLL_X);
+    _movement_amount.z = -0.5*event.ranges.at(InputRange::CURSOR_SCROLL_Y);
   }
 
+  /*
   // Update camera movement vector
   float speed = 0.05f;
   if(event.has(InputState::MOVE_LEFT)){
@@ -105,6 +120,7 @@ void Camera::receive(const event::ActiveInput& event){
   }if(event.has(InputState::MOVE_DOWN)){
     _movement_amount.y = -speed;
   }
+  */
 }
 
 }

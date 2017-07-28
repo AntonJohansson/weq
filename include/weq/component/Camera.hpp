@@ -27,7 +27,7 @@ struct Camera{
       position(position),
       direction(direction),
       target(target),
-      up({0, 1, 0}),
+      up({0, 0, 1}),
       update_projection(true){
   }
 
