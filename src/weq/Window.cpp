@@ -6,6 +6,10 @@
 #include <entityx/entityx.h>
 #include <spdlog/spdlog.h>
 
+/*
+ *    Handle window-independent stuff such as GL-context (TODO move?) and GLFW-init.
+ */
+
 namespace{
   int _window_count = 0;
 
@@ -37,7 +41,11 @@ namespace{
   }
 }
 
-Window::Window(entityx::EventManager& events, Mode mode)
+/*
+ *    Window Impl.
+ */
+
+Window::Window(entityx::EventManager& events, WindowMode mode)
   : _events(events),
     _mode(mode),
     _x(0),
@@ -75,7 +83,7 @@ Window::Window(entityx::EventManager& events, Mode mode)
 Window::~Window(){
   glfwDestroyWindow(_window);
   glfwTerminate();
-  //window_terminate();
+  window_terminate();
 }
 
 // Do stuff
@@ -109,21 +117,39 @@ void Window::set_size(int w, int h){
   glfwSetWindowSize(_window, _width, _height);
 }
 
-void Window::set_mode(Mode mode){
+void Window::set_mode(WindowMode mode){
   _mode = mode;
   auto primary_monitor = monitor(0);
   auto vid_mode = glfwGetVideoMode(primary_monitor);
 
   switch(mode){
-  case Mode::WINDOWED:
+  case WindowMode::WINDOWED:
     glfwSetWindowMonitor(_window, nullptr, 0, 0, _width, _height, 0);
     break;
-  case Mode::FULLSCREEN:
+  case WindowMode::FULLSCREEN:
     glfwSetWindowMonitor(_window, primary_monitor, 0, 0, _width, _height, _refresh_rate);
     break;
-  case Mode::WINDOWED_FULLSCREEN:
+  case WindowMode::WINDOWED_FULLSCREEN:
     glfwSetWindowMonitor(_window, primary_monitor, 0, 0, vid_mode->width, vid_mode->height, vid_mode->refreshRate);
     break;
+  default:
+    // TODO print actual window enum (convert to string?)
+    spdlog::get("console")->error("Unrecognized window mode {}");
+    break;
+  }
+}
+
+void Window::set_cursor_mode(CursorMode mode){
+  switch(mode){
+  case CursorMode::NORMAL:
+    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    break;
+  case CursorMode::DISABLED:
+    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    break;
+  default:
+    // TODO print actual window enum (convert to string?)
+    spdlog::get("console")->error("Unrecognized window mode");
   }
 }
 
@@ -148,4 +174,3 @@ GLFWmonitor* Window::monitor(int index){
 
   return (index < count && index >= 0) ? monitors[index] : nullptr;
 }
-

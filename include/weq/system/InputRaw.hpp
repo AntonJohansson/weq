@@ -150,6 +150,8 @@ enum Mouse: int{
 enum Axes: int{
   MOUSE_X = 10,
   MOUSE_Y = 11,
+  MOUSE_SCROLL_X = 12,
+  MOUSE_SCROLL_Y = 13,
 };
 
 };

@@ -28,6 +28,7 @@ enum class InputState{
   MOVE_DOWN,
   MOVE_LEFT,
   MOVE_RIGHT,
+  CURSOR_DOWN,
   UNKNOWN,
 };
 
@@ -36,5 +37,7 @@ enum class InputRange{
   CURSOR_Y,
   CURSOR_DX,
   CURSOR_DY,
+  CURSOR_SCROLL_X,
+  CURSOR_SCROLL_Y,
   UNKNOWN,
 };

@@ -42,6 +42,7 @@ namespace{
   static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
     // Connect to ImGui
     ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
+    _ial->register_scroll(xoffset, yoffset);
   }
 
   static void character_callback(GLFWwindow* window, unsigned int codepoint){
@@ -74,8 +75,6 @@ void Input::configure(ex::EventManager& events){
   glfwSetCharCallback(_window_context, character_callback);
   //glfwSetCharModsCallback(_window_context, charmods_callback);
 
-  glfwSetInputMode(_window_context, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
   // Setup ImGui binding
   ImGui_ImplGlfwGL3_Init(_window_context, false);
 
@@ -104,11 +103,14 @@ void Input::configure(ex::EventManager& events){
         {raw::Key::S, InputState::MOVE_BACK},
         {raw::Key::D, InputState::MOVE_RIGHT},
         {raw::Key::LEFT_SHIFT, InputState::MOVE_UP},
-        {raw::Key::LEFT_CONTROL, InputState::MOVE_DOWN}
+        {raw::Key::LEFT_CONTROL, InputState::MOVE_DOWN},
+        {raw::Mouse::BUTTON_LEFT, InputState::CURSOR_DOWN},
       },
       {
         {raw::Axes::MOUSE_X, InputRange::CURSOR_X},
-        {raw::Axes::MOUSE_Y, InputRange::CURSOR_Y}
+        {raw::Axes::MOUSE_Y, InputRange::CURSOR_Y},
+        {raw::Axes::MOUSE_SCROLL_X, InputRange::CURSOR_SCROLL_X},
+        {raw::Axes::MOUSE_SCROLL_Y, InputRange::CURSOR_SCROLL_Y},
       }
     });
 }

@@ -79,10 +79,9 @@ void Renderer::update(ex::EntityManager& entities,
       glDrawElements(GL_TRIANGLES, r.mesh->indices(), GL_UNSIGNED_INT, 0);
     });
 
-  //render_ui(entities, events, dt);
+  render_ui(entities, events, dt);
 
   _window->swap_buffers();
-  //Window::poll_events(); //TODO should you pull at the end of, or begining of frame?
 }
 
 void Renderer::render_ui(ex::EntityManager& entities,
@@ -106,10 +105,12 @@ void Renderer::render_ui(ex::EntityManager& entities,
 }
 
 void Renderer::receive(const event::ActiveInput &event){
-  float speed = 0.05f;
-  if(event.has(InputRange::CURSOR_X) && event.has(InputRange::CURSOR_Y)){
+  if(event.has(InputState::CURSOR_DOWN)){
+    _window->set_cursor_mode(CursorMode::DISABLED);
+  }else{
+    // TODO should probably sent out a "state-changed" event
+    _window->set_cursor_mode(CursorMode::NORMAL);
   }
-
 }
 
 }

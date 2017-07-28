@@ -1,19 +1,36 @@
 #pragma once
 
+/*
+ * Forward declarations
+ */
+
 struct GLFWwindow;
 struct GLFWmonitor;
 
 namespace entityx{class EventManager;}
 
-enum class Mode{
+/*
+ * Window modes
+ */
+
+enum class WindowMode{
   WINDOWED,
   FULLSCREEN,
   WINDOWED_FULLSCREEN
 };
 
-class Window{
+enum class CursorMode{
+  NORMAL,
+  DISABLED,
+};
+
+/*
+ * Window decl.
+ */
+
+class Window {
 public:
-  Window(entityx::EventManager& events, Mode mode = Mode::WINDOWED);
+  Window(entityx::EventManager& events, WindowMode mode = WindowMode::WINDOWED);
   ~Window();
 
   void make_current();
@@ -23,7 +40,8 @@ public:
   static void poll_events();
 
   void set_size(int w, int h);
-  void set_mode(Mode mode);
+  void set_mode(WindowMode mode);
+  void set_cursor_mode(CursorMode mode);
 
   bool should_close();
   static GLFWwindow* current();
@@ -43,7 +61,7 @@ private:
   GLFWmonitor* monitor(int index);
 
   entityx::EventManager& _events;
-  Mode _mode;
+  WindowMode _mode;
   unsigned int _x;
   unsigned int _y;
   unsigned int _width;

@@ -17,6 +17,7 @@ public:
 
   void register_key(int key, int action, int mods);
   void register_mouse(double x, double y, unsigned int x_range, unsigned int y_range);
+  void register_scroll(double xoffset, double yoffset);
 
   void receive(const event::RegisterInput& event);
   void receive(const event::ChangeInputContext& event);

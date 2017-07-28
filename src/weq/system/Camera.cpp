@@ -74,11 +74,23 @@ void Camera::receive(const event::WindowUpdate& event){
 }
 
 void Camera::receive(const event::ActiveInput& event){
-  if(event.has(InputRange::CURSOR_DX) && event.has(InputRange::CURSOR_DY)){
-    _delta_cursor.x = 10.0f*event.ranges.at(InputRange::CURSOR_DX);
-    _delta_cursor.y = 10.0f*event.ranges.at(InputRange::CURSOR_DY);
+  // Only update mouse camera direction when mouse is down
+  if(event.has(InputState::CURSOR_DOWN)){
+    // Update mouse delta position
+    if(event.has(InputRange::CURSOR_DX) && event.has(InputRange::CURSOR_DY)){
+      _delta_cursor.x = 10.0f*event.ranges.at(InputRange::CURSOR_DX);
+      _delta_cursor.y = 10.0f*event.ranges.at(InputRange::CURSOR_DY);
+    }
   }
 
+  // Update camera distance with scroll
+  if(event.has(InputRange::CURSOR_SCROLL_X) && event.has(InputRange::CURSOR_SCROLL_Y)){
+    double x = event.ranges.at(InputRange::CURSOR_SCROLL_X);
+    double y = event.ranges.at(InputRange::CURSOR_SCROLL_Y);
+    _movement_amount.z = y;
+  }
+
+  // Update camera movement vector
   float speed = 0.05f;
   if(event.has(InputState::MOVE_LEFT)){
     _movement_amount.x = -speed;
