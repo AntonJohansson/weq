@@ -82,27 +82,25 @@ public:
     auto ui = _entities.create();
     ui.assign<component::ImGui>([](ex::EventManager& e){
         ImGui::Begin("Menu");
-        ImGui::SetWindowCollapsed("Menu", true, ImGuiSetCond_FirstUseEver);
-        ImGui::SetWindowPos("Menu", ImVec2(0,0), ImGuiSetCond_Appearing);
+        ImGui::SetWindowCollapsed("Menu", false, ImGuiSetCond_FirstUseEver);
+        ImGui::SetWindowPos("Menu", ImVec2(10,10), ImGuiSetCond_Appearing);
+        ImGui::SetWindowSize("Menu", ImVec2(200,500), ImGuiSetCond_Appearing);
 
-        static float f = 0.0f;
-        static bool show_debug = false;
-        ImGui::Text("Hello, world!");
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-        if(ImGui::Button("Debug"))show_debug ^= 1;
+        if(ImGui::CollapsingHeader("simulation")){
+        }
+
+        if(ImGui::CollapsingHeader("settings")){
+        }
+
+        if(ImGui::CollapsingHeader("debug")){
+          ImGui::Text("Avg. frametime %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        }
 
         if(ImGui::Button("Exit")){
           e.emit(event::Quit());
         }
 
         ImGui::End();
-
-        if(show_debug){
-          ImGui::SetNextWindowPos(ImVec2(200,0), ImGuiSetCond_Appearing);
-          ImGui::Begin("Debug Window", &show_debug);
-          ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-          ImGui::End();
-        }
       });
   }
 

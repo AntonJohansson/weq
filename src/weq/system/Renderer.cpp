@@ -70,7 +70,7 @@ void Renderer::update(ex::EntityManager& entities,
       glDrawElements(GL_TRIANGLES, r.mesh->indices(), GL_UNSIGNED_INT, 0);
     });
 
-  //render_ui(entities, events, dt);
+  render_ui(entities, events, dt);
 
   _window->swap_buffers();
 
@@ -88,6 +88,10 @@ void Renderer::render_ui(ex::EntityManager& entities,
   ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, ImVec4(20/255.f, 20/255.f, 20/255.f, 1.0f));
   ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(40/255.f, 40/255.f, 40/255.f, 1.0f));
   ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(135/255.f, 135/255.f, 135/255.f, 1.0f));
+  ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(20/255.f, 20/255.f, 20/255.f, 1.0f));
+  ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(40/255.f, 40/255.f, 40/255.f, 1.0f));
+  ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(135/255.f, 135/255.f, 135/255.f, 1.0f));
+
   ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 
   entities.each<component::ImGui>([dt, &events](ex::Entity e, component::ImGui& i){
@@ -95,7 +99,7 @@ void Renderer::render_ui(ex::EntityManager& entities,
     });
 
   ImGui::PopStyleVar();
-  ImGui::PopStyleColor(3);
+  ImGui::PopStyleColor(6);
 
   ImGui::Render();
 }
