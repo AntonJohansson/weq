@@ -48,7 +48,7 @@ void InputAbstractionLayer::register_mouse(double x,
 }
 
 void InputAbstractionLayer::register_scroll(double xoffset, double yoffset){
-  // TODO scroll input is not normalized
+  // TODO scroll input is not normalized (undefined range)
   if(_context.is_range(raw::Axes::MOUSE_SCROLL_X)){
     _active_input.ranges[_context.range(raw::Axes::MOUSE_SCROLL_X)] = xoffset;
   }

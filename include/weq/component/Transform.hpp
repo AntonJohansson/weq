@@ -31,7 +31,6 @@ struct Transform{
   glm::vec3 _direction;
   glm::vec3 _translate;
   glm::quat _rotation;
-  //glm::mat4 _transform;
 };
 
 }

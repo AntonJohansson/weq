@@ -33,9 +33,23 @@ public:
   }
 
   void configure() override{
+    configure_states();
     add_camera();
     add_wave();
     add_ui();
+  }
+
+  void configure_states(){
+    //  _state_manager.add({"default", {
+    //          {},
+    //          {},
+    //          {}
+    //        }});
+    //  _state_manager.add({"simulation", {
+    //        {},
+    //        {},
+    //        {}
+    //      }});
   }
 
   void add_camera(){
@@ -51,9 +65,9 @@ public:
     float resolution = 150.0f;
     float size = 5.0f;
 
-    auto v = _resources.get<gl::Shader>("vertex.vert");
-    auto f = _resources.get<gl::Shader>("fragment.frag");
-    auto p = _resources.get<gl::ShaderProgram>("default.prog", v, f);
+    auto v = _resource_manager.get<gl::Shader>("vertex.vert");
+    auto f = _resource_manager.get<gl::Shader>("fragment.frag");
+    auto p = _resource_manager.get<gl::ShaderProgram>("default.prog", v, f);
 
     auto mesh_data = primitive::plane::solid(resolution, resolution, size/resolution);
     auto mesh = new Mesh(mesh_data, p);

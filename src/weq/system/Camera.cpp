@@ -9,6 +9,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+/* TODO (bug)
+   something weird happens when the camera is looking along the "up" vector,
+   that results in a black image (empty view-matrix)
+*/
+
+
 namespace weq::system{
 
 Camera::Camera(){
@@ -50,7 +56,7 @@ void Camera::update(ex::EntityManager& entities,
 }
 
 void Camera::update_target(component::Camera& camera, component::Transform& t){
-  static float r = 10.0f, theta = 0.0f, phi = 0.0f;
+  static float r = 10.0f, theta = 45.0f, phi = 45.0f;
   r     += _movement_amount.z;
   phi   += _delta_cursor.x;
   theta += _delta_cursor.y;
@@ -68,8 +74,8 @@ void Camera::update_target(component::Camera& camera, component::Transform& t){
 }
 
 void Camera::update_direction(component::Camera& camera, component::Transform& t){
-  auto right    = glm::cross(camera.direction, camera.up);
-  auto local_up = glm::cross(right, camera.direction);
+  auto right    = glm::cross(t._direction, camera.up);
+  auto local_up = glm::cross(right, t._direction);
 
   t.rotate({glm::radians(_delta_cursor.y), glm::radians(_delta_cursor.x), 0});
 

@@ -6,7 +6,6 @@
 #include <spdlog/spdlog.h>
 
 #include <glad/glad.h> //@TODO required?
-#include <weq/Camera.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <algorithm>

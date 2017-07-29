@@ -1,5 +1,4 @@
 #include <weq/system/Renderer.hpp>
-#include <weq/Camera.hpp>
 #include <weq/component/Renderable.hpp>
 #include <weq/component/Transform.hpp>
 #include <weq/component/ImGui.hpp>
@@ -7,7 +6,6 @@
 #include <weq/Window.hpp>
 #include <weq/event/RegisterInput.hpp>
 
-#include <weq/Engine.hpp> // TODO TEMP
 #include <weq/Texture.hpp>
 #include <weq/resource/ResourceManager.hpp>
 
@@ -15,6 +13,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
+#include <spdlog/spdlog.h>
 
 #include <thread>
 
@@ -42,12 +41,6 @@ void Renderer::configure(ex::EventManager& events){
 
   events.subscribe<event::ActiveInput>(*this);
 
-  //camera::set_aspect(640.0/480.0f);
-  //camera::set_fov(45.0f);
-  //camera::set_pos({0, 0, 10});
-  //camera::set_dir({0, 0, -1});
-  //camera::calculate_perspective();
-
   //texture = engine::resource_mgr()->get<Texture>("sample.png");
   //texture = engine::resource_mgr()->get<Texture>("cloudtop_bk.tga");
   //texture->bind(); //TODO TEMP
@@ -57,8 +50,6 @@ void Renderer::update(ex::EntityManager& entities,
                       ex::EventManager& events,
                       ex::TimeDelta dt){
   (void)events;
-
-  //camera::update();
 
   _window->clear(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -82,6 +73,11 @@ void Renderer::update(ex::EntityManager& entities,
   //render_ui(entities, events, dt);
 
   _window->swap_buffers();
+
+  // Check for OpenGL errors (TODO should be able to disable this)
+  if(GLuint err = glGetError(); err != GL_NO_ERROR){
+    spdlog::get("console")->error("GL-error: {}", err);
+  }
 }
 
 void Renderer::render_ui(ex::EntityManager& entities,

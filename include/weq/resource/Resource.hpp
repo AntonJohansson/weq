@@ -6,8 +6,7 @@ class Resource{
 public:
   Resource(const std::string& id)
     : _id(id),
-      _is_loaded(false),
-      _is_managed(false){}
+      _is_loaded(false){}
 
   virtual ~Resource(){}
   virtual void load() = 0;
@@ -20,5 +19,5 @@ protected:
   bool _is_loaded;
 
 private:
-  bool _is_managed;
+  //bool _is_managed;
 };

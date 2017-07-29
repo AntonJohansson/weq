@@ -1,6 +1,7 @@
 #pragma once
 
 #include <weq/resource/ResourceManager.hpp>
+#include <weq/state/StateManager.hpp>
 
 #include <entityx/entityx.h>
 #include <spdlog/spdlog.h>
@@ -31,7 +32,10 @@ protected:
   EventManager _events;
   EntityManager _entities{_events};
   SystemManager _systems{_entities, _events};
-  ResourceManager _resources;
+
+  ResourceManager _resource_manager;
+  StateManager _state_manager;
+
   std::shared_ptr<spdlog::logger> _console;
 };
 
