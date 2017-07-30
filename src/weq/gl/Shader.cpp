@@ -6,18 +6,20 @@
 
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
 
 namespace gl{
 
-Shader::Shader(const std::string& id)
-  : Resource(id){
-  if(auto p = _id.find_last_of(".") ; p != std::string::npos){
-    auto str = _id.substr(p);
-    if     (str == ".vert"){_type = ShaderType::VERTEX;}
-    else if(str == ".frag"){_type = ShaderType::FRAGMENT;}
-    else if(str == ".geom"){_type = ShaderType::GEOMETRY;}
-    else{spdlog::get("console")->error("Could not determine shader type for {} with extension {}!", _id, str);}
-  }
+Shader::Shader(const std::string& id, const std::string& filename)
+  : Resource(id),
+    _filename(filename){
+  _type = type_from_filename(_filename);
+}
+
+Shader::Shader(const std::string& id, ShaderType type, const std::string& source)
+  : Resource(id),
+    _shader_source(source),
+    _type(type){
 }
 
 Shader::~Shader(){
@@ -28,11 +30,14 @@ void Shader::load(){
   if(_is_loaded){
   }
 
-  auto source = read_from_file(_resource_path + _id);
+  if(_shader_source.empty()){
+    // Load from file
+    _shader_source = read_from_file(_resource_path + _filename);
+  }
 
   _shader = glCreateShader(_type);
-  const auto* source_data = source.c_str(); // glShaderSource needs a pointer to a pointer for some reason
-  glShaderSource(_shader, 1, &source_data, NULL);
+  const char* source = _shader_source.c_str();
+  glShaderSource(_shader, 1, &source, NULL);
 
   compile();
 }
@@ -59,6 +64,24 @@ void Shader::compile(){
   }
 }
 
+/*
+ * Private functions
+ */
+
+ShaderType Shader::type_from_filename(const std::string& filename) const {
+  if(auto p = filename.find_last_of(".") ; p != std::string::npos){
+    auto str = filename.substr(p);
+    if     (str == ".vert"){return ShaderType::VERTEX;}
+    else if(str == ".frag"){return ShaderType::FRAGMENT;}
+    else if(str == ".geom"){return ShaderType::GEOMETRY;}
+    else{
+      spdlog::get("console")->error("Could not determine shader type for {} with extension {}!", _id, str);
+    }
+  }
+
+  // TODO How should I handle this? Only expections? Optionals?
+  throw std::runtime_error("Could not determine shader type!");
+}
 
 void Shader::delete_shader(){
   glDeleteShader(_shader);

@@ -76,6 +76,8 @@ Window::Window(entityx::EventManager& events, WindowMode mode)
 
   spdlog::get("console")->info("Using OpenGL {}.{}", GLVersion.major, GLVersion.minor);
 
+  glfwSwapInterval(0); // Disable vsync
+
   float aspect_ratio = static_cast<float>(_width)/static_cast<float>(_height);
   _events.emit(event::WindowUpdate(_width, _height, _refresh_rate, aspect_ratio));
 }

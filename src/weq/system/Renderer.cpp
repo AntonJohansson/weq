@@ -51,18 +51,23 @@ void Renderer::update(ex::EntityManager& entities,
                       ex::TimeDelta dt){
   (void)events;
 
+  static glm::mat4 mvp;
+
   _window->clear(0.0f, 0.0f, 0.0f, 1.0f);
 
   component::Camera active_camera;
   entities.each<component::Camera, component::ActiveCamera>([&active_camera](ex::Entity e, component::Camera& c, component::ActiveCamera& a){active_camera = c;});
 
+  // caluclate vp-matrix
+  active_camera.viewproj = active_camera.projection * active_camera.view;
+
   entities.each<Renderable, Transform>([dt, &active_camera](ex::Entity e,
                                                             Renderable& r,
                                                             Transform& t){
+      // calculate mvp for each model
+      mvp = active_camera.viewproj * t.model();
       r.program->use();
-      r.program->set("model", t.model());
-      r.program->set("view", active_camera.view);
-      r.program->set("projection", active_camera.projection);
+      r.program->set("mvp", mvp);
       r.program->set("normal_matrix", active_camera.normal_matrix);
 
       r.mesh->vao().bind();

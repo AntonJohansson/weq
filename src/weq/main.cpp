@@ -8,6 +8,8 @@
 #include <weq/primitive/Plane.hpp>
 #include <weq/event/Internal.hpp>
 
+#include <weq/EmbeddedData.hpp>
+
 #include <weq/Application.hpp>
 #include <weq/system/Input.hpp>
 #include <weq/system/WaveSimulation.hpp>
@@ -65,19 +67,24 @@ public:
     float resolution = 150.0f;
     float size = 5.0f;
 
-    auto v = _resource_manager.get<gl::Shader>("vertex.vert");
-    auto f = _resource_manager.get<gl::Shader>("fragment.frag");
+    auto v = _resource_manager.get<gl::Shader>("vertex.vert", "vertex.vert");
+    auto f = _resource_manager.get<gl::Shader>("fragment.frag", "fragment.frag");
     auto p = _resource_manager.get<gl::ShaderProgram>("default.prog", v, f);
 
     auto mesh_data = primitive::plane::solid(resolution, resolution, size/resolution);
+
+    //MeshData mesh_data;
+    //mesh_data.interleaved = {0,0,0,    1,0,0,1};
+
     auto mesh = new Mesh(mesh_data, p);
 
     auto wave = _entities.create();
-    wave.assign<component::Wave>(resolution, resolution, size/resolution, 0.5f);
+    //wave.assign<component::Wave>(resolution, resolution, size/resolution, 0.5f);
     wave.assign<component::Transform>()->_translate = {-size/2, -size/2, 0};
     wave.assign<component::Renderable>(mesh, p);
   }
 
+  //TODO improve UI
   void add_ui(){
     auto ui = _entities.create();
     ui.assign<component::ImGui>([](ex::EventManager& e){

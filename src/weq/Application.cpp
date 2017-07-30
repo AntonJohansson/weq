@@ -20,7 +20,8 @@ Application::Application(){
 void Application::main_loop(){
   using Clock = std::chrono::high_resolution_clock;
 
-  constexpr nanoseconds timestep(16ms);
+  //constexpr nanoseconds timestep(16ms);
+  constexpr nanoseconds timestep(1ms);
   constexpr double timestep_value = duration_cast<duration<double>>(timestep).count();
 
   nanoseconds lag{0ns};
@@ -46,6 +47,7 @@ void Application::main_loop(){
 }
 
 void Application::receive(const event::Quit& q){
+  (void)q;
   _should_quit = true;
 }
 
