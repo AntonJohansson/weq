@@ -38,9 +38,8 @@ public:
   void configure() override{
     configure_states();
     add_camera();
-    //add_wave();
+    add_wave();
     add_ui();
-    test_geom();
   }
 
   void configure_states(){
@@ -63,28 +62,6 @@ public:
     //TODO something's fishy
     //c.component<component::Transform>()->_translate = c.component<component::Camera>()->position;
     c.assign<component::ActiveCamera>();
-  }
-
-  void test_geom(){
-    float resolution = 1000.0f;
-    float size = 5.0f;
-
-    auto v = _resource_manager.get<gl::Shader>("wave_v", "wave.vert");
-    auto f = _resource_manager.get<gl::Shader>("wave_f", "wave.frag");
-    auto p = _resource_manager.get<gl::ShaderProgram>("wave.prog", v, f);
-
-    p->set("gridsize", size/resolution);
-
-    auto mesh_data = primitive::plane::solid(resolution,
-                                              resolution,
-                                              size/resolution,
-                                              gl::format::VC);
-
-    auto mesh = new Mesh(mesh_data, p, gl::DrawMode::TRIANGLES);
-
-    auto geom = _entities.create();
-    geom.assign<component::Transform>()->_translate = {-size/2.0f, -size/2.0f, 1.0f};
-    geom.assign<component::Renderable>(mesh, p);
   }
 
   void add_wave(){
