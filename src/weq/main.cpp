@@ -19,7 +19,8 @@
 /* TODO
    I should implement sub-systems (for mt)*/
 /* TODO
-   Reimplement GLFW->IMGUI bindings so they're implemented more nicely*/
+ * Reimplement GLFW->IMGUI bindings so they're implemented more nicely
+ */
 
 class Simulation : public weq::Application{
 public:
@@ -37,8 +38,9 @@ public:
   void configure() override{
     configure_states();
     add_camera();
-    add_wave();
+    //add_wave();
     add_ui();
+    test_geom();
   }
 
   void configure_states(){
@@ -63,20 +65,42 @@ public:
     c.assign<component::ActiveCamera>();
   }
 
-  void add_wave(){
-    float resolution = 150.0f;
+  void test_geom(){
+    float resolution = 1000.0f;
     float size = 5.0f;
 
-    auto v = _resource_manager.get<gl::Shader>("vertex.vert", "vertex.vert");
-    auto f = _resource_manager.get<gl::Shader>("fragment.frag", "fragment.frag");
-    auto p = _resource_manager.get<gl::ShaderProgram>("default.prog", v, f);
+    auto v = _resource_manager.get<gl::Shader>("wave_v", "wave.vert");
+    auto f = _resource_manager.get<gl::Shader>("wave_f", "wave.frag");
+    auto p = _resource_manager.get<gl::ShaderProgram>("wave.prog", v, f);
 
-    auto mesh_data = primitive::plane::solid(resolution, resolution, size/resolution);
+    p->set("gridsize", size/resolution);
 
-    //MeshData mesh_data;
-    //mesh_data.interleaved = {0,0,0,    1,0,0,1};
+    auto mesh_data = primitive::plane::solid(resolution,
+                                              resolution,
+                                              size/resolution,
+                                              gl::format::VC);
 
-    auto mesh = new Mesh(mesh_data, p);
+    auto mesh = new Mesh(mesh_data, p, gl::DrawMode::TRIANGLES);
+
+    auto geom = _entities.create();
+    geom.assign<component::Transform>()->_translate = {-size/2.0f, -size/2.0f, 1.0f};
+    geom.assign<component::Renderable>(mesh, p);
+  }
+
+  void add_wave(){
+    float resolution = 1000.0f;
+    float size = 5.0f;
+
+    auto v = _resource_manager.get<gl::Shader>("vertex", "vertex.vert");
+    auto f = _resource_manager.get<gl::Shader>("fragment", "fragment.frag");
+    auto p = _resource_manager.get<gl::ShaderProgram>("wave.prog", v, f);
+
+    auto mesh_data = primitive::plane::solid(resolution,
+                                             resolution,
+                                             size/resolution,
+                                             gl::format::VNCT);
+
+    auto mesh = new Mesh(mesh_data, p, gl::DrawMode::TRIANGLES);
 
     auto wave = _entities.create();
     //wave.assign<component::Wave>(resolution, resolution, size/resolution, 0.5f);

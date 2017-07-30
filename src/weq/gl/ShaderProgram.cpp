@@ -13,10 +13,12 @@ ShaderProgram::ShaderProgram(const std::string& id)
 
 ShaderProgram::ShaderProgram(const std::string& id,
                              std::shared_ptr<gl::Shader> v,
-                             std::shared_ptr<gl::Shader> f)
+                             std::shared_ptr<gl::Shader> f,
+                             std::shared_ptr<gl::Shader> g)
   : Resource(id){
-  _shaders[v->type()] = v;
-  _shaders[f->type()] = f;
+  if(v)_shaders[v->type()] = v;
+  if(f)_shaders[f->type()] = f;
+  if(g)_shaders[g->type()] = g;
 }
 
 ShaderProgram::~ShaderProgram(){

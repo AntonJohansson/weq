@@ -15,8 +15,9 @@ class ShaderProgram : public Resource{
 public:
   ShaderProgram(const std::string& id);
   ShaderProgram(const std::string& id,
-                std::shared_ptr<gl::Shader> v,
-                std::shared_ptr<gl::Shader> f);
+                std::shared_ptr<gl::Shader> v = nullptr,
+                std::shared_ptr<gl::Shader> f = nullptr,
+                std::shared_ptr<gl::Shader> g = nullptr);
   ~ShaderProgram();
 
   void link();

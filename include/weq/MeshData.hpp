@@ -1,8 +1,15 @@
 #pragma once
 
 #include <vector>
+#include <weq/gl/VertexFormat.hpp>
 
 struct MeshData{
+  MeshData(gl::VertexFormat format)
+    : format(format){
+  }
+
+  gl::VertexFormat format;
+
   std::vector<float> vertices;
   std::vector<float> color;
   std::vector<float> normals;

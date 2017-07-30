@@ -72,7 +72,7 @@ void Renderer::update(ex::EntityManager& entities,
 
       r.mesh->vao().bind();
       r.mesh->bind_ebo();
-      glDrawElements(GL_TRIANGLES, r.mesh->indices(), GL_UNSIGNED_INT, 0);
+      glDrawElements(r.mesh->draw_mode(), r.mesh->indices(), GL_UNSIGNED_INT, 0);
     });
 
   render_ui(entities, events, dt);
@@ -116,6 +116,13 @@ void Renderer::receive(const event::ActiveInput &event){
     // TODO should probably sent out a "state-changed" event
     _window->set_cursor_mode(CursorMode::NORMAL);
   }
+
+  if(event.has(InputAction::RENDER_WIREFRAME)){
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+  }else if(event.has(InputAction::RENDER_SOLID)){
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+  }
+
 }
 
 }

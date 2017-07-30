@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
 
 namespace gl{
 
@@ -59,6 +60,16 @@ struct VertexFormat{
     }
   }
 
+  bool has(const std::string& attrib){
+    auto it = std::find_if(components.begin(),
+                 components.end(),
+                 [&attrib](const VertexComponent& component){
+        return component.attribute == attrib;
+      });
+
+    return it != components.end();
+  }
+
   size_t size(){return components.size();}
   VertexComponent& operator[](size_t index){return components[index];}
   const VertexComponent& operator[](size_t index) const {return components[index];}
@@ -68,7 +79,11 @@ struct VertexFormat{
   unsigned int vertex_size;
 };
 
-namespace formats{
+/*
+ * Predefined vertex formats
+ */
+
+namespace format{
 
 const static VertexFormat VNCT = {{
   {"position", FLOAT, 3},

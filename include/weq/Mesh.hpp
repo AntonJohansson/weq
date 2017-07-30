@@ -4,20 +4,23 @@
 #include <weq/gl/ShaderProgram.hpp>
 #include <weq/gl/Buffer.hpp>
 #include <weq/gl/VertexArray.hpp>
-#include <cmath>
+#include <weq/gl/DrawModes.hpp>
 
 #include <glm/glm.hpp>
 
+#include <cmath>
 #include <vector>
 
 class Mesh{
 public:
-  Mesh(MeshData data, std::shared_ptr<gl::ShaderProgram> program)
-    : _data(data){
+  Mesh(MeshData data, std::shared_ptr<gl::ShaderProgram> program, gl::DrawMode mode)
+    : _data(data),
+      _draw_mode(mode){
+
     _vbo = {gl::Usage::STREAM, _data.interleaved};
     _mapped_region = _vbo.map(gl::Access::READ_WRITE);
 
-    _vao = {program, {{_vbo, gl::formats::VNCT}}};
+    _vao = {program, {{_vbo, _data.format}}};
 
     _ebo = {gl::Usage::STATIC, _data.elements};
   }
@@ -42,9 +45,11 @@ public:
 
   void bind_ebo(){_ebo.bind();}
   size_t indices(){return _ebo.size();}
+  unsigned int draw_mode(){return GLuint(_draw_mode);}
 
 private:
   MeshData _data;
+  gl::DrawMode _draw_mode;
   gl::VertexArray  _vao;
   gl::VertexBuffer _vbo;
   gl::ElementBuffer _ebo;
