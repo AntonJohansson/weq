@@ -52,9 +52,6 @@ void ShaderProgram::load(){
   }
 
   glBindFragDataLocation(_program, 0, "frag_color");
-
-  link();
-  use();
 }
 
 void ShaderProgram::unload(){
@@ -77,6 +74,10 @@ void ShaderProgram::bind_attribute(const std::string& attribute,
   auto attrib_location = glGetAttribLocation(_program, attribute.c_str());
   glVertexAttribPointer(attrib_location, size, type, GL_FALSE, stride, (void*)offset);
   glEnableVertexAttribArray(attrib_location);
+}
+
+void ShaderProgram::set_feedback(std::vector<const char*> varyings){
+  glTransformFeedbackVaryings(_program, varyings.size(), varyings.data(), GL_INTERLEAVED_ATTRIBS);
 }
 
 void ShaderProgram::set(const std::string& name, glm::mat4 mat){

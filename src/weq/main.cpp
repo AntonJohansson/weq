@@ -71,6 +71,8 @@ public:
     auto v = _resource_manager.get<gl::Shader>("vertex", "vertex.vert");
     auto f = _resource_manager.get<gl::Shader>("fragment", "fragment.frag");
     auto p = _resource_manager.get<gl::ShaderProgram>("wave.prog", v, f);
+    p->set_feedback({"height_field", "delta"});
+    p->link();
 
     auto mesh_data = primitive::plane::solid(resolution,
                                              resolution,

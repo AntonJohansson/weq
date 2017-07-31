@@ -6,6 +6,7 @@
 
 #include <unordered_map>
 #include <memory>
+#include <vector>
 
 namespace gl{
 
@@ -31,6 +32,7 @@ public:
                       unsigned int stride,
                       unsigned int offset);
 
+  void set_feedback(std::vector<const char*> varyings);
   void set(const std::string& name, glm::mat4 mat);
   void set(const std::string& name, glm::vec3 vec);
   void set(const std::string& name, glm::vec4 vec);

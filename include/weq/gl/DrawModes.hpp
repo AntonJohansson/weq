@@ -7,7 +7,7 @@
 
 namespace gl{
 
-enum class DrawMode : GLuint{
+enum class DrawMode : GLenum {
   POINTS                    = GL_POINTS,
   LINES_STRIP               = GL_LINE_STRIP,
   LINE_LOOP                 = GL_LINE_LOOP,

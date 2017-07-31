@@ -17,12 +17,12 @@ public:
     : _data(data),
       _draw_mode(mode){
 
-    _vbo = {gl::Usage::STREAM, _data.interleaved};
+    _vbo = {gl::Usage::STREAM_DRAW, _data.interleaved};
     _mapped_region = _vbo.map(gl::Access::READ_WRITE);
 
     _vao = {program, {{_vbo, _data.format}}};
 
-    _ebo = {gl::Usage::STATIC, _data.elements};
+    _ebo = {gl::Usage::STATIC_DRAW, _data.elements};
   }
 
   ~Mesh(){
@@ -45,7 +45,7 @@ public:
 
   void bind_ebo(){_ebo.bind();}
   size_t indices(){return _ebo.size();}
-  unsigned int draw_mode(){return GLuint(_draw_mode);}
+  unsigned int draw_mode(){return GLenum(_draw_mode);}
 
 private:
   MeshData _data;
