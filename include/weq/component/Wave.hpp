@@ -1,8 +1,30 @@
 #pragma once
 
 #include <weq/FlatBuffer.hpp>
+#include <weq/gl/ShaderProgram.hpp>
+#include <weq/gl/Framebuffer.hpp>
+#include <weq/Mesh.hpp>
+#include <memory>
 
 namespace component{
+
+struct WaveGPU{
+  using ProgramPtr = std::shared_ptr<gl::ShaderProgram>;
+  WaveGPU(unsigned int w, unsigned int h,
+          float gridsize, float c,
+          ProgramPtr force)
+    : r(c*c/(gridsize*gridsize)),
+      force_fbo(w, h),
+      force_shader(force){
+  }
+
+  unsigned int width;
+  unsigned int height;
+  float r;
+  gl::Framebuffer force_fbo;
+  std::shared_ptr<gl::ShaderProgram> force_shader;
+  Mesh* mesh;
+};
 
 struct Wave{
   Wave(int w, int h, float gridsize, float c)

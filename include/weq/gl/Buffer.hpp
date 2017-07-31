@@ -91,6 +91,9 @@ private:
 
 using VertexBuffer   = Buffer<GL_ARRAY_BUFFER, float>;
 using ElementBuffer  = Buffer<GL_ELEMENT_ARRAY_BUFFER, unsigned int>;
+
+
+// TODO is this set up correctly?
 template<typename T>
 using FeedbackBuffer = Buffer<GL_TRANSFORM_FEEDBACK_BUFFER, T>;
 

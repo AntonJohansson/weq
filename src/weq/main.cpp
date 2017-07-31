@@ -12,7 +12,7 @@
 
 #include <weq/Application.hpp>
 #include <weq/system/Input.hpp>
-#include <weq/system/WaveSimulation.hpp>
+#include <weq/system/WaveGPUSimulation.hpp>
 #include <weq/system/Camera.hpp>
 #include <weq/system/Renderer.hpp>
 
@@ -28,7 +28,8 @@ public:
     : Application(){
     _systems.add<weq::system::Input>();
 
-    _systems.add<weq::system::WaveSimulation>();
+    //_systems.add<weq::system::WaveSimulation>();
+    _systems.add<weq::system::WaveGPUSimulation>();
 
     _systems.add<weq::system::Camera>();
     _systems.add<weq::system::Renderer>();
@@ -59,8 +60,6 @@ public:
     auto c = _entities.create();
     c.assign<component::Camera>(LookMode::TARGET);
     c.assign<component::Transform>();
-    //TODO something's fishy
-    //c.component<component::Transform>()->_translate = c.component<component::Camera>()->position;
     c.assign<component::ActiveCamera>();
   }
 
@@ -68,23 +67,27 @@ public:
     float resolution = 1000.0f;
     float size = 5.0f;
 
-    auto v = _resource_manager.get<gl::Shader>("vertex", "vertex.vert");
-    auto f = _resource_manager.get<gl::Shader>("fragment", "fragment.frag");
-    auto p = _resource_manager.get<gl::ShaderProgram>("wave.prog", v, f);
-    p->set_feedback({"height_field", "delta"});
-    p->link();
+    auto rv = _resource_manager.get<gl::Shader>("render_v", "render.vert");
+    auto rf = _resource_manager.get<gl::Shader>("render_f", "render.frag");
+    auto rp = _resource_manager.get<gl::ShaderProgram>("render.prog", rv, rf);
+    rp->link();
+
+    //    auto fv = _resource_manager.get<gl::Shader>("force_v", "force.vert");
+    //    auto ff = _resource_manager.get<gl::Shader>("force_f", "force.frag");
+    //    auto fp = _resource_manager.get<gl::ShaderProgram>("force.prog", fv, ff);
+    //    fp->link();
 
     auto mesh_data = primitive::plane::solid(resolution,
                                              resolution,
                                              size/resolution,
                                              gl::format::VNCT);
 
-    auto mesh = new Mesh(mesh_data, p, gl::DrawMode::TRIANGLES);
+    auto mesh = new Mesh(mesh_data, gl::DrawMode::TRIANGLES);
 
     auto wave = _entities.create();
     //wave.assign<component::Wave>(resolution, resolution, size/resolution, 0.5f);
     wave.assign<component::Transform>()->_translate = {-size/2, -size/2, 0};
-    wave.assign<component::Renderable>(mesh, p);
+    wave.assign<component::Renderable>(mesh, rp);
   }
 
   //TODO improve UI

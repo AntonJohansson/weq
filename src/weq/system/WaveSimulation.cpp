@@ -148,16 +148,16 @@ void WaveSimulation::update(ex::EntityManager& entities,
 
           normal = glm::normalize(normal);
 
-          renderable.mesh->normal_x(w.to_index(i,j)) = normal.x;
-          renderable.mesh->normal_y(w.to_index(i,j)) = normal.y;
-          renderable.mesh->normal_z(w.to_index(i,j)) = normal.z;
+          //renderable.mesh->normal_x(w.to_index(i,j)) = normal.x;
+          //renderable.mesh->normal_y(w.to_index(i,j)) = normal.y;
+          //renderable.mesh->normal_z(w.to_index(i,j)) = normal.z;
 
           bool should_update_color = true;
           for(auto& ob : obstructions){
             if(ob(w.height_field, i, j)){
-              renderable.mesh->color_r(w.to_index(i,j)) = 1.0f;
-              renderable.mesh->color_g(w.to_index(i,j)) = 0.0f;
-              renderable.mesh->color_b(w.to_index(i,j)) = 0.0f;
+              //renderable.mesh->color_r(w.to_index(i,j)) = 1.0f;
+              //renderable.mesh->color_g(w.to_index(i,j)) = 0.0f;
+              //renderable.mesh->color_b(w.to_index(i,j)) = 0.0f;
 
               w.height_field(i,j) = 0.0f;
               w.delta(i,j) = 0.0f;
@@ -167,7 +167,7 @@ void WaveSimulation::update(ex::EntityManager& entities,
           }
 
           result = w.height_field(i,j) + w.delta(i,j)*dt;
-          renderable.mesh->vertex_z(w.to_index(i,j)) = result;
+          //renderable.mesh->vertex_z(w.to_index(i,j)) = result;
 
           // Update color;
           if(update_color && should_update_color){
@@ -176,13 +176,13 @@ void WaveSimulation::update(ex::EntityManager& entities,
             auto color_val_3 = glm::abs(result/0.1f);
 
             if(result > 0 ){
-              renderable.mesh->color_r(w.to_index(i,j)) = color_val_1;
-              renderable.mesh->color_g(w.to_index(i,j)) = color_val_2;
-              renderable.mesh->color_b(w.to_index(i,j)) = color_val_3;
+              //renderable.mesh->color_r(w.to_index(i,j)) = color_val_1;
+              //renderable.mesh->color_g(w.to_index(i,j)) = color_val_2;
+              //renderable.mesh->color_b(w.to_index(i,j)) = color_val_3;
             }else{
-              renderable.mesh->color_r(w.to_index(i,j)) = color_val_3;
-              renderable.mesh->color_g(w.to_index(i,j)) = color_val_2;
-              renderable.mesh->color_b(w.to_index(i,j)) = color_val_1;
+              //renderable.mesh->color_r(w.to_index(i,j)) = color_val_3;
+              //renderable.mesh->color_g(w.to_index(i,j)) = color_val_2;
+              //renderable.mesh->color_b(w.to_index(i,j)) = color_val_1;
             }
           }
         }
@@ -190,7 +190,7 @@ void WaveSimulation::update(ex::EntityManager& entities,
 
       for(int i = 0; i <= w.width; i++){
         for(int j = 0; j <= w.height; j++){
-          w.height_field(i,j) = renderable.mesh->vertex_z(w.to_index(i,j));
+          //w.height_field(i,j) = renderable.mesh->vertex_z(w.to_index(i,j));
         }
       }
     });

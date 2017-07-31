@@ -13,14 +13,14 @@
 
 class Mesh{
 public:
-  Mesh(MeshData data, std::shared_ptr<gl::ShaderProgram> program, gl::DrawMode mode)
+  Mesh(MeshData data, gl::DrawMode mode)
     : _data(data),
       _draw_mode(mode){
 
     _vbo = {gl::Usage::STREAM_DRAW, _data.interleaved};
     _mapped_region = _vbo.map(gl::Access::READ_WRITE);
 
-    _vao = {program, {{_vbo, _data.format}}};
+    //_vao = {program, {{_vbo, _data.format}}};
 
     _ebo = {gl::Usage::STATIC_DRAW, _data.elements};
   }
@@ -40,17 +40,16 @@ public:
   float& color_b(int index){return  _mapped_region[12*index + 8];}
   float& color_a(int index){return  _mapped_region[12*index + 9];}
 
-  const gl::VertexArray& vao() const {return _vao;}
+  gl::VertexArray vao(std::shared_ptr<gl::ShaderProgram> program) const {
+    return {program, {{_vbo, _data.format}}};
+  }
+  const gl::ElementBuffer& ebo() const {return _ebo;}
 
-
-  void bind_ebo(){_ebo.bind();}
-  size_t indices(){return _ebo.size();}
-  unsigned int draw_mode(){return GLenum(_draw_mode);}
+  gl::DrawMode draw_mode(){return _draw_mode;}
 
 private:
   MeshData _data;
   gl::DrawMode _draw_mode;
-  gl::VertexArray  _vao;
   gl::VertexBuffer _vbo;
   gl::ElementBuffer _ebo;
   float* _mapped_region;

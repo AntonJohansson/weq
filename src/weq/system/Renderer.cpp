@@ -6,6 +6,7 @@
 #include <weq/Window.hpp>
 #include <weq/event/RegisterInput.hpp>
 
+#include <weq/gl/Framebuffer.hpp>
 #include <weq/Texture.hpp>
 #include <weq/resource/ResourceManager.hpp>
 
@@ -70,9 +71,10 @@ void Renderer::update(ex::EntityManager& entities,
       r.program->set("mvp", mvp);
       r.program->set("normal_matrix", active_camera.normal_matrix);
 
-      r.mesh->vao().bind();
-      r.mesh->bind_ebo();
-      glDrawElements(r.mesh->draw_mode(), r.mesh->indices(), GL_UNSIGNED_INT, 0);
+      r.vao.bind();
+      r.ebo.bind();
+
+      glDrawElements(GLenum(r.draw_mode), r.ebo.size(), GL_UNSIGNED_INT, 0);
     });
 
   render_ui(entities, events, dt);
