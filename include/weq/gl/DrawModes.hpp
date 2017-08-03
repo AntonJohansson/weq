@@ -2,11 +2,12 @@
 
 #include <glad/glad.h>
 
-// TODO this should be movable to a .cpp and made extern,
-// thus skipping including GL
 
 namespace gl{
 
+// Abstracts some common OpenGL draw modes.
+// TODO this should be movable to a .cpp and made extern,
+//      thus skipping including GL.
 enum class DrawMode : GLenum {
   POINTS                    = GL_POINTS,
   LINES_STRIP               = GL_LINE_STRIP,
@@ -21,4 +22,4 @@ enum class DrawMode : GLenum {
   TRIANGLES_ADJACENCY       = GL_TRIANGLES_ADJACENCY,
 };
 
-}
+} // namespace gl

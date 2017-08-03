@@ -5,16 +5,14 @@
 namespace gl{
 
 VertexArray::VertexArray()
-  : _size(0)
-{
+  : _size(0){
   glGenVertexArrays(1, &_vao);
 }
 
 VertexArray::VertexArray(std::shared_ptr<ShaderProgram> program,
                          std::vector<BufferFormat> bufferformat)
-  : _program(program)
-  , _size(0)
-{
+  : _program(program),
+    _size(0){
   glGenVertexArrays(1, &_vao);
   bind();
 

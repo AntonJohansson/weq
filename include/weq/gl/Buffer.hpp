@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glad/glad.h>
+#include <spdlog/spdlog.h>
 
 #include <iterator>
 #include <tuple>
@@ -8,7 +9,8 @@
 
 namespace gl{
 
-// Enum for wrapping the OpenGL defines for buffer usage
+// Enum for wrapping the OpenGL enums pertaining to
+// buffer Usage. TODO extern this?
 enum class Usage : GLenum {
   STREAM_DRAW = GL_STREAM_DRAW,
   STREAM_READ = GL_STREAM_READ,
@@ -21,34 +23,55 @@ enum class Usage : GLenum {
   DYNAMIC_COPY= GL_DYNAMIC_COPY,
 };
 
+// Enum for wrapping accessing modes to mapped memory regions.
+// TODO extern this?
 enum class Access : GLenum {
   READ = GL_READ_ONLY,
   WRITE = GL_WRITE_ONLY,
   READ_WRITE = GL_READ_WRITE
 };
 
-// Generic buffer class for handeling VBOs, EBOs, TBOs
+// Generic buffer class for handling VBOs and EBOs. The
+// buffer_target template param. specifies the OpenGL
+// buffer target (GL_ARRAY_BUFFER, ...)
+// The typename specifies the buffer type.
 template<GLuint buffer_target, typename T>
 class Buffer{
 public:
-
-  using Iterator = typename std::vector<T>::iterator;
-
+  // Does absolutely nothing.
   Buffer(){}
+
+  // Generates the actual OpenGL buffer and calls
+  // set_data(...) which uses the data vector and
+  // buffer usage.
   Buffer(Usage b, std::vector<T>& data)
     : _usage(b){
     glGenBuffers(1, &_buffer);
     set_data(&data[0], data.size());
   }
 
+  // Deletes the resoruces for the OpenGL buffer.
+  ~Buffer(){
+    glDeleteBuffers(1, &_buffer);
+  }
+
+  // Binds the buffer for use with OpenGL functions,
+  // this method asumes the specified template target
+  // by default.
   void bind(GLuint target = buffer_target){
     glBindBuffer(target, _buffer);
   }
 
+  // This function binds the buffer at a specific binding
+  // point as referenced by the index.
   void bind(GLuint target, unsigned int index){
     glBindBufferBase(target, index, _buffer);
   }
 
+  // Sets the buffer data calling glBufferData, this function
+  // does not invalidate the buffer for more efficient memory
+  // replacement.
+  // Automatically calls bind().
   void set_data(T* data, size_t size){
     bind();
 
@@ -59,28 +82,46 @@ public:
                  _data, GLenum(_usage));
   }
 
+  // Maps the GPU buffer to a memory region on the CPU so that
+  // it can be easily modified.
+  // Parameter specifies write access.
+  // Automatically calls bind().
+  // TODO does currently not support mapped ranges.
   T* map(Access access){
     bind();
     void* ptr = glMapBuffer(buffer_target, GLenum(access));
+
+    if(ptr == nullptr){
+      spdlog::get("console")->error("Failed to map memory region!");
+      //TODO should I throw?
+    }
+
     return static_cast<T*>(ptr);
   }
 
+  // Binds the buffer and unmaps the CPU side memory region.
+  // Invalidates pointer to the memory region.
   void unmap(){
     bind();
-    glUnmapBuffer(buffer_target);
+
+    if(glUnmapBuffer(buffer_target) == GL_FALSE){
+      spdlog::get("console")->error("Failed to unmap memory region!");
+      // TODO throw?
+    }
   }
 
-  auto size(){return _size;}
-  GLuint object(){return _buffer;}
+  // Returns the current size of the buffer.
+  size_t size() const {return _size;}
 
+  // Returns the OpenGL int handle.
+  GLuint object() const {return _buffer;}
+
+  // Overloaded operators to access the underlying data,
+  // this assumes that the buffer has not been changed
+  // after the data was set.
+  // TODO remove?
   float& operator[](size_t index){return _data[index];}
   const float& operator[](size_t index) const {return _data[index];}
-
-  //void sub_data(Iterator& begin, Iterator& end){
-    //auto offset = std::distance(_data_vector.begin(), begin);
-    //auto size = std::distance(begin, end);
-    //auto data_ptr = &(*begin);
-  //}
 
 private:
   Usage _usage;
@@ -89,6 +130,7 @@ private:
   GLuint _buffer;
 };
 
+// Defines some common template specifications of Buffer.
 using VertexBuffer   = Buffer<GL_ARRAY_BUFFER, float>;
 using ElementBuffer  = Buffer<GL_ELEMENT_ARRAY_BUFFER, unsigned int>;
 
@@ -97,4 +139,4 @@ using ElementBuffer  = Buffer<GL_ELEMENT_ARRAY_BUFFER, unsigned int>;
 template<typename T>
 using FeedbackBuffer = Buffer<GL_TRANSFORM_FEEDBACK_BUFFER, T>;
 
-};
+} // namespace gl

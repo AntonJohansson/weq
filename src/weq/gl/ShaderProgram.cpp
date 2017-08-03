@@ -9,6 +9,7 @@ namespace gl{
 
 ShaderProgram::ShaderProgram(const std::string& id)
   : Resource(id){
+  _program = glCreateProgram();
 }
 
 ShaderProgram::ShaderProgram(const std::string& id,
@@ -19,10 +20,16 @@ ShaderProgram::ShaderProgram(const std::string& id,
   if(v)_shaders[v->type()] = v;
   if(f)_shaders[f->type()] = f;
   if(g)_shaders[g->type()] = g;
+
+  _program = glCreateProgram();
 }
 
 ShaderProgram::~ShaderProgram(){
   unload();
+
+  if(glIsProgram(_program)){
+    glDeleteProgram(_program);
+  }
 }
 
 void ShaderProgram::link(){
@@ -39,14 +46,10 @@ void ShaderProgram::link(){
     glGetProgramInfoLog(_program, 512, NULL, buffer);
 
     spdlog::get("console")->error("Failed to link program {}!\nLink log:\n{}", _id, buffer);
-
-    delete_program();
   }
 }
 
 void ShaderProgram::load(){
-  _program = glCreateProgram();
-
   for(auto& shader : _shaders){
     glAttachShader(_program, shader.second->id());
   }
@@ -58,8 +61,6 @@ void ShaderProgram::unload(){
   for(auto& shader : _shaders){
     glDetachShader(_program, shader.second->id());
   }
-
-  delete_program();
 }
 
 void ShaderProgram::use(){
@@ -98,10 +99,6 @@ void ShaderProgram::set(const std::string& name, glm::vec4 vec){
 void ShaderProgram::set(const std::string& name, float f){
   auto uniform = glGetUniformLocation(_program, name.c_str());
   glUniform1f(uniform, f);
-}
-
-void ShaderProgram::delete_program(){
-  glDeleteProgram(_program);
 }
 
 }

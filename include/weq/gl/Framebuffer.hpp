@@ -5,8 +5,16 @@
 
 namespace gl{
 
+// Abstraction of a common OpenGL framebuffer.
+// Also supports depth and stencil render targets
+// (not yet tho lol).
+// TODO integrate with existing texture class.
 class Framebuffer{
 public:
+  // Creates a framebuffer with the specified width and height.
+  // Handles creating the actual framebuffer, textures and
+  // render targets.
+  // TODO split.
   Framebuffer(unsigned int w, unsigned int h){
     // Generate framebuffer
     glGenFramebuffers(1, &_id);
@@ -41,22 +49,31 @@ public:
     }
   }
 
+  // Destroys the framebuffer, render buffers and texutres.
   ~Framebuffer(){
     glDeleteFramebuffers(1, &_id);
+    glDeleteTextures(1, &_texture);
   }
 
+  // Returns true if the framebuffer creation was successful.
   bool check_complete(){
     return glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE;
   }
 
+  // Binds the current framebuffer handle for use with OpenGL functions,
+  // assumes the framebuffer was created correctly.
   void bind(){
     glBindFramebuffer(GL_FRAMEBUFFER, _id);
   }
 
+  // Binds the related render texture.
+  // Assumes that the texture was created correctly.
   void bind_texture(){
     glBindTexture(GL_TEXTURE_2D, _texture);
   }
 
+  // Unbinds the current framebuffer. Effectively binding
+  // the default framebuffer instead.
   void unbind(){
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
   }
@@ -66,4 +83,4 @@ private:
   unsigned int _id;
 };
 
-}
+} // namespace gl

@@ -1,5 +1,8 @@
 #pragma once
 
+// This file defines resources that should be included in the the generated
+// executable.
+
 #include <string>
 
 namespace data{
@@ -12,5 +15,4 @@ const std::string vertex_source = R"(
 const std::string fragment_source = R"(
 )";
 
-
-}
+} // namespace data

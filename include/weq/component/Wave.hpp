@@ -8,8 +8,18 @@
 
 namespace component{
 
+// Component describing all the relevant data for performing
+// FDM Wave. Eq. calculations on the GPU through FBOs.
 struct WaveGPU{
   using ProgramPtr = std::shared_ptr<gl::ShaderProgram>;
+
+  // Parameters:
+  //   w - width of simulation grid,
+  //   h - height of simulation grid,
+  //   gridsize - distance between two following grid points,
+  //   c - Wave velocity (unit?) used to calculate the constant
+  //         r = c^2/gridsize^2,
+  //       which is used to speed up force calculations.
   WaveGPU(unsigned int w, unsigned int h,
           float gridsize, float c,
           ProgramPtr force)
@@ -20,12 +30,18 @@ struct WaveGPU{
 
   unsigned int width;
   unsigned int height;
+
   float r;
+
   gl::Framebuffer force_fbo;
   std::shared_ptr<gl::ShaderProgram> force_shader;
+
   Mesh* mesh;
 };
 
+// Component describing all the relevant data for performing
+// FDM Wave. Eq. calculations on the CPU.
+// TODO remove?
 struct Wave{
   Wave(int w, int h, float gridsize, float c)
     : width(w),
@@ -71,4 +87,4 @@ struct Wave{
   float* s_edge;
 };
 
-}
+} // namespace component

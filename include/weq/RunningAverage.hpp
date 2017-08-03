@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO move?
+
 template<typename T>
 class RunningAverage{
 public:

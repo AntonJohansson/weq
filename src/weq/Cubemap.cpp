@@ -33,7 +33,6 @@ void Cubemap::load(){
 }
 
 void Cubemap::unload(){
-  
 }
 
 void Cubemap::bind(){

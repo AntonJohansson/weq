@@ -84,7 +84,6 @@ Window::Window(entityx::EventManager& events, WindowMode mode)
 
 Window::~Window(){
   glfwDestroyWindow(_window);
-  glfwTerminate();
   window_terminate();
 }
 

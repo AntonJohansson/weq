@@ -8,40 +8,32 @@
 
 namespace event{
 
-struct RegisterInput{
-  RegisterInput(InputAction action = InputAction::UNKNOWN,
-                     int key = -1,
-                     int key_state = -1)
-    : action(action),
-      key(key),
-      key_state(key_state){
-  }
-
-  InputAction action;
-  int key;
-  int key_state;
-};
-
+// Event sent out by the input system. Gathers all active inputs,
+// sorted into actions, states, and ranges.
 struct ActiveInput{
   std::deque<InputAction> actions;
   std::deque<InputState>  states;
   std::map<InputRange, float> ranges;
 
+  // returns true if a given InputAction is active.
   bool has(InputAction action) const {
     return std::find(actions.begin(), actions.end(), action) != actions.end();
   }
 
+  // returns true if a given InputState is active.
   bool has(InputState state) const {
     return std::find(states.begin(), states.end(), state) != states.end();
   }
 
+  // returns true if a given InputRange is active.
   bool has(InputRange range) const {
     return ranges.find(range) != ranges.end();
   }
 };
 
+// TODO requried?
 struct ChangeInputContext{
   InputContext context;
 };
 
-}
+} // namespace event

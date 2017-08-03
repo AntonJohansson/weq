@@ -4,6 +4,8 @@
 
 namespace primitive::plane{
 
+// Generates meshdata for a point plane of size w * h with a fixed gridsize.
+// Data generated according to passed in format.
 MeshData points(int w, int h, float gridsize, gl::VertexFormat format){
   MeshData data(format);
 
@@ -44,6 +46,9 @@ MeshData points(int w, int h, float gridsize, gl::VertexFormat format){
   return data;
 }
 
+// Generates meshdata for a solid plane (consisting of triangles) of size w * h
+// with a fixed gridsize.
+// Data generated according to passed in format.
 MeshData solid(int w, int h, float gridsize, gl::VertexFormat format){
   MeshData data(format);
 
@@ -93,4 +98,4 @@ MeshData solid(int w, int h, float gridsize, gl::VertexFormat format){
   return data;
 }
 
-};
+} // namespace primitive::plane

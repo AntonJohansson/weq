@@ -20,6 +20,7 @@ Shader::Shader(const std::string& id, ShaderType type, const std::string& source
   : Resource(id),
     _shader_source(source),
     _type(type){
+  _shader = glCreateShader(_type);
 }
 
 Shader::~Shader(){
@@ -43,7 +44,7 @@ void Shader::load(){
 }
 
 void Shader::unload(){
-  delete_shader();
+  glDeleteShader(_shader);
 }
 
 void Shader::compile(){
@@ -81,10 +82,6 @@ ShaderType Shader::type_from_filename(const std::string& filename) const {
 
   // TODO How should I handle this? Only expections? Optionals?
   throw std::runtime_error("Could not determine shader type!");
-}
-
-void Shader::delete_shader(){
-  glDeleteShader(_shader);
 }
 
 std::string Shader::read_from_file(const std::string& file){

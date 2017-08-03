@@ -2,12 +2,22 @@
 
 #include <weq/resource/Resource.hpp>
 
+// Resource class for representing a texture that is useable
+// by OpenGL.
 class Texture : public Resource{
 public:
+  // Contructs a texture resource with given id,
+  // also generates the OpenGL texture id.
   Texture(const std::string& id);
+
+  // Destorys the previously generated texture id.
   ~Texture();
 
+  // Handles loading the texture from file or memory to a
+  // format useable by OpenGL.
   void load() override;
+
+  // Unloads the texture data but keeps the texture id intact.
   void unload() override;
 
   void bind();

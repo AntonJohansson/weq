@@ -8,6 +8,8 @@
 
 namespace gl{
 
+// Some standard abstractions of OpenGL types
+// TODO extern?
 enum Type{
   FLOAT = GL_FLOAT,
   DOUBLE = GL_DOUBLE,
@@ -15,6 +17,7 @@ enum Type{
   UINT = GL_UNSIGNED_INT
 };
 
+// Returns size of OpenGL types.
 static size_t get_size(Type type){
   switch(type){
   case FLOAT: return sizeof(float); break;
@@ -25,64 +28,77 @@ static size_t get_size(Type type){
   }
 }
 
-struct VertexComponent{
-  VertexComponent(std::string attribute, Type type, unsigned int size)
+// Struct associating an attribute name with a type and the number
+// of values of that type.
+// The offset member variable is set by the vertex format struct,
+// since knowledge of other attributes in a format is
+// necessary.
+struct VertexAttribute{
+  VertexAttribute(std::string attribute, Type type, unsigned int length)
     : attribute(attribute)
     , type(type)
-    , size(size)
+    , length(length)
     , offset(0)
   {}
 
   std::string attribute;
   Type type;
-  unsigned int size;
+  unsigned int length;
   unsigned int offset;
 };
 
+// Struct that combines VertexComponents to form a describtion of
+// a single vertex in a format.
 struct VertexFormat{
-  VertexFormat(std::vector<VertexComponent> c)
-    : components(c)
+  // Calculates attribute offset, format length (in values), and
+  // the vertex stride (size in bytes).
+  VertexFormat(std::vector<VertexAttribute> attributes)
+    : attributes(attributes)
     , stride(0)
-    , vertex_size(0)
+    , format_length(0)
   {
-    unsigned int offset = 0;
+    unsigned int offset_count = 0;
 
-    for(auto& v : components){
-      auto size = get_size(v.type);
-      vertex_size += v.size;
+    for(auto& attribute : attributes){
+      auto size = get_size(attribute.type);
+      format_length += attribute.length;
 
-      if(components.size() > 1){
-        stride += v.size * size;
-        v.offset = offset;
+      // If the format only contains a single attribute,
+      // don't update stride and offset (not necessary).
+      if(attributes.size() > 1){
+        stride += attribute.length * size;
+        attribute.offset = offset_count;
 
-        offset += v.size * size;
+        offset_count += attribute.length * size;
       }
     }
   }
 
-  bool has(const std::string& attrib){
-    auto it = std::find_if(components.begin(),
-                 components.end(),
-                 [&attrib](const VertexComponent& component){
-        return component.attribute == attrib;
+  // Returns true if the format contains a provided attribute.
+  bool has(const std::string& name){
+    auto it = std::find_if(attributes.begin(),
+                 attributes.end(),
+                 [&name](const VertexAttribute& attribute){
+        return attribute.attribute == name;
       });
 
-    return it != components.end();
+    return it != attributes.end();
   }
 
-  size_t size(){return components.size();}
-  VertexComponent& operator[](size_t index){return components[index];}
-  const VertexComponent& operator[](size_t index) const {return components[index];}
+  // Returns the number of attributes in the format.
+  size_t attribute_count(){return attributes.size();}
 
-  std::vector<VertexComponent> components;
+  // Overload to access attributes in an array-like fashion.
+  VertexAttribute& operator[](size_t index){return attributes[index];}
+  const VertexAttribute& operator[](size_t index) const {return attributes[index];}
+
+  std::vector<VertexAttribute> attributes;
   unsigned int stride;
-  unsigned int vertex_size;
+  unsigned int format_length;
 };
 
-/*
- * Predefined vertex formats
- */
 
+// Defines some commonly used formats.
 namespace format{
 
 const static VertexFormat VNCT = {{
@@ -142,4 +158,4 @@ const static VertexFormat T = {{
 
 }
 
-};
+} // namespace gl

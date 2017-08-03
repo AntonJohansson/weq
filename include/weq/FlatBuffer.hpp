@@ -5,6 +5,8 @@
 #include <iostream>
 #include <cassert>
 
+// TODO remove?
+
 template<typename T>
 class FlatBuffer{
 public:

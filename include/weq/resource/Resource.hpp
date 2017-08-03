@@ -19,5 +19,10 @@ protected:
   bool _is_loaded;
 
 private:
-  //bool _is_managed;
+  friend class ResourceManager;
+
+  // Set the path where all resources will be located.
+  //void set_resource_path(const std::string& path){
+  //  _resource_path = &path;
+  //}
 };
