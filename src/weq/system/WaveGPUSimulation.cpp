@@ -26,17 +26,22 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
 void WaveGPUSimulation::update(ex::EntityManager& entities,
                             ex::EventManager& events,
                             ex::TimeDelta dt){
+  (void)events;
+  (void)dt;
+
   entities.each<WaveGPU, Renderable>([](ex::Entity e, WaveGPU& wave, Renderable& r){
+      (void)e;
+
       wave.force_shader->use();
 
       wave.force_fbo.bind_texture();
       wave.force_fbo.bind();
       glViewport(0, 0, wave.width, wave.height);
 
-      r.vao.bind();
-      r.ebo.bind();
+      r.mesh->vao().bind();
+      r.mesh->ebo().bind();
 
-      glDrawElements(GLenum(r.draw_mode), r.ebo.size(), GL_UNSIGNED_BYTE, 0);
+      glDrawElements(GLenum(r.draw_mode), r.mesh->ebo().size(), GL_UNSIGNED_BYTE, 0);
 
       wave.force_fbo.unbind();
       glViewport(0, 0, 1280, 720);

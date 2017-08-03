@@ -8,6 +8,7 @@
 
 #include <glm/glm.hpp>
 
+#include <utility>
 #include <cmath>
 #include <vector>
 
@@ -18,16 +19,15 @@ public:
   // Convertes MeshData to a VBO and EBO. The OpenGL draw mode is stored
   // for later use. Currently maps VBO-region to memory for easy
   // modification.
-  Mesh(MeshData data, gl::DrawMode mode)
+  Mesh(std::shared_ptr<gl::ShaderProgram> program, MeshData data, gl::DrawMode mode)
     : _data(data),
-      _draw_mode(mode){
+      _draw_mode(mode),
+      _vbo(gl::Usage::STATIC_DRAW, _data.interleaved),
+      _ebo(gl::Usage::STATIC_DRAW, _data.elements){
 
-    _vbo = {gl::Usage::STREAM_DRAW, _data.interleaved};
     _mapped_region = _vbo.map(gl::Access::READ_WRITE);
 
-    //_vao = {program, {{_vbo, _data.format}}};
-
-    _ebo = {gl::Usage::STATIC_DRAW, _data.elements};
+    _vao = {program, _vbo, _data.format};
   }
 
   // Unmaps the VBO from memory and automatically calls
@@ -48,13 +48,9 @@ public:
   float& color_b(int index){return  _mapped_region[12*index + 8];}
   float& color_a(int index){return  _mapped_region[12*index + 9];}
 
-  // Generates a VAO-binding for a given shader program.
-  gl::VertexArray vao(std::shared_ptr<gl::ShaderProgram> program) const {
-    return {program, {{_vbo, _data.format}}};
-  }
-
   // returns the generated EBO
   const gl::ElementBuffer& ebo() const {return _ebo;}
+  const gl::VertexArray& vao() const {return _vao;}
 
   // returns the given OpenGL draw mode
   gl::DrawMode draw_mode() const {return _draw_mode;}
@@ -64,5 +60,6 @@ private:
   gl::DrawMode _draw_mode;
   gl::VertexBuffer _vbo;
   gl::ElementBuffer _ebo;
+  gl::VertexArray _vao;
   float* _mapped_region;
 };

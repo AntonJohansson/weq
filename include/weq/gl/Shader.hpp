@@ -10,8 +10,7 @@
 namespace gl{
 
 // Enum encapsulating the OpenGL shader types.
-// TODO make extern?
-enum ShaderType : GLuint{
+enum class ShaderType : GLenum{
   VERTEX   = GL_VERTEX_SHADER,
   FRAGMENT = GL_FRAGMENT_SHADER,
   GEOMETRY = GL_GEOMETRY_SHADER
@@ -45,7 +44,7 @@ public:
   void compile();
 
   // Returns the OpenGL shader handle.
-  unsigned int id() const {return _shader;}
+  GLuint id() const {return _shader;}
 
   // Returns the current shader type.
   const ShaderType& type(){return _type;}
@@ -60,7 +59,7 @@ private:
   std::string _filename;
   std::string _shader_source;
   ShaderType _type;
-  unsigned int _shader;
+  GLuint _shader;
 };
 
-};
+} // namespace gl

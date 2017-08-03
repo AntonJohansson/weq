@@ -72,20 +72,20 @@ public:
     auto rp = _resource_manager.get<gl::ShaderProgram>("render.prog", rv, rf);
     rp->link();
 
-    //    auto fv = _resource_manager.get<gl::Shader>("force_v", "force.vert");
-    //    auto ff = _resource_manager.get<gl::Shader>("force_f", "force.frag");
-    //    auto fp = _resource_manager.get<gl::ShaderProgram>("force.prog", fv, ff);
-    //    fp->link();
+//    auto fv = _resource_manager.get<gl::Shader>("force_v", "force.vert");
+//    auto ff = _resource_manager.get<gl::Shader>("force_f", "force.frag");
+//    auto fp = _resource_manager.get<gl::ShaderProgram>("force.prog", fv, ff);
+//    fp->link();
 
     auto mesh_data = primitive::plane::solid(resolution,
                                              resolution,
                                              size/resolution,
                                              gl::format::VNCT);
 
-    auto mesh = new Mesh(mesh_data, gl::DrawMode::TRIANGLES);
+    auto mesh = std::make_shared<Mesh>(rp, mesh_data, gl::DrawMode::TRIANGLES);
 
     auto wave = _entities.create();
-    //wave.assign<component::Wave>(resolution, resolution, size/resolution, 0.5f);
+    // wave.assign<component::WaveGPU>(100, 100, 1, 0.2f, fp);
     wave.assign<component::Transform>()->_translate = {-size/2, -size/2, 0};
     wave.assign<component::Renderable>(mesh, rp);
   }
@@ -125,7 +125,7 @@ public:
 int main(){
   Simulation sim;
   sim.configure();
-  sim.main_loop();
+  sim.run();
 
   return 0;
 }

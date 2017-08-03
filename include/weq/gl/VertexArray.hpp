@@ -5,7 +5,6 @@
 #include <weq/gl/ShaderProgram.hpp>
 
 #include <utility>
-#include <vector>
 #include <memory>
 
 namespace gl{
@@ -14,8 +13,6 @@ namespace gl{
 // binding between the Vertex Buffer and Shader Program.
 class VertexArray{
 public:
-  using BufferFormat = std::pair<VertexBuffer, VertexFormat>;
-
   // Creates the OpenGL handle.
   VertexArray();
 
@@ -24,11 +21,12 @@ public:
   // Also binds the vertex buffers and accompanied vertex format
   // with the shader program, through calling bind_attribute(...)
   VertexArray(std::shared_ptr<ShaderProgram> program,
-              std::vector<BufferFormat> bufferformat);
+              gl::VertexBuffer& vbo,
+              gl::VertexFormat format);
 
   // Binds the parameter (vertex buffer and vertex format) to the shader
   // specified in the constructor.
-  void bind_attribute(BufferFormat format);
+  void bind_attribute(gl::VertexBuffer& vbo, gl::VertexFormat format);
 
   // Binds for use with OpenGL functions.
   void bind() const;

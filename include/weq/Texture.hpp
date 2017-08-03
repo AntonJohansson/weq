@@ -2,6 +2,8 @@
 
 #include <weq/resource/Resource.hpp>
 
+#include <glad/glad.h>
+
 // Resource class for representing a texture that is useable
 // by OpenGL.
 class Texture : public Resource{
@@ -25,5 +27,5 @@ public:
 private:
   unsigned int _width;
   unsigned int _height;
-  unsigned int _texture;
+  GLuint _texture;
 };

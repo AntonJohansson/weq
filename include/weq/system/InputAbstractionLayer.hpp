@@ -19,7 +19,6 @@ public:
   void register_mouse(double x, double y, unsigned int x_range, unsigned int y_range);
   void register_scroll(double xoffset, double yoffset);
 
-  void receive(const event::RegisterInput& event);
   void receive(const event::ChangeInputContext& event);
 
   const event::ActiveInput& get_active(){return _active_input;}

@@ -71,10 +71,10 @@ void Renderer::update(ex::EntityManager& entities,
       r.program->set("mvp", mvp);
       r.program->set("normal_matrix", active_camera.normal_matrix);
 
-      r.vao.bind();
-      r.ebo.bind();
+      r.mesh->vao().bind();
+      r.mesh->ebo().bind();
 
-      glDrawElements(GLenum(r.draw_mode), r.ebo.size(), GL_UNSIGNED_INT, 0);
+      glDrawElements(GLenum(r.draw_mode), r.mesh->ebo().size(), GL_UNSIGNED_INT, 0);
     });
 
   render_ui(entities, events, dt);
@@ -82,7 +82,8 @@ void Renderer::update(ex::EntityManager& entities,
   _window->swap_buffers();
 
   // Check for OpenGL errors (TODO should be able to disable this)
-  if(GLuint err = glGetError(); err != GL_NO_ERROR){
+  GLenum err;
+  while((err = glGetError()) != GL_NO_ERROR){
     spdlog::get("console")->error("GL-error: {}", err);
   }
 }

@@ -9,8 +9,7 @@
 namespace gl{
 
 // Some standard abstractions of OpenGL types
-// TODO extern?
-enum Type{
+enum class Type: GLenum{
   FLOAT = GL_FLOAT,
   DOUBLE = GL_DOUBLE,
   INT = GL_INT,
@@ -20,10 +19,10 @@ enum Type{
 // Returns size of OpenGL types.
 static size_t get_size(Type type){
   switch(type){
-  case FLOAT: return sizeof(float); break;
-  case DOUBLE: return sizeof(double); break;
-  case INT: return sizeof(int); break;
-  case UINT: return sizeof(unsigned int); break;
+  case Type::FLOAT: return sizeof(GLfloat); break;
+  case Type::DOUBLE: return sizeof(GLdouble); break;
+  case Type::INT: return sizeof(GLint); break;
+  case Type::UINT: return sizeof(GLuint); break;
   default: return 0;
   }
 }
@@ -52,8 +51,8 @@ struct VertexAttribute{
 struct VertexFormat{
   // Calculates attribute offset, format length (in values), and
   // the vertex stride (size in bytes).
-  VertexFormat(std::vector<VertexAttribute> attributes)
-    : attributes(attributes)
+  VertexFormat(std::vector<VertexAttribute> a)
+    : attributes(a)
     , stride(0)
     , format_length(0)
   {
@@ -102,60 +101,60 @@ struct VertexFormat{
 namespace format{
 
 const static VertexFormat VNCT = {{
-  {"position", FLOAT, 3},
-  {"normal", FLOAT, 3},
-  {"color", FLOAT, 4},
-  {"texcoord", FLOAT, 2}
+  {"position", Type::FLOAT, 3},
+  {"normal",   Type::FLOAT, 3},
+  {"color",    Type::FLOAT, 4},
+  {"texcoord", Type::FLOAT, 2}
 }};
 
 const static VertexFormat VNC = {{
-    {"position", FLOAT, 3},
-    {"normal", FLOAT, 3},
-    {"color", FLOAT, 4},
+  {"position", Type::FLOAT, 3},
+  {"normal",   Type::FLOAT, 3},
+  {"color",    Type::FLOAT, 4},
 }};
 
 const static VertexFormat VNT = {{
-    {"position", FLOAT, 3},
-    {"normal", FLOAT, 3},
-    {"texcoord", FLOAT, 3}
+  {"position", Type::FLOAT, 3},
+  {"normal",   Type::FLOAT, 3},
+  {"texcoord", Type::FLOAT, 3}
 }};
 
 const static VertexFormat VC = {{
-  {"position", FLOAT, 3},
-  {"color", FLOAT, 4}
+  {"position", Type::FLOAT, 3},
+  {"color",    Type::FLOAT, 4}
 }};
 
 const static VertexFormat VT = {{
-  {"position", FLOAT, 3},
-  {"texcoord", FLOAT, 3}
+  {"position", Type::FLOAT, 3},
+  {"texcoord", Type::FLOAT, 3}
 }};
 
 const static VertexFormat NT = {{
-    {"normal", FLOAT, 3},
-    {"texcoord", FLOAT, 3}
+  {"normal",   Type::FLOAT, 3},
+  {"texcoord", Type::FLOAT, 3}
 }};
 
 const static VertexFormat NC = {{
-    {"normal", FLOAT, 3},
-    {"color", FLOAT, 4}
+  {"normal", Type::FLOAT, 3},
+  {"color",  Type::FLOAT, 4}
 }};
 
 const static VertexFormat V = {{
-    {"position", FLOAT, 3}
+  {"position", Type::FLOAT, 3}
 }};
 
 const static VertexFormat N = {{
-    {"normal", FLOAT, 3}
+  {"normal", Type::FLOAT, 3}
 }};
 
 const static VertexFormat C = {{
-    {"color", FLOAT, 4}
+  {"color", Type::FLOAT, 4}
 }};
 
 const static VertexFormat T = {{
-    {"texcoord", FLOAT, 3}
+  {"texcoord", Type::FLOAT, 3}
 }};
 
-}
+} // namespace format
 
 } // namespace gl

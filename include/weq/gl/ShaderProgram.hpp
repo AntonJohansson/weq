@@ -2,6 +2,7 @@
 
 #include <weq/resource/Resource.hpp>
 
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 
 #include <unordered_map>
@@ -10,6 +11,7 @@
 
 namespace gl{
 
+// Defined in <weq/gl/Shader.hpp>
 class Shader;
 
 // Resource that links already compiled shaders into a functioning shader program.
@@ -50,10 +52,10 @@ public:
   //     ->
   //   in vec3 position.
   void bind_attribute(const std::string& attribute,
-                      unsigned int type,
-                      unsigned int size,
-                      unsigned int stride,
-                      unsigned int offset);
+                      GLuint type,
+                      GLuint size,
+                      GLuint stride,
+                      GLuint offset);
 
   // Sets the feedback varyings to be used during Transform Feedback.
   // Needs to be called before the program is linked.
@@ -66,8 +68,8 @@ public:
   void set(const std::string& name, float f);
 
 private:
-  unsigned int _program;
-  std::unordered_map<unsigned int, std::shared_ptr<Shader>> _shaders;
+  GLuint _program;
+  std::unordered_map<GLenum, std::shared_ptr<Shader>> _shaders;
 };
 
 }

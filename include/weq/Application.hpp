@@ -34,7 +34,7 @@ public:
   // Fixed timestep update loop that drives the entire simulation,
   // calls update(double dt) which is responsible for dispatching
   // system update calls.
-  void main_loop() const;
+  void run();
 
   // Handles internal engine events such as Quit
   void receive(const event::Quit& q);

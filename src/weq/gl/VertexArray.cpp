@@ -10,28 +10,24 @@ VertexArray::VertexArray()
 }
 
 VertexArray::VertexArray(std::shared_ptr<ShaderProgram> program,
-                         std::vector<BufferFormat> bufferformat)
+                         gl::VertexBuffer& vbo,
+                         gl::VertexFormat format)
   : _program(program),
     _size(0){
   glGenVertexArrays(1, &_vao);
   bind();
 
-  for(auto& bf : bufferformat){
-    bind_attribute(bf);
-  }
+  bind_attribute(vbo, format);
 }
 
-void VertexArray::bind_attribute(BufferFormat bufferformat){
-  auto& buffer = bufferformat.first;
-  auto& format = bufferformat.second;
+void VertexArray::bind_attribute(gl::VertexBuffer& vbo, gl::VertexFormat format){
+  vbo.bind();
 
-  buffer.bind();
-
-  for(auto& v : format.components){
-    _program->bind_attribute(v.attribute, v.type, v.size, format.stride, v.offset);
+  for(auto& a : format.attributes){
+    _program->bind_attribute(a.attribute, GLenum(a.type), a.length, format.stride, a.offset);
   }
 
-  auto size = buffer.size() / format.vertex_size;
+  auto size = vbo.size() / format.format_length;
 
   if(_size != 0 && size != _size){
     std::cerr << "Format mismatch" << std::endl;

@@ -13,17 +13,15 @@ namespace component{
 struct Renderable{
   // Extracts relevant data from a given Mesh pointer. Renderable does not
   // take ownership of the allocated Mesh.
-  Renderable(Mesh* m, std::shared_ptr<gl::ShaderProgram> p)
-    : program(p){
+  Renderable(std::shared_ptr<Mesh> m, std::shared_ptr<gl::ShaderProgram> p)
+    : mesh(m),
+      program(p){
     draw_mode = m->draw_mode();
-    ebo = m->ebo();
-    vao = m->vao(program);
   }
 
+  std::shared_ptr<Mesh> mesh;
   std::shared_ptr<gl::ShaderProgram> program;
   gl::DrawMode draw_mode;
-  gl::ElementBuffer ebo;
-  gl::VertexArray vao;
 };
 
 } // namespace component

@@ -3,15 +3,12 @@
 #include <glad/glad.h>
 #include <spdlog/spdlog.h>
 
-#include <iterator>
-#include <tuple>
 #include <vector>
 
 namespace gl{
 
 // Enum for wrapping the OpenGL enums pertaining to
-// buffer Usage. TODO extern this?
-enum class Usage : GLenum {
+enum class Usage: GLenum {
   STREAM_DRAW = GL_STREAM_DRAW,
   STREAM_READ = GL_STREAM_READ,
   STREAM_COPY = GL_STREAM_COPY,
@@ -24,8 +21,7 @@ enum class Usage : GLenum {
 };
 
 // Enum for wrapping accessing modes to mapped memory regions.
-// TODO extern this?
-enum class Access : GLenum {
+enum class Access: GLenum {
   READ = GL_READ_ONLY,
   WRITE = GL_WRITE_ONLY,
   READ_WRITE = GL_READ_WRITE
@@ -35,36 +31,69 @@ enum class Access : GLenum {
 // buffer_target template param. specifies the OpenGL
 // buffer target (GL_ARRAY_BUFFER, ...)
 // The typename specifies the buffer type.
-template<GLuint buffer_target, typename T>
+template<GLenum buffer_target, typename T>
 class Buffer{
 public:
   // Does absolutely nothing.
-  Buffer(){}
+  Buffer()
+    : _usage(),
+      _data(nullptr),
+      _size(0),
+      _buffer(0){
+    glGenBuffers(1, &_buffer);
+  }
 
   // Generates the actual OpenGL buffer and calls
   // set_data(...) which uses the data vector and
   // buffer usage.
   Buffer(Usage b, std::vector<T>& data)
-    : _usage(b){
+    : _usage(b),
+      _data(nullptr),
+      _size(0),
+      _buffer(0){
     glGenBuffers(1, &_buffer);
     set_data(&data[0], data.size());
   }
 
   // Deletes the resoruces for the OpenGL buffer.
   ~Buffer(){
-    glDeleteBuffers(1, &_buffer);
+    if(glIsBuffer(_buffer) == GL_TRUE){
+      glDeleteBuffers(1, &_buffer);
+    }
+  }
+
+  // Copying not allowed.
+  Buffer(const Buffer<buffer_target, T>&) = delete;
+
+  Buffer(Buffer<buffer_target, T>&& rhs)
+    : _usage(rhs._usage),
+      _data(rhs._data),
+      _size(rhs._size),
+      _buffer(rhs._buffer){
+  }
+
+
+  Buffer<buffer_target, T>& operator=(const Buffer<buffer_target, T>&) = delete;
+
+  Buffer<buffer_target, T>& operator=(const Buffer<buffer_target, T>&& rhs){
+    using std::swap;
+    swap(_usage, rhs._usage);
+    swap(_data, rhs._data);
+    swap(_size, rhs._size);
+    swap(_buffer, rhs._buffer);
+    return *this;
   }
 
   // Binds the buffer for use with OpenGL functions,
   // this method asumes the specified template target
   // by default.
-  void bind(GLuint target = buffer_target){
+  void bind(GLenum target = buffer_target) const {
     glBindBuffer(target, _buffer);
   }
 
   // This function binds the buffer at a specific binding
   // point as referenced by the index.
-  void bind(GLuint target, unsigned int index){
+  void bind(GLenum target, unsigned int index) const {
     glBindBufferBase(target, index, _buffer);
   }
 
@@ -89,6 +118,7 @@ public:
   // TODO does currently not support mapped ranges.
   T* map(Access access){
     bind();
+
     void* ptr = glMapBuffer(buffer_target, GLenum(access));
 
     if(ptr == nullptr){

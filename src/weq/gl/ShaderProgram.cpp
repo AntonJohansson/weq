@@ -17,9 +17,9 @@ ShaderProgram::ShaderProgram(const std::string& id,
                              std::shared_ptr<gl::Shader> f,
                              std::shared_ptr<gl::Shader> g)
   : Resource(id){
-  if(v)_shaders[v->type()] = v;
-  if(f)_shaders[f->type()] = f;
-  if(g)_shaders[g->type()] = g;
+  if(v)_shaders[GLenum(v->type())] = v;
+  if(f)_shaders[GLenum(f->type())] = f;
+  if(g)_shaders[GLenum(g->type())] = g;
 
   _program = glCreateProgram();
 }
@@ -39,10 +39,10 @@ void ShaderProgram::link(){
   GLint status;
   glGetProgramiv(_program, GL_LINK_STATUS, &status);
 
-  if(status == GL_TRUE){
+  if(status){
     use();
   }else{
-    char buffer[512];
+    GLchar buffer[512];
     glGetProgramInfoLog(_program, 512, NULL, buffer);
 
     spdlog::get("console")->error("Failed to link program {}!\nLink log:\n{}", _id, buffer);
@@ -68,16 +68,18 @@ void ShaderProgram::use(){
 }
 
 void ShaderProgram::bind_attribute(const std::string& attribute,
-                                   unsigned int type,
-                                   unsigned int size,
-                                   unsigned int stride,
-                                   unsigned int offset){
+                                   GLuint type,
+                                   GLuint size,
+                                   GLuint stride,
+                                   GLuint offset){
+  GLvoid const* offset_pointer = static_cast<char const*>(0) + offset;
+
   auto attrib_location = glGetAttribLocation(_program, attribute.c_str());
-  glVertexAttribPointer(attrib_location, size, type, GL_FALSE, stride, (void*)offset);
+  glVertexAttribPointer(attrib_location, size, type, GL_FALSE, stride, offset_pointer);
   glEnableVertexAttribArray(attrib_location);
 }
 
-void ShaderProgram::set_feedback(std::vector<const char*> varyings){
+void ShaderProgram::set_feedback(std::vector<const GLchar*> varyings){
   glTransformFeedbackVaryings(_program, varyings.size(), varyings.data(), GL_INTERLEAVED_ATTRIBS);
 }
 
@@ -101,4 +103,4 @@ void ShaderProgram::set(const std::string& name, float f){
   glUniform1f(uniform, f);
 }
 
-}
+} // namespace gl

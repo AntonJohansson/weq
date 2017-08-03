@@ -17,7 +17,7 @@ Application::Application(){
 }
 
 
-void Application::main_loop(){
+void Application::run(){
   using Clock = std::chrono::high_resolution_clock;
 
   //constexpr nanoseconds timestep(16ms);

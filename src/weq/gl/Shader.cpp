@@ -14,17 +14,18 @@ Shader::Shader(const std::string& id, const std::string& filename)
   : Resource(id),
     _filename(filename){
   _type = type_from_filename(_filename);
+  _shader = glCreateShader(GLenum(_type));
 }
 
 Shader::Shader(const std::string& id, ShaderType type, const std::string& source)
   : Resource(id),
     _shader_source(source),
     _type(type){
-  _shader = glCreateShader(_type);
+  _shader = glCreateShader(GLenum(_type));
 }
 
 Shader::~Shader(){
-  unload();
+  glDeleteShader(_shader);
 }
 
 void Shader::load(){
@@ -36,15 +37,13 @@ void Shader::load(){
     _shader_source = read_from_file(_resource_path + _filename);
   }
 
-  _shader = glCreateShader(_type);
-  const char* source = _shader_source.c_str();
+  const GLchar* source = _shader_source.c_str();
   glShaderSource(_shader, 1, &source, NULL);
 
   compile();
 }
 
 void Shader::unload(){
-  glDeleteShader(_shader);
 }
 
 void Shader::compile(){
@@ -54,14 +53,11 @@ void Shader::compile(){
   GLint status;
   glGetShaderiv(_shader, GL_COMPILE_STATUS, &status);
 
-  if(status == GL_TRUE){
-  }else{
-    char buffer[512];
+  if(!status){
+    GLchar buffer[512];
     glGetShaderInfoLog(_shader, 512, NULL, buffer);
 
     spdlog::get("console")->error("Failed to compile shader {}!\nCompile logs:\n{}", _id, buffer);
-
-    delete_shader();
   }
 }
 
@@ -97,4 +93,4 @@ std::string Shader::read_from_file(const std::string& file){
   }
 }
 
-};
+} // namespace gl

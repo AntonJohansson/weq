@@ -1,6 +1,9 @@
 #pragma once
 
 #include <weq/resource/Resource.hpp>
+
+#include <glad/glad.h>
+
 #include <vector>
 #include <string>
 
@@ -33,5 +36,5 @@ private:
   load_texture(const std::string& id);
 
   std::vector<std::string> _texture_ids;
-  unsigned int _cubemap;
+  GLuint _cubemap;
 };

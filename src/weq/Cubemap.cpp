@@ -35,7 +35,7 @@ void Cubemap::load(){
 void Cubemap::unload(){
 }
 
-void Cubemap::bind(){
+void Cubemap::bind() const {
   glBindTexture(GL_TEXTURE_CUBE_MAP, _cubemap);
 }
 

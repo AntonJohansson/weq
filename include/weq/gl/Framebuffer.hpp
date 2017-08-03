@@ -79,8 +79,8 @@ public:
   }
 
 private:
-  unsigned int _texture;
-  unsigned int _id;
+  GLuint _texture;
+  GLuint _id;
 };
 
 } // namespace gl

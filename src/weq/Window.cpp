@@ -89,11 +89,11 @@ Window::~Window(){
 
 // Do stuff
 
-void Window::make_current(){
+void Window::make_current() const {
   glfwMakeContextCurrent(_window);
 }
 
-void Window::swap_buffers(){
+void Window::swap_buffers() const {
   glfwSwapBuffers(_window);
 }
 
@@ -155,10 +155,6 @@ void Window::set_cursor_mode(CursorMode mode){
 }
 
 // Get stuff
-
-bool Window::should_close(){
-  return glfwWindowShouldClose(_window);
-}
 
 GLFWwindow* Window::current(){
   return glfwGetCurrentContext();

@@ -58,9 +58,6 @@ void InputAbstractionLayer::register_scroll(double xoffset, double yoffset){
   }
 }
 
-void InputAbstractionLayer::receive(const event::RegisterInput& event){
-}
-
 void InputAbstractionLayer::receive(const event::ChangeInputContext& event){
   _context = event.context;
 }
