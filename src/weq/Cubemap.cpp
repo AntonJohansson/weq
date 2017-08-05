@@ -6,7 +6,7 @@
 
 Cubemap::Cubemap(const std::string& id,
                  const std::vector<std::string>& texture_ids)
-  : Resource(id),
+  : Resource(id, ResourceType::FILE),
     _texture_ids(texture_ids){
   glGenTextures(1, &_cubemap);
 }

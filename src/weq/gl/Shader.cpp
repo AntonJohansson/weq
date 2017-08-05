@@ -11,13 +11,13 @@
 namespace gl{
 
 Shader::Shader(const std::string& id)
-  : Resource(id){
+  : Resource(id, ResourceType::FILE){
   _type = type_from_filename(_id);
   _shader = glCreateShader(GLenum(_type));
 }
 
 Shader::Shader(const std::string& id, ShaderType type, const std::string& source)
-  : Resource(id),
+  : Resource(id, ResourceType::MEMORY),
     _shader_source(source),
     _type(type){
   _shader = glCreateShader(GLenum(_type));

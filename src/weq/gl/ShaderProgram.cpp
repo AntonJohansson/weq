@@ -8,7 +8,7 @@
 namespace gl{
 
 ShaderProgram::ShaderProgram(const std::string& id)
-  : Resource(id){
+  : Resource(id, ResourceType::FILE){
   _program = glCreateProgram();
 }
 
@@ -16,7 +16,7 @@ ShaderProgram::ShaderProgram(const std::string& id,
                              std::shared_ptr<gl::Shader> v,
                              std::shared_ptr<gl::Shader> f,
                              std::shared_ptr<gl::Shader> g)
-  : Resource(id){
+  : Resource(id, ResourceType::MEMORY){
   if(v)_shaders[GLenum(v->type())] = v;
   if(f)_shaders[GLenum(f->type())] = f;
   if(g)_shaders[GLenum(g->type())] = g;

@@ -96,8 +96,7 @@ void Renderer::update(ex::EntityManager& entities,
       r.screen_mesh->vao(r.screen->id()).bind();
       r.screen_mesh->ebo().bind();
 
-      glActiveTexture(GL_TEXTURE0);
-      r.fbo.bind_texture();
+      r.fbo.texture()->bind(0);
 
       glDrawElements(GLenum(r.draw_mode), r.screen_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
     });
