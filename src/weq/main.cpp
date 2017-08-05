@@ -29,7 +29,7 @@ public:
     _systems.add<weq::system::Input>();
 
     //_systems.add<weq::system::WaveSimulation>();
-    _systems.add<weq::system::WaveGPUSimulation>();
+    //_systems.add<weq::system::WaveGPUSimulation>();
 
     _systems.add<weq::system::Camera>();
     _systems.add<weq::system::Renderer>();
@@ -40,7 +40,7 @@ public:
     configure_states();
     add_camera();
     add_wave();
-    add_ui();
+    //add_ui();
   }
 
   void configure_states(){
@@ -64,36 +64,90 @@ public:
   }
 
   void add_wave(){
-    float resolution = 1000.0f;
+    float resolution = 100.0f;
     float size = 5.0f;
 
-    auto rv = _resource_manager.get<gl::Shader>("render_v", "render.vert");
-    auto rf = _resource_manager.get<gl::Shader>("render_f", "render.frag");
-    auto rp = _resource_manager.get<gl::ShaderProgram>("render.prog", rv, rf);
-    rp->link();
+    // Scene shader
+    auto scene_v = _resource_manager.get<gl::Shader>("scene.vert");
+    auto scene_f = _resource_manager.get<gl::Shader>("scene.frag");
+    auto scene_p = _resource_manager.get<gl::ShaderProgram>("scene.prog",
+                                                            scene_v,
+                                                            scene_f);
+    scene_p->link();
 
-//    auto fv = _resource_manager.get<gl::Shader>("force_v", "force.vert");
-//    auto ff = _resource_manager.get<gl::Shader>("force_f", "force.frag");
-//    auto fp = _resource_manager.get<gl::ShaderProgram>("force.prog", fv, ff);
-//    fp->link();
+    // Screen shader
+    auto screen_v = _resource_manager.get<gl::Shader>("screen.vert");
+    auto screen_f = _resource_manager.get<gl::Shader>("screen.frag");
+    auto screen_p = _resource_manager.get<gl::ShaderProgram>("screen.prog",
+                                                             screen_v,
+                                                             screen_f);
 
-    auto mesh_data = primitive::plane::solid(resolution,
-                                             resolution,
-                                             size/resolution,
-                                             gl::format::VNCT);
 
-    auto mesh = std::make_shared<Mesh>(rp, mesh_data, gl::DrawMode::TRIANGLES);
+    screen_p->link();
+
+    // Force calculation shader
+    auto force_v = _resource_manager.get<gl::Shader>("force.vert");
+    auto force_f = _resource_manager.get<gl::Shader>("force.frag");
+    auto force_p = _resource_manager.get<gl::ShaderProgram>("force.prog",
+                                                            force_v,
+                                                            force_f);
+    force_p->link();
+
+    // Screen mesh data
+    gl::VertexFormat VT2 = {{
+        {"position", gl::Type::FLOAT, 2},
+        {"texcoord", gl::Type::FLOAT, 2}
+      }};
+
+    MeshData screen_mesh_data(VT2);
+    screen_mesh_data.interleaved = {
+      -1.0f,  1.0f,  0.0f, 1.0f, // top left
+      1.0f,  1.0f,  1.0f, 1.0f, // top right
+      1.0f, -1.0f,  1.0f, 0.0f, // bottom right
+      -1.0f, -1.0f,  0.0f, 0.0f, // bottom left
+    };
+
+    screen_mesh_data.elements = {
+      0, 1, 2,
+      2, 3, 0
+    };
+
+    auto screen_mesh = std::make_shared<Mesh>(screen_mesh_data, gl::DrawMode::TRIANGLES);
+
+    // Mesh for wave plane
+    auto wave_mesh_data = primitive::plane::solid(resolution,
+                                                  resolution,
+                                                  size/resolution,
+                                                  gl::format::VNCT);
+
+    auto wave_mesh = std::make_shared<Mesh>(wave_mesh_data, gl::DrawMode::TRIANGLES);
+    wave_mesh->generate_vao(scene_p);
+    wave_mesh->generate_vao(force_p);
+    screen_mesh->generate_vao(screen_p);
 
     auto wave = _entities.create();
-    // wave.assign<component::WaveGPU>(100, 100, 1, 0.2f, fp);
+//    wave.assign<component::WaveGPU>(resolution,
+//                                    resolution,
+//                                    size/resolution,
+//                                    0.2f,
+//                                    force_p);
+
     wave.assign<component::Transform>()->_translate = {-size/2, -size/2, 0};
-    wave.assign<component::Renderable>(mesh, rp);
+    auto r = wave.assign<component::Renderable>(wave_mesh);
+    r->scene = scene_p;
+    r->screen = screen_p;
+    r->screen_mesh = screen_mesh;
+
+    //auto texture = _entities.create();
+    //texture.assign<component::Transform>()->_translate = {0,0,1};
+    //texture.assign<component::Renderable>(texture_mesh, rp);
   }
 
   //TODO improve UI
   void add_ui(){
     auto ui = _entities.create();
     ui.assign<component::ImGui>([](ex::EventManager& e){
+        //ImGui::ShowTestWindow();
         ImGui::Begin("Menu");
         ImGui::SetWindowCollapsed("Menu", false, ImGuiSetCond_FirstUseEver);
         ImGui::SetWindowPos("Menu", ImVec2(10,10), ImGuiSetCond_Appearing);

@@ -23,7 +23,7 @@ public:
   // Creates a shader resource with id which should be loaded from file.
   // Automatically assumes shader type from file extension by calling
   // type_from_filename(...)
-  Shader(const std::string& id, const std::string& file);
+  Shader(const std::string& id);
 
   // Creates a shader resource with id, ShaderType type and loads them
   // actual shader directly from memory.
@@ -56,7 +56,6 @@ private:
   // Handles loading the shader source from file.
   std::string read_from_file(const std::string& file);
 
-  std::string _filename;
   std::string _shader_source;
   ShaderType _type;
   GLuint _shader;

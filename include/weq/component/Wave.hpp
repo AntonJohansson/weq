@@ -23,7 +23,9 @@ struct WaveGPU{
   WaveGPU(unsigned int w, unsigned int h,
           float gridsize, float c,
           ProgramPtr force)
-    : r(c*c/(gridsize*gridsize)),
+    : width(w),
+      height(h),
+      r(c*c/(gridsize*gridsize)),
       force_fbo(w, h),
       force_shader(force){
   }
@@ -35,8 +37,6 @@ struct WaveGPU{
 
   gl::Framebuffer force_fbo;
   std::shared_ptr<gl::ShaderProgram> force_shader;
-
-  Mesh* mesh;
 };
 
 // Component describing all the relevant data for performing

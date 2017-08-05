@@ -6,6 +6,7 @@
 #include <weq/Window.hpp>
 #include <weq/event/RegisterInput.hpp>
 
+#include <weq/gl/VertexFormat.hpp>
 #include <weq/gl/Framebuffer.hpp>
 #include <weq/Texture.hpp>
 #include <weq/resource/ResourceManager.hpp>
@@ -42,9 +43,8 @@ void Renderer::configure(ex::EventManager& events){
 
   events.subscribe<event::ActiveInput>(*this);
 
-  //texture = engine::resource_mgr()->get<Texture>("sample.png");
-  //texture = engine::resource_mgr()->get<Texture>("cloudtop_bk.tga");
-  //texture->bind(); //TODO TEMP
+  texture = std::make_shared<Texture>("cloudtop_bk.tga");
+  texture->load();
 }
 
 void Renderer::update(ex::EntityManager& entities,
@@ -65,16 +65,36 @@ void Renderer::update(ex::EntityManager& entities,
   entities.each<Renderable, Transform>([dt, &active_camera](ex::Entity e,
                                                             Renderable& r,
                                                             Transform& t){
+
+      // Draw scene to fbo
+
+      r.fbo.bind();
+
       // calculate mvp for each model
       mvp = active_camera.viewproj * t.model();
-      r.program->use();
-      r.program->set("mvp", mvp);
-      r.program->set("normal_matrix", active_camera.normal_matrix);
+      r.scene->use();
+      r.scene->set("mvp", mvp);
+      r.scene->set("normal_matrix", active_camera.normal_matrix);
 
-      r.mesh->vao().bind();
+      r.mesh->vao(r.scene->id()).bind();
       r.mesh->ebo().bind();
 
       glDrawElements(GLenum(r.draw_mode), r.mesh->ebo().size(), GL_UNSIGNED_INT, 0);
+
+      r.fbo.unbind();
+
+      // Draw screen from fbo
+
+      r.screen->use();
+      r.screen->set("framebuffer", 0);
+
+      r.screen_mesh->vao(r.screen->id()).bind();
+      r.screen_mesh->ebo().bind();
+
+      glActiveTexture(GL_TEXTURE0);
+      r.fbo.bind_texture();
+
+      glDrawElements(GLenum(r.draw_mode), r.screen_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
     });
 
   render_ui(entities, events, dt);

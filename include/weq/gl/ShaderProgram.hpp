@@ -66,6 +66,7 @@ public:
   void set(const std::string& name, glm::vec3 vec);
   void set(const std::string& name, glm::vec4 vec);
   void set(const std::string& name, float f);
+  void set(const std::string& name, int i);
 
 private:
   GLuint _program;

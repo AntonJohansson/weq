@@ -116,7 +116,7 @@ const static VertexFormat VNC = {{
 const static VertexFormat VNT = {{
   {"position", Type::FLOAT, 3},
   {"normal",   Type::FLOAT, 3},
-  {"texcoord", Type::FLOAT, 3}
+  {"texcoord", Type::FLOAT, 2}
 }};
 
 const static VertexFormat VC = {{
@@ -126,12 +126,12 @@ const static VertexFormat VC = {{
 
 const static VertexFormat VT = {{
   {"position", Type::FLOAT, 3},
-  {"texcoord", Type::FLOAT, 3}
+  {"texcoord", Type::FLOAT, 2}
 }};
 
 const static VertexFormat NT = {{
   {"normal",   Type::FLOAT, 3},
-  {"texcoord", Type::FLOAT, 3}
+  {"texcoord", Type::FLOAT, 2}
 }};
 
 const static VertexFormat NC = {{
@@ -152,7 +152,7 @@ const static VertexFormat C = {{
 }};
 
 const static VertexFormat T = {{
-  {"texcoord", Type::FLOAT, 3}
+  {"texcoord", Type::FLOAT, 2}
 }};
 
 } // namespace format

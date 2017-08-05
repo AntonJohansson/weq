@@ -103,4 +103,9 @@ void ShaderProgram::set(const std::string& name, float f){
   glUniform1f(uniform, f);
 }
 
+void ShaderProgram::set(const std::string& name, int i){
+  auto uniform = glGetUniformLocation(_program, name.c_str());
+  glUniform1i(uniform, i);
+}
+
 } // namespace gl

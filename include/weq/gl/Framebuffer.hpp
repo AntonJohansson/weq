@@ -24,40 +24,39 @@ public:
     glGenTextures(1, &_texture);
     bind_texture();
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    /* Depth buffer
-       unsigned int depth_render_buffer;
-       glGenRenderBuffers(1, &depth_render_buffer);
-       glBindRenderBuffer(GL_RENDERBUFFER, depth_render_buffer);
-       glRenderBufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 1024, 768);
-       glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_render_buffer);
-       ...
-       glDeleteRenderbuffers(depth_render_buffer);
-    */
+    //glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, _texture, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _texture, 0);
 
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, _texture, 0);
+    // Renderbuffer Depth
+    glGenRenderbuffers(1, &_rbo_depth);
+    glBindRenderbuffer(GL_RENDERBUFFER, _rbo_depth);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, w, h);
+    //glRenderBufferStorage(GL_RENDER_BUFFER, GL_DEPTH24_STENCIL8, w, h);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _rbo_depth);
+    //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _rbo_depth);
 
-    GLenum draw_buffers[1] = {GL_COLOR_ATTACHMENT0};
-    glDrawBuffers(1, draw_buffers);
-
-    if(check_complete()){
+    if(!check_complete()){
       spdlog::get("console")->error("Failed to create frambuffer {}!", _id);
     }
+
+    unbind();
   }
 
   // Destroys the framebuffer, render buffers and texutres.
   ~Framebuffer(){
     glDeleteFramebuffers(1, &_id);
+    glDeleteRenderbuffers(1, &_rbo_depth);
     glDeleteTextures(1, &_texture);
   }
 
   // Returns true if the framebuffer creation was successful.
   bool check_complete(){
-    return glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE;
+    return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
   }
 
   // Binds the current framebuffer handle for use with OpenGL functions,
@@ -78,7 +77,11 @@ public:
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
   }
 
+  // Returns internal texture handle.
+  GLuint texture(){return _texture;}
+
 private:
+  GLuint _rbo_depth;
   GLuint _texture;
   GLuint _id;
 };

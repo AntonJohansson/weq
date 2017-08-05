@@ -24,6 +24,9 @@ public:
 
   void bind();
 
+  unsigned int width() const {return _width;}
+  unsigned int height() const {return _height;}
+
 private:
   unsigned int _width;
   unsigned int _height;

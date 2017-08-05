@@ -10,10 +10,9 @@
 
 namespace gl{
 
-Shader::Shader(const std::string& id, const std::string& filename)
-  : Resource(id),
-    _filename(filename){
-  _type = type_from_filename(_filename);
+Shader::Shader(const std::string& id)
+  : Resource(id){
+  _type = type_from_filename(_id);
   _shader = glCreateShader(GLenum(_type));
 }
 
@@ -34,7 +33,7 @@ void Shader::load(){
 
   if(_shader_source.empty()){
     // Load from file
-    _shader_source = read_from_file(_resource_path + _filename);
+    _shader_source = read_from_file(_resource_path + _id);
   }
 
   const GLchar* source = _shader_source.c_str();

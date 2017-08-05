@@ -12,6 +12,7 @@ public:
   virtual void load() = 0;
   virtual void unload() = 0;
   virtual void reload(){unload();load();}
+  const std::string& id(){return _id;}
 
 protected:
   static constexpr auto _resource_path = "/Users/antonjohansson/git/WaveEquationFDM/res/";
