@@ -38,7 +38,6 @@ void Renderer::configure(ex::EventManager& events){
   //glBlendEquation(GL_FUNC_ADD);
   //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   //glEnable(GL_CULL_FACE);
-  glEnable(GL_DEPTH_TEST);
   //glEnable(GL_SCISSOR_TEST);
 
   events.subscribe<event::ActiveInput>(*this);
@@ -54,7 +53,7 @@ void Renderer::update(ex::EntityManager& entities,
 
   static glm::mat4 mvp;
 
-  _window->clear(0.0f, 0.0f, 0.0f, 1.0f);
+  //_window->clear(0.0f, 0.0f, 0.0f, 1.0f);
 
   component::Camera active_camera;
   entities.each<component::Camera, component::ActiveCamera>([&active_camera](ex::Entity e, component::Camera& c, component::ActiveCamera& a){active_camera = c;});
@@ -70,6 +69,11 @@ void Renderer::update(ex::EntityManager& entities,
 
       r.fbo.bind();
 
+      glClearColor(0, 0, 0, 1);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      glEnable(GL_DEPTH_TEST);
+      //glDepthMask(GL_TRUE);
+
       // calculate mvp for each model
       mvp = active_camera.viewproj * t.model();
       r.scene->use();
@@ -81,6 +85,7 @@ void Renderer::update(ex::EntityManager& entities,
 
       glDrawElements(GLenum(r.draw_mode), r.mesh->ebo().size(), GL_UNSIGNED_INT, 0);
 
+      glDisable(GL_DEPTH_TEST);
       r.fbo.unbind();
 
       // Draw screen from fbo
@@ -97,11 +102,11 @@ void Renderer::update(ex::EntityManager& entities,
       glDrawElements(GLenum(r.draw_mode), r.screen_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
     });
 
-  render_ui(entities, events, dt);
+  //render_ui(entities, events, dt);
 
   _window->swap_buffers();
 
-  // Check for OpenGL errors (TODO should be able to disable this)
+  // Check for OpenGL errors (TODO should be able to disable this?)
   GLenum err;
   while((err = glGetError()) != GL_NO_ERROR){
     spdlog::get("console")->error("GL-error: {}", err);
