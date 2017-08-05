@@ -40,7 +40,7 @@ public:
     configure_states();
     add_camera();
     add_wave();
-    //add_ui();
+    add_ui();
   }
 
   void configure_states(){
@@ -147,7 +147,7 @@ public:
   void add_ui(){
     auto ui = _entities.create();
     ui.assign<component::ImGui>([](ex::EventManager& e){
-        //ImGui::ShowTestWindow();
+        ImGui::ShowTestWindow();
         ImGui::Begin("Menu");
         ImGui::SetWindowCollapsed("Menu", false, ImGuiSetCond_FirstUseEver);
         ImGui::SetWindowPos("Menu", ImVec2(10,10), ImGuiSetCond_Appearing);

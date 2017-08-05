@@ -9,6 +9,9 @@ namespace gl{
 // Also supports depth and stencil render targets
 // (not yet tho lol).
 // TODO integrate with existing texture class.
+// TODO Make more customizable.
+// TODO support multisampling.
+// TODO support resizing.
 class Framebuffer{
 public:
   // Creates a framebuffer with the specified width and height.

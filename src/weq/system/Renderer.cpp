@@ -61,10 +61,11 @@ void Renderer::update(ex::EntityManager& entities,
   // caluclate vp-matrix
   active_camera.viewproj = active_camera.projection * active_camera.view;
 
+  // Move draw code out of entities loop, works fine since there's only a
+  // single entity.
   entities.each<Renderable, Transform>([dt, &active_camera](ex::Entity e,
                                                             Renderable& r,
                                                             Transform& t){
-
       // Draw scene to fbo
 
       r.fbo.bind();
@@ -72,7 +73,6 @@ void Renderer::update(ex::EntityManager& entities,
       glClearColor(0, 0, 0, 1);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       glEnable(GL_DEPTH_TEST);
-      //glDepthMask(GL_TRUE);
 
       // calculate mvp for each model
       mvp = active_camera.viewproj * t.model();
@@ -102,7 +102,7 @@ void Renderer::update(ex::EntityManager& entities,
       glDrawElements(GLenum(r.draw_mode), r.screen_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
     });
 
-  //render_ui(entities, events, dt);
+  render_ui(entities, events, dt);
 
   _window->swap_buffers();
 
