@@ -26,6 +26,7 @@ public:
   bool is_action(int key){return _action_map.find(key) != _action_map.end();}
   bool is_state(int key){return _state_map.find(key) != _state_map.end();}
   bool is_range(int key){return _range_map.find(key) != _range_map.end();}
+
   const InputAction& action(int key){return _action_map[key];}
   const InputState& state(int key){return _state_map[key];}
   const InputRange& range(int key){return _range_map[key];}

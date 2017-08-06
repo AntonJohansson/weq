@@ -1,6 +1,5 @@
 #include <weq/Texture.hpp>
 
-#include <glad/glad.h>
 #include <spdlog/spdlog.h>
 #include <FreeImage.h>
 

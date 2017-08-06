@@ -1,13 +1,21 @@
 #pragma once
 
-#include <weq/gl/VertexFormat.hpp>
-#include <weq/gl/Buffer.hpp>
-#include <weq/gl/ShaderProgram.hpp>
+#include <glad/glad.h>
 
-#include <utility>
 #include <memory>
 
 namespace gl{
+
+// Defined in <weq/gl/Buffer.hpp>
+template<GLenum buffer_target, typename T>
+class Buffer;
+using VertexBuffer = Buffer<GL_ARRAY_BUFFER, float>;
+
+// Defined in <weq/gl/VertexFormat.hpp>
+class ShaderProgram;
+
+// Defined in <weq/gl/VertexFormat.hpp>
+struct VertexFormat;
 
 // Abstraction of an OpenGL Vertex Array that handles the
 // binding between the Vertex Buffer and Shader Program.
@@ -16,17 +24,16 @@ public:
   // Creates the OpenGL handle.
   VertexArray();
 
-
   // Creates the OpenGL handle.
   // Also binds the vertex buffers and accompanied vertex format
   // with the shader program, through calling bind_attribute(...)
-  VertexArray(std::shared_ptr<ShaderProgram> program,
+  VertexArray(std::shared_ptr<gl::ShaderProgram> program,
               gl::VertexBuffer& vbo,
-              gl::VertexFormat format);
+              gl::VertexFormat& format);
 
   // Binds the parameter (vertex buffer and vertex format) to the shader
   // specified in the constructor.
-  void bind_attribute(gl::VertexBuffer& vbo, gl::VertexFormat format);
+  void bind_attribute(gl::VertexBuffer& vbo, gl::VertexFormat& format);
 
   // Binds for use with OpenGL functions.
   void bind() const;
@@ -44,4 +51,4 @@ private:
   size_t _size;
 };
 
-};
+} // namespace gl

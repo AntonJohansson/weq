@@ -1,15 +1,18 @@
 #include <weq/system/Input.hpp>
 #include <weq/system/InputAbstractionLayer.hpp>
-#include <weq/Window.hpp>
 #include <weq/system/InputRaw.hpp>
+#include <weq/system/InputTypes.hpp>
+#include <weq/system/InputContext.hpp>
+#include <weq/Window.hpp>
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
 
 #include <GLFW/glfw3.h>
 
-#include <string>
-#include <deque>
+#include <memory>
+
+// TODO read input from config file instead of hard coded.
 
 namespace weq::system{
 
@@ -78,8 +81,8 @@ void Input::configure(ex::EventManager& events){
   // Setup ImGui binding
   ImGui_ImplGlfwGL3_Init(_window_context, false);
 
-  _ial = new InputAbstractionLayer({
-      {
+  auto context = InputContext(
+    {
         {raw::Key::E, InputAction::SPAWN_PLANE_WAVE},
         {raw::Key::Q, InputAction::SPAWN_WAVELET},
         {raw::Key::C, InputAction::CLEAR},
@@ -112,7 +115,9 @@ void Input::configure(ex::EventManager& events){
         {raw::Axes::MOUSE_SCROLL_X, InputRange::CURSOR_SCROLL_X},
         {raw::Axes::MOUSE_SCROLL_Y, InputRange::CURSOR_SCROLL_Y},
       }
-    });
+    );
+
+  _ial = new InputAbstractionLayer(std::shared_ptr<InputContext>(&context));
 }
 
 void Input::update(ex::EntityManager& entities,

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glad/glad.h>
-#include <spdlog/spdlog.h>
+#include <memory>
 
 class Texture;
 
@@ -10,7 +10,6 @@ namespace gl{
 // Abstraction of a common OpenGL framebuffer.
 // Also supports depth and stencil render targets
 // (not yet tho lol).
-// TODO integrate with existing texture class.
 // TODO Make more customizable.
 // TODO support multisampling.
 // TODO support resizing.

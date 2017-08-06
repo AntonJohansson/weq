@@ -75,16 +75,6 @@ public:
                                                             scene_f);
     scene_p->link();
 
-    // Screen shader
-    auto screen_v = _resource_manager.get<gl::Shader>("screen.vert");
-    auto screen_f = _resource_manager.get<gl::Shader>("screen.frag");
-    auto screen_p = _resource_manager.get<gl::ShaderProgram>("screen.prog",
-                                                             screen_v,
-                                                             screen_f);
-
-
-    screen_p->link();
-
     // Force calculation shader
     auto force_v = _resource_manager.get<gl::Shader>("force.vert");
     auto force_f = _resource_manager.get<gl::Shader>("force.frag");
@@ -92,27 +82,6 @@ public:
                                                             force_v,
                                                             force_f);
     force_p->link();
-
-    // Screen mesh data
-    gl::VertexFormat VT2 = {{
-        {"position", gl::Type::FLOAT, 2},
-        {"texcoord", gl::Type::FLOAT, 2}
-      }};
-
-    MeshData screen_mesh_data(VT2);
-    screen_mesh_data.interleaved = {
-      -1.0f,  1.0f,  0.0f, 1.0f, // top left
-      1.0f,  1.0f,  1.0f, 1.0f, // top right
-      1.0f, -1.0f,  1.0f, 0.0f, // bottom right
-      -1.0f, -1.0f,  0.0f, 0.0f, // bottom left
-    };
-
-    screen_mesh_data.elements = {
-      0, 1, 2,
-      2, 3, 0
-    };
-
-    auto screen_mesh = std::make_shared<Mesh>(screen_mesh_data, gl::DrawMode::TRIANGLES);
 
     // Mesh for wave plane
     auto wave_mesh_data = primitive::plane::solid(resolution,
@@ -123,7 +92,6 @@ public:
     auto wave_mesh = std::make_shared<Mesh>(wave_mesh_data, gl::DrawMode::TRIANGLES);
     wave_mesh->generate_vao(scene_p);
     wave_mesh->generate_vao(force_p);
-    screen_mesh->generate_vao(screen_p);
 
     auto wave = _entities.create();
 //    wave.assign<component::WaveGPU>(resolution,
@@ -135,12 +103,6 @@ public:
     wave.assign<component::Transform>()->_translate = {-size/2, -size/2, 0};
     auto r = wave.assign<component::Renderable>(wave_mesh);
     r->scene = scene_p;
-    r->screen = screen_p;
-    r->screen_mesh = screen_mesh;
-
-    //auto texture = _entities.create();
-    //texture.assign<component::Transform>()->_translate = {0,0,1};
-    //texture.assign<component::Renderable>(texture_mesh, rp);
   }
 
   //TODO improve UI

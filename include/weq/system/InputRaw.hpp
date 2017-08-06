@@ -154,4 +154,4 @@ enum Axes: int{
   MOUSE_SCROLL_Y = 13,
 };
 
-};
+} // namespace raw

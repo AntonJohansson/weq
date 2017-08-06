@@ -2,7 +2,7 @@
 #include <weq/component/Camera.hpp>
 #include <weq/component/Transform.hpp>
 #include <weq/event/Window.hpp>
-#include <weq/event/RegisterInput.hpp>
+#include <weq/event/Input.hpp>
 
 #include <spdlog/spdlog.h>
 #include <glm/gtx/rotate_vector.hpp>

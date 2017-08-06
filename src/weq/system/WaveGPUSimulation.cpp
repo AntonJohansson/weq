@@ -1,18 +1,11 @@
 #include <weq/system/WaveGPUSimulation.hpp>
 #include <weq/component/Renderable.hpp>
 #include <weq/component/Wave.hpp>
-#include <weq/event/RegisterInput.hpp>
+#include <weq/event/Input.hpp>
 
 #include <spdlog/spdlog.h>
 
-#include <glad/glad.h> //@TODO required?
-#include <glm/gtc/matrix_transform.hpp>
-
-#include <algorithm>
-#include <functional>
-#include <deque>
-#include <iostream>
-#include <cmath>
+#include <glad/glad.h>
 
 using component::Renderable;
 using component::WaveGPU;

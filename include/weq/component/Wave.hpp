@@ -1,9 +1,8 @@
 #pragma once
 
-#include <weq/FlatBuffer.hpp>
 #include <weq/gl/ShaderProgram.hpp>
 #include <weq/gl/Framebuffer.hpp>
-#include <weq/Mesh.hpp>
+#include <weq/FlatBuffer.hpp>
 #include <memory>
 
 namespace component{

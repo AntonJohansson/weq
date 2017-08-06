@@ -6,12 +6,16 @@
 namespace ex = entityx;
 
 namespace component{
+// Defined in <weq/component/Camera.hpp>
 struct Camera;
+// Defined in <weq/component/Camera.hpp>
 struct Transform;
 }
 
 namespace event{
+// Defined in <weq/event/Window.hpp>
 struct WindowUpdate;
+// Defined in <weq/event/Input.hpp>
 struct ActiveInput;
 }
 
@@ -35,6 +39,7 @@ public:
   void receive(const event::ActiveInput& event);
 
 private:
+  // TODO: Not sure about these ones.
   glm::vec2 _delta_cursor;
   glm::vec3 _movement_amount;
   float _aspect_ratio;

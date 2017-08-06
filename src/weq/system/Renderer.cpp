@@ -1,15 +1,15 @@
 #include <weq/system/Renderer.hpp>
+#include <weq/gl/ShaderProgram.hpp>
+#include <weq/gl/Shader.hpp>
 #include <weq/component/Renderable.hpp>
 #include <weq/component/Transform.hpp>
 #include <weq/component/ImGui.hpp>
 #include <weq/component/Camera.hpp>
-#include <weq/Window.hpp>
-#include <weq/event/RegisterInput.hpp>
-
+#include <weq/event/Input.hpp>
 #include <weq/gl/VertexFormat.hpp>
 #include <weq/gl/Framebuffer.hpp>
+#include <weq/Window.hpp>
 #include <weq/Texture.hpp>
-#include <weq/resource/ResourceManager.hpp>
 
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp>
@@ -17,10 +17,14 @@
 #include <imgui/imgui_impl_glfw_gl3.h>
 #include <spdlog/spdlog.h>
 
-#include <thread>
-
 namespace weq::system{
+
+namespace{
 std::shared_ptr<Texture> texture;
+std::shared_ptr<gl::ShaderProgram> screen_p;
+std::shared_ptr<Mesh> screen_mesh;
+std::shared_ptr<gl::Framebuffer> scene_fbo;
+}
 
 using component::Renderable;
 using component::Transform;
@@ -34,14 +38,46 @@ Renderer::~Renderer(){
 void Renderer::configure(ex::EventManager& events){
   _window = std::make_unique<Window>(events);
 
-  //glEnable(GL_BLEND);
-  //glBlendEquation(GL_FUNC_ADD);
-  //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  //glEnable(GL_CULL_FACE);
-  //glEnable(GL_SCISSOR_TEST);
-
+  // Events
   events.subscribe<event::ActiveInput>(*this);
 
+  // Setup screen shader
+  auto screen_v = std::make_shared<gl::Shader>("screen.vert");
+  screen_v->load();
+  auto screen_f = std::make_shared<gl::Shader>("screen.frag");
+  screen_f->load();
+  screen_p = std::make_shared<gl::ShaderProgram>("screen.prog",
+                                                 screen_v,
+                                                 screen_f);
+  screen_p->load();
+  screen_p->link();
+
+  // Setup screen mesh
+  gl::VertexFormat VT2 = {{
+      {"position", gl::Type::FLOAT, 2},
+      {"texcoord", gl::Type::FLOAT, 2}
+    }};
+
+  MeshData screen_mesh_data(VT2);
+  screen_mesh_data.interleaved = {
+    -1.0f,  1.0f,  0.0f, 1.0f, // top left
+    1.0f,  1.0f,  1.0f, 1.0f, // top right
+    1.0f, -1.0f,  1.0f, 0.0f, // bottom right
+    -1.0f, -1.0f,  0.0f, 0.0f, // bottom left
+  };
+
+  screen_mesh_data.elements = {
+    0, 1, 2,
+    2, 3, 0
+  };
+
+  screen_mesh = std::make_shared<Mesh>(screen_mesh_data,
+                                       gl::DrawMode::TRIANGLES);
+  screen_mesh->generate_vao(screen_p);
+
+  scene_fbo = std::make_shared<gl::Framebuffer>(_window->width(), _window->height());
+
+  // Setup cubemap
   texture = std::make_shared<Texture>("cloudtop_bk.tga");
   texture->load();
 }
@@ -51,29 +87,28 @@ void Renderer::update(ex::EntityManager& entities,
                       ex::TimeDelta dt){
   (void)events;
 
-  static glm::mat4 mvp;
+  static glm::mat4 mvp; // should prob not be static (mem.?).
 
-  //_window->clear(0.0f, 0.0f, 0.0f, 1.0f);
-
+  // Get the active camera (TODO must be a better way).
   component::Camera active_camera;
   entities.each<component::Camera, component::ActiveCamera>([&active_camera](ex::Entity e, component::Camera& c, component::ActiveCamera& a){active_camera = c;});
 
   // caluclate vp-matrix
   active_camera.viewproj = active_camera.projection * active_camera.view;
 
+  // Bind scene fbo.
+  scene_fbo->bind();
+
+  glClearColor(0, 0, 0, 1);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glEnable(GL_DEPTH_TEST);
+
   // Move draw code out of entities loop, works fine since there's only a
   // single entity.
+
   entities.each<Renderable, Transform>([dt, &active_camera](ex::Entity e,
                                                             Renderable& r,
                                                             Transform& t){
-      // Draw scene to fbo
-
-      r.fbo.bind();
-
-      glClearColor(0, 0, 0, 1);
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      glEnable(GL_DEPTH_TEST);
-
       // calculate mvp for each model
       mvp = active_camera.viewproj * t.model();
       r.scene->use();
@@ -83,24 +118,26 @@ void Renderer::update(ex::EntityManager& entities,
       r.mesh->vao(r.scene->id()).bind();
       r.mesh->ebo().bind();
 
-      glDrawElements(GLenum(r.draw_mode), r.mesh->ebo().size(), GL_UNSIGNED_INT, 0);
-
-      glDisable(GL_DEPTH_TEST);
-      r.fbo.unbind();
-
-      // Draw screen from fbo
-
-      r.screen->use();
-      r.screen->set("framebuffer", 0);
-
-      r.screen_mesh->vao(r.screen->id()).bind();
-      r.screen_mesh->ebo().bind();
-
-      r.fbo.texture()->bind(0);
-
-      glDrawElements(GLenum(r.draw_mode), r.screen_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
+      glDrawElements(GLenum(r.mesh->draw_mode()), r.mesh->ebo().size(), GL_UNSIGNED_INT, 0);
     });
 
+  glDisable(GL_DEPTH_TEST);
+  scene_fbo->unbind();
+
+  // Draw screen from fbo
+
+  screen_p->use();
+  screen_p->set("framebuffer", 0);
+
+  screen_mesh->vao(screen_p->id()).bind();
+  screen_mesh->ebo().bind();
+
+  scene_fbo->texture()->bind(0);
+
+  glDrawElements(GLenum(screen_mesh->draw_mode()),
+                 screen_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
+
+  // Render ui
   render_ui(entities, events, dt);
 
   _window->swap_buffers();
@@ -152,4 +189,4 @@ void Renderer::receive(const event::ActiveInput &event){
 
 }
 
-}
+} // namespace weq::system

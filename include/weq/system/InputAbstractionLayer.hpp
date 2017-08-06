@@ -1,19 +1,26 @@
 #pragma once
 
-#include <weq/event/RegisterInput.hpp>
-
 #include <entityx/entityx.h>
 
-#include <unordered_map>
-#include <deque>
+#include <memory>
 
 namespace ex = entityx;
 
+// TODO this doesnt need to be a class. Totally useless.
+// TODO move event handling to input system and forward.
+
+// Defined in <weq/event/Input.hpp>
+namespace event{
+struct ActiveInput;
+struct ChangeInputContext;
+}
+
+// Defined in <weq/system/InputContext.hpp>
+class InputContext;
+
 class InputAbstractionLayer : public ex::Receiver<InputAbstractionLayer>{
 public:
-  InputAbstractionLayer(InputContext context)
-    : _context(context){
-  }
+  InputAbstractionLayer(std::shared_ptr<InputContext> context);
 
   void register_key(int key, int action, int mods);
   void register_mouse(double x, double y, unsigned int x_range, unsigned int y_range);
@@ -21,13 +28,6 @@ public:
 
   void receive(const event::ChangeInputContext& event);
 
-  const event::ActiveInput& get_active(){return _active_input;}
-  void clear(){
-    _active_input.actions.clear();
-    //_active_input.states.clear();
-    _active_input.ranges.clear();
-  }
-private:
-  event::ActiveInput _active_input;
-  InputContext _context;
+  const event::ActiveInput& get_active();
+  void clear();
 };

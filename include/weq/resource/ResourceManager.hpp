@@ -5,7 +5,6 @@
 #include <unordered_map>
 #include <type_traits>
 #include <memory>
-#include <list>
 #include <string>
 
 #include <FreeImage.h>

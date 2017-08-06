@@ -1,10 +1,13 @@
 #pragma once
 
 #include <weq/system/InputTypes.hpp>
-#include <weq/system/InputContext.hpp>
 
+#include <memory>
 #include <deque>
 #include <map>
+
+// Defined in <weq/system/InputContext.hpp>
+class InputContext;
 
 namespace event{
 
@@ -33,7 +36,7 @@ struct ActiveInput{
 
 // TODO requried?
 struct ChangeInputContext{
-  InputContext context;
+  std::shared_ptr<InputContext> context;
 };
 
 } // namespace event

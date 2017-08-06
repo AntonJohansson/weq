@@ -6,11 +6,6 @@
 #include <weq/gl/VertexArray.hpp>
 #include <weq/gl/DrawModes.hpp>
 
-#include <glm/glm.hpp>
-
-#include <utility>
-#include <cmath>
-#include <vector>
 #include <unordered_map>
 
 // Class that takes mesh data and generates a VBO and EBO that can be

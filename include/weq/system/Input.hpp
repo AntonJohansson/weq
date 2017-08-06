@@ -4,6 +4,7 @@
 
 namespace ex = entityx;
 
+// Defined in <GLFW/glfw3.h>
 struct GLFWwindow;
 
 namespace weq::system{

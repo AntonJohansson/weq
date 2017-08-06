@@ -3,7 +3,6 @@
 #include <weq/resource/Resource.hpp>
 
 #include <glad/glad.h>
-#include <glm/glm.hpp>
 
 #include <string>
 

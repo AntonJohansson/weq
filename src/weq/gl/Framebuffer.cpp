@@ -1,6 +1,8 @@
 #include <weq/gl/Framebuffer.hpp>
 #include <weq/Texture.hpp>
 
+#include <spdlog/spdlog.h>
+
 namespace gl{
 
 Framebuffer::Framebuffer(unsigned int w, unsigned int h){
