@@ -65,7 +65,7 @@ public:
   }
 
   void add_wave(){
-    float resolution = 100.0f;
+    float resolution = 1000.0f;
     float size = 5.0f;
 
     // Scene shader
@@ -89,9 +89,9 @@ public:
     auto wave_gpu = wave.assign<component::WaveGPU>(resolution,
                                                     resolution,
                                                     size/resolution,
-                                                    0.2f);
+                                                    0.02f);
 
-    wave_gpu->force_fbo.texture()->set_parameters({
+    wave_gpu->vel_fbo.texture()->set_parameters({
         {GL_TEXTURE_BASE_LEVEL, 0},
         {GL_TEXTURE_MAX_LEVEL, 0},
 
@@ -101,6 +101,17 @@ public:
         {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
         {GL_TEXTURE_MAG_FILTER, GL_LINEAR},
       });
+    wave_gpu->height_fbo.texture()->set_parameters({
+        {GL_TEXTURE_BASE_LEVEL, 0},
+        {GL_TEXTURE_MAX_LEVEL, 0},
+
+        {GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
+        {GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE},
+
+        {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
+        {GL_TEXTURE_MAG_FILTER, GL_LINEAR},
+        });
+
 
     wave.assign<component::Transform>()->_translate = {-size/2, -size/2, 0};
     auto r = wave.assign<component::Renderable>(wave_mesh);

@@ -24,7 +24,8 @@ struct WaveGPU{
       height(h),
       gridsize(gridsz),
       r(c*c/(gridsz*gridsz)),
-      force_fbo(w, h){
+      vel_fbo(w, h),
+      height_fbo(w, h){
   }
 
   unsigned int width;
@@ -33,7 +34,8 @@ struct WaveGPU{
   float gridsize;
   float r;
 
-  gl::Framebuffer force_fbo;
+  gl::Framebuffer vel_fbo;
+  gl::Framebuffer height_fbo;
 };
 
 // Component describing all the relevant data for performing

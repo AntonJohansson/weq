@@ -88,6 +88,11 @@ void ShaderProgram::set(const std::string& name, glm::mat4 mat){
   glUniformMatrix4fv(uniform, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
+void ShaderProgram::set(const std::string& name, glm::vec2 vec){
+  auto uniform = glGetUniformLocation(_program, name.c_str());
+  glUniform2fv(uniform, 1, glm::value_ptr(vec));
+}
+
 void ShaderProgram::set(const std::string& name, glm::vec3 vec){
   auto uniform = glGetUniformLocation(_program, name.c_str());
   glUniform3fv(uniform, 1, glm::value_ptr(vec));
@@ -96,6 +101,10 @@ void ShaderProgram::set(const std::string& name, glm::vec3 vec){
 void ShaderProgram::set(const std::string& name, glm::vec4 vec){
   auto uniform = glGetUniformLocation(_program, name.c_str());
   glUniform4fv(uniform, 1, glm::value_ptr(vec));
+}
+
+void ShaderProgram::set(const std::string& name, double d){
+  set(name, static_cast<float>(d));
 }
 
 void ShaderProgram::set(const std::string& name, float f){

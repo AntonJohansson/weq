@@ -64,8 +64,10 @@ public:
 
   // -- Set Uniforms
   void set(const std::string& name, glm::mat4 mat);
+  void set(const std::string& name, glm::vec2 vec);
   void set(const std::string& name, glm::vec3 vec);
   void set(const std::string& name, glm::vec4 vec);
+  void set(const std::string& name, double d);
   void set(const std::string& name, float f);
   void set(const std::string& name, int i);
 

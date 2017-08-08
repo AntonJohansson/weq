@@ -112,6 +112,7 @@ void Renderer::update(ex::EntityManager& entities,
   (void)events;
 
   static glm::mat4 mvp; // should prob not be static (mem.?).
+  static glm::mat4 tmp_model;
 
   // Get the active camera (TODO must be a better way).
   component::Camera active_camera;
@@ -128,6 +129,7 @@ void Renderer::update(ex::EntityManager& entities,
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glEnable(GL_DEPTH_TEST);
+  glDepthMask(GL_TRUE);
 
   // Move draw code out of entities loop, works fine since there's only a
   // single entity.
@@ -135,6 +137,7 @@ void Renderer::update(ex::EntityManager& entities,
   entities.each<Renderable, Transform>([dt, &active_camera](ex::Entity e,
                                                             Renderable& r,
                                                             Transform& t){
+                                         tmp_model = t.model();
       // calculate mvp for each model
       mvp = active_camera.viewproj * t.model();
       r.scene->use();
@@ -152,6 +155,8 @@ void Renderer::update(ex::EntityManager& entities,
       glDrawElements(GLenum(r.mesh->draw_mode()),
                      r.mesh->ebo().size(), GL_UNSIGNED_INT, 0);
     });
+
+  model = tmp_model;
 
   glDisable(GL_DEPTH_TEST);
   scene_fbo->unbind();
@@ -207,11 +212,14 @@ void Renderer::render_ui(ex::EntityManager& entities,
 
 void Renderer::receive(const event::ActiveInput &event){
   if(event.has(InputRange::CURSOR_X) && event.has(InputRange::CURSOR_Y)){
+    scene_fbo->bind();
     float x = event.ranges.at(InputRange::CURSOR_X);
     float y = event.ranges.at(InputRange::CURSOR_Y);
-    glm::vec3 win = {x*1280.0f, y*720.0f, scene_fbo->depth(x*1280.0f, y*720.0f)};
-    auto vec = glm::unProject(win, glm::inverse(view), proj, glm::vec4{0, 0, 1280.0f, 720.0f});
-    spdlog::get("console")->info("{}, {}, {}", vec.x, vec.y, vec.z);
+    float z = scene_fbo->depth(x*1280.0f, y*720.0f);
+    glm::vec3 win = {x*1280.0f, y*720.0f, z};
+    auto vec = glm::unProject(win, view*model, proj, glm::vec4{0, 0, 1280.0f, 720.0f});
+    //spdlog::get("console")->info("{}, {}, {} - depth {}", vec.x, vec.y, vec.z, z);
+    scene_fbo->unbind();
   }
 
   if(event.has(InputState::CURSOR_DOWN)){

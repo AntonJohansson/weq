@@ -59,8 +59,11 @@ void Camera::update(ex::EntityManager& entities,
 void Camera::update_target(component::Camera& camera, component::Transform& t){
   static float r = 10.0f, theta = 45.0f, phi = 45.0f;
   r     += _movement_amount.z;
-  phi   += _delta_cursor.x;
-  theta += _delta_cursor.y;
+  // phi increases counter clockwise according to ISO standard.
+  // +x -> rotate left.
+  phi   -= _delta_cursor.x;
+  // theta increases clockwise around the +x axis, +y -> rotate down.
+  theta -= _delta_cursor.y;
 
   // clamp minimum sphere radius
   if(r < 0.01f) r = 0.01f;

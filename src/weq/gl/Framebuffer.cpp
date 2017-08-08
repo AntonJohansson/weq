@@ -24,9 +24,7 @@ Framebuffer::Framebuffer(unsigned int w, unsigned int h){
     glGenRenderbuffers(1, &_rbo_depth);
     glBindRenderbuffer(GL_RENDERBUFFER, _rbo_depth);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, w, h);
-    //glRenderBufferStorage(GL_RENDER_BUFFER, GL_DEPTH24_STENCIL8, w, h);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _rbo_depth);
-    //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _rbo_depth);
 
     if(!check_complete()){
       spdlog::get("console")->error("Failed to create a complete frambuffer {}!", _id);
