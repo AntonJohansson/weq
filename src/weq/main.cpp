@@ -22,6 +22,7 @@
  * Reimplement GLFW->IMGUI bindings so they're implemented more nicely
  */
 // TODO config files
+// TODO R32F for height map textures!!!! (IMPORTANT)
 
 class Simulation : public weq::Application{
 public:
