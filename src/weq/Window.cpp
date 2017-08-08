@@ -78,6 +78,12 @@ Window::Window(entityx::EventManager& events, WindowMode mode)
 
   glfwSwapInterval(0); // Disable vsync
 
+  // Check if texture lookup in vertex shader is supported.
+  int max_units;
+  glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &max_units);
+  spdlog::get("console")->info("MAX_VERTEX_TEXTURE_IMAGE_UNITS: {}", max_units);
+
+  // Calculate aspect ratio and send an update event.
   float aspect_ratio = static_cast<float>(_width)/static_cast<float>(_height);
   _events.emit(event::WindowUpdate(_width, _height, _refresh_rate, aspect_ratio));
 }

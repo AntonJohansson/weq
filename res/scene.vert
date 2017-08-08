@@ -11,9 +11,13 @@ out vec2 v_texcoord;
 
 uniform mat4 mvp;
 uniform mat4 normal_matrix;
+uniform sampler2D height_field;
 
 void main(){
-  gl_Position = mvp * vec4(position, 1.0);
+  //float height = texture(height_field, v_texcoord).r;
+  float height = textureLod(height_field, texcoord, 0.0).r;
+  gl_Position = mvp * vec4(position.xy, position.z + height, 1.0);
+
   v_normal = normal;
   v_color = color;
   v_texcoord = texcoord;

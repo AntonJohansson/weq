@@ -3,10 +3,11 @@
 #include <weq/system/InputTypes.hpp>
 #include <unordered_map>
 
+template<typename T, typename U>
+using InputMap = std::unordered_map<T, U>;
+
 class InputContext{
 public:
-  template<typename T, typename U>
-  using InputMap = std::unordered_map<T, U>;
 
   InputContext(InputMap<int, InputAction> action,
                InputMap<int, InputState> state,

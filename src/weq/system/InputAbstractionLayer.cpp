@@ -38,7 +38,7 @@ void InputAbstractionLayer::register_mouse(double x,
                                            unsigned int y_range){
   if(_context->is_range(raw::Axes::MOUSE_X)){
     static double last_x = 0.0;
-    double normalized_x  = -x/x_range; // also flips axis
+    double normalized_x  = x/x_range; // also flips axis
     double normalized_dx = normalized_x - last_x;
     last_x = normalized_x;
 
@@ -48,7 +48,7 @@ void InputAbstractionLayer::register_mouse(double x,
 
   if(_context->is_range(raw::Axes::MOUSE_Y)){
     static double last_y = 0.0;
-    double normalized_y = -y/y_range; // also flips axis
+    double normalized_y = y/y_range; // also flips axis
     double normalized_dy = normalized_y - last_y;
     last_y = normalized_y;
 

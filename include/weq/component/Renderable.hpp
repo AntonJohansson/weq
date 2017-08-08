@@ -2,6 +2,7 @@
 
 #include <weq/gl/ShaderProgram.hpp>
 #include <weq/Mesh.hpp>
+#include <weq/Texture.hpp>
 
 namespace component{
 
@@ -16,6 +17,7 @@ struct Renderable{
 
   std::shared_ptr<Mesh> mesh;
   std::shared_ptr<gl::ShaderProgram> scene;
+  std::shared_ptr<Texture> texture;
 };
 
 } // namespace component

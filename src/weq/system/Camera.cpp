@@ -14,6 +14,7 @@
    that results in a black image (empty view-matrix)
 */
 
+// TODO inverted x-movement
 
 namespace weq::system{
 

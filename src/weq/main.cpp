@@ -21,6 +21,7 @@
 /* TODO
  * Reimplement GLFW->IMGUI bindings so they're implemented more nicely
  */
+// TODO config files
 
 class Simulation : public weq::Application{
 public:
@@ -29,7 +30,7 @@ public:
     _systems.add<weq::system::Input>();
 
     //_systems.add<weq::system::WaveSimulation>();
-    //_systems.add<weq::system::WaveGPUSimulation>();
+    _systems.add<weq::system::WaveGPUSimulation>();
 
     _systems.add<weq::system::Camera>();
     _systems.add<weq::system::Renderer>();
@@ -75,14 +76,6 @@ public:
                                                             scene_f);
     scene_p->link();
 
-    // Force calculation shader
-    auto force_v = _resource_manager.get<gl::Shader>("force.vert");
-    auto force_f = _resource_manager.get<gl::Shader>("force.frag");
-    auto force_p = _resource_manager.get<gl::ShaderProgram>("force.prog",
-                                                            force_v,
-                                                            force_f);
-    force_p->link();
-
     // Mesh for wave plane
     auto wave_mesh_data = primitive::plane::solid(resolution,
                                                   resolution,
@@ -91,14 +84,23 @@ public:
 
     auto wave_mesh = std::make_shared<Mesh>(wave_mesh_data, gl::DrawMode::TRIANGLES);
     wave_mesh->generate_vao(scene_p);
-    wave_mesh->generate_vao(force_p);
 
     auto wave = _entities.create();
-//    wave.assign<component::WaveGPU>(resolution,
-//                                    resolution,
-//                                    size/resolution,
-//                                    0.2f,
-//                                    force_p);
+    auto wave_gpu = wave.assign<component::WaveGPU>(resolution,
+                                                    resolution,
+                                                    size/resolution,
+                                                    0.2f);
+
+    wave_gpu->force_fbo.texture()->set_parameters({
+        {GL_TEXTURE_BASE_LEVEL, 0},
+        {GL_TEXTURE_MAX_LEVEL, 0},
+
+        {GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
+        {GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE},
+
+        {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
+        {GL_TEXTURE_MAG_FILTER, GL_LINEAR},
+      });
 
     wave.assign<component::Transform>()->_translate = {-size/2, -size/2, 0};
     auto r = wave.assign<component::Renderable>(wave_mesh);
@@ -109,7 +111,7 @@ public:
   void add_ui(){
     auto ui = _entities.create();
     ui.assign<component::ImGui>([](ex::EventManager& e){
-        ImGui::ShowTestWindow();
+        //ImGui::ShowTestWindow();
         ImGui::Begin("Menu");
         ImGui::SetWindowCollapsed("Menu", false, ImGuiSetCond_FirstUseEver);
         ImGui::SetWindowPos("Menu", ImVec2(10,10), ImGuiSetCond_Appearing);

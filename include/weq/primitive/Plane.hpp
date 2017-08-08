@@ -15,7 +15,7 @@ MeshData points(int w, int h, float gridsize, gl::VertexFormat format){
       if(auto v = data.format.has("position")){
         data.interleaved.push_back(x * gridsize);
         data.interleaved.push_back(y * gridsize);
-        data.interleaved.push_back(x*gridsize);
+        data.interleaved.push_back(x * gridsize);
       }
 
       // normals

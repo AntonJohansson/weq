@@ -27,6 +27,10 @@ public:
   // Returns true if the framebuffer creation was successful.
   bool check_complete();
 
+  // Reads the depth buffer (if the fbo has one) at
+  // coordnates (x, y).
+  float depth(float x, float y);
+
   // Returns a pointer to the underlying fbo texture.
   std::shared_ptr<Texture> texture(){return _texture;}
 

@@ -74,6 +74,7 @@ void ShaderProgram::bind_attribute(const std::string& attribute,
   GLvoid const* offset_pointer = static_cast<char const*>(0) + offset;
 
   auto attrib_location = glGetAttribLocation(_program, attribute.c_str());
+
   glVertexAttribPointer(attrib_location, size, type, GL_FALSE, stride, offset_pointer);
   glEnableVertexAttribArray(attrib_location);
 }

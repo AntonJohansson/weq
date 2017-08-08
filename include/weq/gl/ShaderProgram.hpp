@@ -17,6 +17,7 @@ class Shader;
 // Resource that links already compiled shaders into a functioning shader program.
 // TODO might be cool to give a way to extract vertex-attribs and shader output
 //      from source?
+// TODO better error checking (loaded or not).
 class ShaderProgram : public Resource{
 public:
   // Constructs a shaderprogram resource with the given (unique) string id.

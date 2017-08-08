@@ -24,6 +24,9 @@ std::shared_ptr<Texture> texture;
 std::shared_ptr<gl::ShaderProgram> screen_p;
 std::shared_ptr<Mesh> screen_mesh;
 std::shared_ptr<gl::Framebuffer> scene_fbo;
+glm::mat4 view;
+glm::mat4 proj;
+glm::mat4 model;
 }
 
 using component::Renderable;
@@ -76,10 +79,31 @@ void Renderer::configure(ex::EventManager& events){
   screen_mesh->generate_vao(screen_p);
 
   scene_fbo = std::make_shared<gl::Framebuffer>(_window->width(), _window->height());
+  scene_fbo->texture()->set_parameters({
+      {GL_TEXTURE_BASE_LEVEL, 0},
+      {GL_TEXTURE_MAX_LEVEL, 0},
+
+      {GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
+      {GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE},
+
+      {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
+      {GL_TEXTURE_MAG_FILTER, GL_LINEAR},
+    });
+
 
   // Setup cubemap
-  texture = std::make_shared<Texture>("cloudtop_bk.tga");
+  texture = std::make_shared<Texture>("cloudtop_bk.tga", GL_TEXTURE_2D);
   texture->load();
+  texture->set_parameters({
+      {GL_TEXTURE_BASE_LEVEL, 0},
+      {GL_TEXTURE_MAX_LEVEL, 0},
+
+      {GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
+      {GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE},
+
+      {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
+      {GL_TEXTURE_MAG_FILTER, GL_LINEAR},
+      });
 }
 
 void Renderer::update(ex::EntityManager& entities,
@@ -95,6 +119,8 @@ void Renderer::update(ex::EntityManager& entities,
 
   // caluclate vp-matrix
   active_camera.viewproj = active_camera.projection * active_camera.view;
+  view = active_camera.view;
+  proj = active_camera.projection;
 
   // Bind scene fbo.
   scene_fbo->bind();
@@ -114,11 +140,17 @@ void Renderer::update(ex::EntityManager& entities,
       r.scene->use();
       r.scene->set("mvp", mvp);
       r.scene->set("normal_matrix", active_camera.normal_matrix);
+      r.scene->set("height_field", 0);
+
+      if(r.texture){
+        r.texture->bind(0);
+      }
 
       r.mesh->vao(r.scene->id()).bind();
       r.mesh->ebo().bind();
 
-      glDrawElements(GLenum(r.mesh->draw_mode()), r.mesh->ebo().size(), GL_UNSIGNED_INT, 0);
+      glDrawElements(GLenum(r.mesh->draw_mode()),
+                     r.mesh->ebo().size(), GL_UNSIGNED_INT, 0);
     });
 
   glDisable(GL_DEPTH_TEST);
@@ -174,8 +206,17 @@ void Renderer::render_ui(ex::EntityManager& entities,
 }
 
 void Renderer::receive(const event::ActiveInput &event){
+  if(event.has(InputRange::CURSOR_X) && event.has(InputRange::CURSOR_Y)){
+    float x = event.ranges.at(InputRange::CURSOR_X);
+    float y = event.ranges.at(InputRange::CURSOR_Y);
+    glm::vec3 win = {x*1280.0f, y*720.0f, scene_fbo->depth(x*1280.0f, y*720.0f)};
+    auto vec = glm::unProject(win, glm::inverse(view), proj, glm::vec4{0, 0, 1280.0f, 720.0f});
+    spdlog::get("console")->info("{}, {}, {}", vec.x, vec.y, vec.z);
+  }
+
   if(event.has(InputState::CURSOR_DOWN)){
     _window->set_cursor_mode(CursorMode::DISABLED);
+
   }else{
     // TODO should probably sent out a "state-changed" event
     _window->set_cursor_mode(CursorMode::NORMAL);

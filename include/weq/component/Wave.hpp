@@ -3,6 +3,7 @@
 #include <weq/gl/ShaderProgram.hpp>
 #include <weq/gl/Framebuffer.hpp>
 #include <weq/FlatBuffer.hpp>
+#include <weq/Texture.hpp>
 #include <memory>
 
 namespace component{
@@ -10,8 +11,6 @@ namespace component{
 // Component describing all the relevant data for performing
 // FDM Wave. Eq. calculations on the GPU through FBOs.
 struct WaveGPU{
-  using ProgramPtr = std::shared_ptr<gl::ShaderProgram>;
-
   // Parameters:
   //   w - width of simulation grid,
   //   h - height of simulation grid,
@@ -20,22 +19,21 @@ struct WaveGPU{
   //         r = c^2/gridsize^2,
   //       which is used to speed up force calculations.
   WaveGPU(unsigned int w, unsigned int h,
-          float gridsize, float c,
-          ProgramPtr force)
+          float gridsz, float c)
     : width(w),
       height(h),
-      r(c*c/(gridsize*gridsize)),
-      force_fbo(w, h),
-      force_shader(force){
+      gridsize(gridsz),
+      r(c*c/(gridsz*gridsz)),
+      force_fbo(w, h){
   }
 
   unsigned int width;
   unsigned int height;
 
+  float gridsize;
   float r;
 
   gl::Framebuffer force_fbo;
-  std::shared_ptr<gl::ShaderProgram> force_shader;
 };
 
 // Component describing all the relevant data for performing

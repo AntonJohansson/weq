@@ -4,24 +4,33 @@
 
 #include <glad/glad.h>
 
+#include <map>
+
 // Resource class for representing a texture that is useable
 // by OpenGL.
 // TODO make more customizable (able to change width etc.)
-// TODO support in memory textures.
+// TODO Should be able to support custom mip maps,
+//      wrap mode, texture min/mag.
 class Texture : public Resource{
 public:
   // Contructs a texture resource with given id,
   // also generates the OpenGL texture id.
-  Texture(const std::string& id);
+  Texture(const std::string& id, GLenum target);
 
   // Constructs an empty texture form memory.
   Texture(const std::string& id,
+          GLenum target,
           unsigned int w,
           unsigned int h,
           unsigned char* bits = nullptr);
 
   // Destorys the previously generated texture id.
   ~Texture();
+
+  void set_format();
+
+  // Set texture parameters as pairs of parameters and values.
+  void set_parameters(std::map<GLenum, GLenum> params);
 
   // Handles loading the texture from file or memory to a
   // format useable by OpenGL.
@@ -30,6 +39,7 @@ public:
   // Unloads the texture data but keeps the texture id intact.
   void unload() override;
 
+  // Binds and sets this texture as active on the specified index.
   void bind(int index = 0);
 
   // Returns the underlying OpenGL texture handle.
@@ -48,6 +58,7 @@ private:
   std::tuple<unsigned char*, unsigned int, unsigned int>
   load_texture(const std::string& filename);
 
+  GLenum _target;
   unsigned int _width;
   unsigned int _height;
   unsigned char* _bits;

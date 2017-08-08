@@ -10,7 +10,7 @@ Framebuffer::Framebuffer(unsigned int w, unsigned int h){
     glGenFramebuffers(1, &_id);
     bind();
 
-    _texture = std::make_shared<Texture>("fbo", w, h);
+    _texture = std::make_shared<Texture>("fbo", GL_TEXTURE_2D, w, h);
     _texture->load();
 
     //glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, _texture, 0);
@@ -42,6 +42,13 @@ Framebuffer::~Framebuffer(){
 
 bool Framebuffer::check_complete(){
   return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
+}
+
+float Framebuffer::depth(float x, float y){
+  float pixel;
+  glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &pixel);
+
+  return pixel;
 }
 
 void Framebuffer::bind(){

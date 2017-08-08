@@ -6,9 +6,9 @@ in vec2 v_texcoord;
 
 out vec4 frag_color;
 
-uniform sampler2D tex;
+uniform sampler2D height_field;
 //uniform sampler3D cubemap;
 
 void main(){
-  frag_color = v_color;
+  frag_color = texture(height_field, v_texcoord);
 }

@@ -3,16 +3,19 @@
 #include <spdlog/spdlog.h>
 #include <FreeImage.h>
 
-Texture::Texture(const std::string& id)
-  : Resource(id, ResourceType::FILE){
+Texture::Texture(const std::string& id, GLenum target)
+  : Resource(id, ResourceType::FILE),
+    _target(target) {
   glGenTextures(1, &_texture);
 }
 
 Texture::Texture(const std::string& id,
+                 GLenum target,
                  unsigned int w,
                  unsigned int h,
                  unsigned char* bits)
   : Resource(id, ResourceType::MEMORY),
+    _target(target),
     _width(w),
     _height(h),
     _bits(bits){
@@ -21,6 +24,13 @@ Texture::Texture(const std::string& id,
 
 Texture::~Texture(){
   glDeleteTextures(1, &_texture);
+}
+
+void Texture::set_parameters(std::map<GLenum, GLenum> params){
+  bind();
+  for(auto& pair : params){
+    glTexParameteri(_target, pair.first, pair.second);
+  }
 }
 
 void Texture::load(){
@@ -35,32 +45,16 @@ void Texture::load(){
 
   bind();
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, _bits);
-
-  // Mipmaps
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-  // Wrap mode
-  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  // Filtering
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-}
+  glTexImage2D(_target, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _bits);
+  }
 
 void Texture::unload(){
   _is_loaded = false;
 }
 
 void Texture::bind(int index){
-  switch(index){
-  case 0: glActiveTexture(GL_TEXTURE0); break;
-  case 1: glActiveTexture(GL_TEXTURE1); break;
-  case 2: glActiveTexture(GL_TEXTURE2); break;
-  case 3: glActiveTexture(GL_TEXTURE3); break;
-  };
-
-  glBindTexture(GL_TEXTURE_2D, _texture);
+  glActiveTexture(GL_TEXTURE0 + index);
+  glBindTexture(_target, _texture);
 }
 
 void Texture::resize(unsigned int w, unsigned int h){
