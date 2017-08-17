@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glad/glad.h>
-#include <spdlog/spdlog.h>
+//#include <spdlog/spdlog.h>
 
 #include <vector>
 
@@ -122,7 +122,7 @@ public:
     void* ptr = glMapBuffer(buffer_target, GLenum(access));
 
     if(ptr == nullptr){
-      spdlog::get("console")->error("Failed to map memory region!");
+      //spdlog::get("console")->error("Failed to map memory region!");
       //TODO should I throw?
     }
 
@@ -135,7 +135,7 @@ public:
     bind();
 
     if(glUnmapBuffer(buffer_target) == GL_FALSE){
-      spdlog::get("console")->error("Failed to unmap memory region!");
+      //spdlog::get("console")->error("Failed to unmap memory region!");
       // TODO throw?
     }
   }

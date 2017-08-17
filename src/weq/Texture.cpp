@@ -1,7 +1,7 @@
 #include <weq/Texture.hpp>
 
 #include <spdlog/spdlog.h>
-#include <FreeImage.h>
+#include <FreeImage/FreeImage.h>
 
 Texture::Texture(const std::string& id, GLenum target)
   : Resource(id, ResourceType::FILE),

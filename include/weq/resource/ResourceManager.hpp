@@ -7,7 +7,7 @@
 #include <memory>
 #include <string>
 
-#include <FreeImage.h>
+#include <FreeImage/FreeImage.h>
 
 class ResourceManager{
 public:

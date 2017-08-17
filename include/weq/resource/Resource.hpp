@@ -22,7 +22,8 @@ public:
   const std::string& id(){return _id;}
 
 protected:
-  static constexpr auto _resource_path = "/Users/antonjohansson/git/WaveEquationFDM/res/";
+  //static constexpr auto _resource_path = "/Users/antonjohansson/git/WaveEquationFDM/res/";
+	static constexpr auto _resource_path = "C:/Users/Anton Johansson/Desktop/weq";
   std::string _id;
   bool _is_loaded;
   ResourceType _type;

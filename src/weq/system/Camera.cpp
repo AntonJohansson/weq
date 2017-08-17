@@ -48,7 +48,7 @@ void Camera::update(ex::EntityManager& entities,
     //c.normal_matrix = glm::transpose(glm::inverse(c.view*t.transform));
 
     if(c.update_projection){
-      c.projection = glm::perspective(glm::radians(c.fov), c.aspect_ratio, c.near, c.far);
+      c.projection = glm::perspective(glm::radians(c.fov), c.aspect_ratio, c._near, c._far);
       c.update_projection = false;
     }
   };

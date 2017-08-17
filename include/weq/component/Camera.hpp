@@ -23,13 +23,13 @@ struct ActiveCamera{};
 // Component that keeps track of all the camera-relevant data.
 struct Camera{
   Camera(LookMode look_mode = LookMode::DIRECTION,
-         float near = 1.0f,
-         float far = 100.0f,
+         float n = 1.0f,
+         float f = 100.0f,
          float fov = 45.0f,
          glm::vec3 target = {0, 0, 0})
     : look_mode(look_mode),
-      near(near),
-      far(far),
+      _near(n),
+      _far(f),
       fov(fov),
       aspect_ratio(1280.0f/720.0f),
       target(target),
@@ -40,8 +40,8 @@ struct Camera{
   LookMode look_mode;
 
   // -- Perspective
-  float near;
-  float far;
+  float _near;
+  float _far;
   float fov;
   float aspect_ratio;
 

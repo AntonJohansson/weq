@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef _WIN32
+#include <Windows.h> // lol wtf... required by spdlog
+#endif
+
 #include <weq/resource/ResourceManager.hpp>
 #include <weq/state/StateManager.hpp>
 

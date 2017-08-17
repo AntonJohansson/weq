@@ -155,6 +155,7 @@ void Window::set_cursor_mode(CursorMode mode){
     glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     break;
   default:
+	break;
     // TODO print actual window enum (convert to string?)
     spdlog::get("console")->error("Unrecognized window mode");
   }

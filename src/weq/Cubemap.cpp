@@ -1,7 +1,7 @@
 #include <weq/Cubemap.hpp>
 
 #include <spdlog/spdlog.h>
-#include <FreeImage.h>
+#include <FreeImage/FreeImage.h>
 
 Cubemap::Cubemap(const std::string& id,
                  const std::vector<std::string>& texture_ids)

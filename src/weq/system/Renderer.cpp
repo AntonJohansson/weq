@@ -218,7 +218,7 @@ void Renderer::receive(const event::ActiveInput &event){
     float z = scene_fbo->depth(x*1280.0f, y*720.0f);
     glm::vec3 win = {x*1280.0f, y*720.0f, z};
     auto vec = glm::unProject(win, view*model, proj, glm::vec4{0, 0, 1280.0f, 720.0f});
-    //spdlog::get("console")->info("{}, {}, {} - depth {}", vec.x, vec.y, vec.z, z);
+    spdlog::get("console")->info("{}, {}, {} - depth {}", vec.x, vec.y, vec.z, z);
     scene_fbo->unbind();
   }
 

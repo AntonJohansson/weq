@@ -28,6 +28,7 @@ class Simulation : public weq::Application{
 public:
   Simulation()
     : Application(){
+	
     _systems.add<weq::system::Input>();
 
     //_systems.add<weq::system::WaveSimulation>();

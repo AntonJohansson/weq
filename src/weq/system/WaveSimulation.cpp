@@ -45,8 +45,8 @@ namespace{
   auto double_slit = [](FlatBuffer<float>& buffer, int i, int j) -> bool{
     if(i == buffer.width()/3
        && (j < buffer.height()/2 - b - d/2
-           || j > buffer.height()/2 + b + d/2
-           || (j > buffer.height()/2 - d/2 && j < buffer.height()/2 + d/2))){
+           || j > buffer.height()/2 + b + d/2
+           || (j > buffer.height()/2 - d/2 && j < buffer.height()/2 + d/2))){
       return true;
     }else{
       return false;

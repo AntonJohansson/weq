@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <string>
+#include <tuple>
 
 // TODO Merge Cubemap and Texture resources?
 

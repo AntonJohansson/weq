@@ -112,7 +112,7 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       wave.height_fbo.texture()->bind(0);
 
       // Drop shader
-      if(true || spawn_drop){
+      if(true || spawn_drop){
         drop_shader->use();
         drop_shader->set("height_field", 0);
 
