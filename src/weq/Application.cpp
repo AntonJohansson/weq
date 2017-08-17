@@ -1,5 +1,6 @@
 #include <weq/Application.hpp>
 #include <weq/event/Internal.hpp>
+#include <weq/gl/Context.hpp>
 
 #include <chrono>
 
