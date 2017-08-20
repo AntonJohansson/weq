@@ -1,5 +1,8 @@
 #pragma once
 
+#include <weq/Window.hpp>
+#include <memory>
+
 namespace event{
 
 // Event sent out by the WindowSystem (which does not exist. Yet.)
@@ -17,6 +20,14 @@ struct WindowUpdate{
   unsigned int height;
   unsigned int refresh_rate;
   float aspect_ratio;
+};
+
+// Event sent out when the active window is changed
+struct ActiveWindow{
+  ActiveWindow(std::shared_ptr<Window> w)
+    : window(w){}
+
+  std::shared_ptr<Window> window;
 };
 
 } // namespace event

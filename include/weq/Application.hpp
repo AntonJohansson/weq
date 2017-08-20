@@ -10,8 +10,9 @@
 #include <entityx/entityx.h>
 #include <spdlog/spdlog.h>
 
-
-// Defined in weq/event/Internal
+// Defined in <weq/Window.hpp>
+class Window;
+// Defined in <weq/event/Internal.hpp>
 namespace event{struct Quit;}
 
 namespace weq{
@@ -27,7 +28,7 @@ using ex::SystemManager;
 class Application : public ex::Receiver<Application>{
 public:
   Application();
-  virtual ~Application(){}
+  virtual ~Application();
 
   // Function that should add and configure all systems.
   virtual void configure(){}
@@ -53,6 +54,7 @@ protected:
   StateManager _state_manager; // TODO not functioning
 
   std::shared_ptr<spdlog::logger> _console;
+  std::shared_ptr<Window> _window;
 };
 
 } // namespace weq

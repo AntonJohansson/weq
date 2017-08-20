@@ -6,6 +6,7 @@
 #include <weq/component/ImGui.hpp>
 #include <weq/component/Camera.hpp>
 #include <weq/event/Input.hpp>
+#include <weq/event/Window.hpp>
 #include <weq/gl/VertexFormat.hpp>
 #include <weq/gl/Framebuffer.hpp>
 #include <weq/Window.hpp>
@@ -39,10 +40,9 @@ Renderer::~Renderer(){
 }
 
 void Renderer::configure(ex::EventManager& events){
-  _window = std::make_unique<Window>(events);
-
   // Events
   events.subscribe<event::ActiveInput>(*this);
+  events.subscribe<event::ActiveWindow>(*this);
 
   // Setup screen shader
   auto screen_v = std::make_shared<gl::Shader>("screen.vert");
@@ -78,18 +78,8 @@ void Renderer::configure(ex::EventManager& events){
                                        gl::DrawMode::TRIANGLES);
   screen_mesh->generate_vao(screen_p);
 
-  scene_fbo = std::make_shared<gl::Framebuffer>(_window->width(), _window->height());
-  scene_fbo->texture()->set_parameters({
-      {GL_TEXTURE_BASE_LEVEL, 0},
-      {GL_TEXTURE_MAX_LEVEL, 0},
-
-      {GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
-      {GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE},
-
-      {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
-      {GL_TEXTURE_MAG_FILTER, GL_LINEAR},
-    });
-
+  // Dependant on the current window, move to event receiver?
+  
 
   // Setup cubemap
   texture = std::make_shared<Texture>("cloudtop_bk.tga", GL_TEXTURE_2D);
@@ -210,7 +200,7 @@ void Renderer::render_ui(ex::EntityManager& entities,
   ImGui::Render();
 }
 
-void Renderer::receive(const event::ActiveInput &event){
+void Renderer::receive(const event::ActiveInput& event){
   if(event.has(InputRange::CURSOR_X) && event.has(InputRange::CURSOR_Y)){
     scene_fbo->bind();
     float x = event.ranges.at(InputRange::CURSOR_X);
@@ -236,6 +226,27 @@ void Renderer::receive(const event::ActiveInput &event){
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
   }
 
+}
+
+void Renderer::receive(const event::ActiveWindow& event){
+  _window = event.window;
+  configure_scene_fbo();
+}
+
+// Private functions
+
+void Renderer::configure_scene_fbo(){
+  scene_fbo = std::make_shared<gl::Framebuffer>(_window->width(), _window->height());
+  scene_fbo->texture()->set_parameters({
+      {GL_TEXTURE_BASE_LEVEL, 0},
+      {GL_TEXTURE_MAX_LEVEL, 0},
+
+      {GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
+      {GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE},
+
+      {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
+      {GL_TEXTURE_MAG_FILTER, GL_LINEAR},
+      });
 }
 
 } // namespace weq::system

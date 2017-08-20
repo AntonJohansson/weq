@@ -6,7 +6,10 @@
 namespace ex = entityx;
 
 class Window;
+// Defined in <weq/event/Input.hpp>
 namespace event{struct ActiveInput;}
+// Defined in <weq/event/Window.hpp>
+namespace event{struct ActiveWindow;}
 
 namespace weq::system{
 
@@ -26,9 +29,11 @@ public:
                  ex::TimeDelta dt);
 
   void receive(const event::ActiveInput& event);
+  void receive(const event::ActiveWindow& window);
 
 private:
-  std::unique_ptr<Window> _window;
+  void configure_scene_fbo();
+  std::shared_ptr<Window> _window;
 };
 
 }

@@ -23,7 +23,7 @@ public:
 
 protected:
   //static constexpr auto _resource_path = "/Users/antonjohansson/git/WaveEquationFDM/res/";
-	static constexpr auto _resource_path = "C:/Users/Anton Johansson/Desktop/weq";
+	static constexpr auto _resource_path = "C:\\Users\\Anton\ Johansson\\Desktop\\weq\\res\\";
   std::string _id;
   bool _is_loaded;
   ResourceType _type;

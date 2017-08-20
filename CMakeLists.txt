@@ -26,7 +26,6 @@ add_executable(weq
   src/weq/gl/ShaderProgram.cpp
   src/weq/gl/VertexArray.cpp
   src/weq/gl/VertexFormat.cpp
-  src/weq/gl/Context.hpp
 
   src/weq/system/Camera.cpp
   src/weq/system/Input.cpp

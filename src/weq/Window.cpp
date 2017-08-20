@@ -6,44 +6,10 @@
 #include <entityx/entityx.h>
 #include <spdlog/spdlog.h>
 
-/*
- *    Handle window-independent stuff such as GL-context (TODO move?) and GLFW-init.
- */
-
 namespace{
-  int _window_count = 0;
-
-  void error_callback(int error, const char* desc){
-    (void)error;
-    spdlog::get("console")->error("GLFW error {}", desc);
-  }
-
-  void window_initialize(){
-    if(_window_count == 0){
-      spdlog::get("console")->info("Running GLFW {}", glfwGetVersionString());
-
-      if(!glfwInit()){
-        spdlog::get("console")->error("Failed to initialize GLFW!");
-      }
-
-      glfwSetErrorCallback(error_callback);
-    }
-
-    _window_count++;
-  }
-
-  void window_terminate(){
-    _window_count--;
-
-    if(_window_count == 0){
-      glfwTerminate();
-    }
-  }
+  bool glfw_initialized;
+  bool glad_initialized;
 }
-
-/*
- *    Window Impl.
- */
 
 Window::Window(entityx::EventManager& events, WindowMode mode)
   : _events(events),
@@ -53,7 +19,14 @@ Window::Window(entityx::EventManager& events, WindowMode mode)
     _width(1280),
     _height(720),
     _refresh_rate(60){
-  window_initialize();
+
+  // Initialize GLFW
+  if(!glfw_initialized && !glfwInit()){
+    spdlog::get("console")->error("Failed to initialize GLFW!");
+    return;
+  }else{
+    glfw_initialized = true;
+  }
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
@@ -65,15 +38,20 @@ Window::Window(entityx::EventManager& events, WindowMode mode)
 
   if(!_window){
     spdlog::get("console")->error("GLFW: Failed to create window!");
-    window_terminate();
+    return;
   }
 
   make_current();
 
-  if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)){
+  // Initialize GLAD after the window context has been created.
+  if (!glad_initialized && !gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)){
     spdlog::get("console")->error("GLAD: Failed to initialize OpenGL context");
+    return;
+  }else{
+    glad_initialized = true;
   }
 
+  spdlog::get("console")->info("Running GLFW {}", glfwGetVersionString());
   spdlog::get("console")->info("Using OpenGL {}.{}", GLVersion.major, GLVersion.minor);
 
   glfwSwapInterval(0); // Disable vsync
@@ -90,7 +68,7 @@ Window::Window(entityx::EventManager& events, WindowMode mode)
 
 Window::~Window(){
   glfwDestroyWindow(_window);
-  window_terminate();
+  glfwTerminate(); // TODO move this, doesn't work for multiple windows.
 }
 
 // Do stuff

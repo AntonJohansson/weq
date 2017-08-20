@@ -1,6 +1,7 @@
 #include <weq/Application.hpp>
 #include <weq/event/Internal.hpp>
-#include <weq/gl/Context.hpp>
+#include <weq/event/Window.hpp>
+#include <weq/Window.hpp>
 
 #include <chrono>
 
@@ -12,13 +13,23 @@ using std::chrono::duration;
 namespace weq{
 
 Application::Application(){
+  // Initialize Logging context
   _console = spdlog::stdout_color_mt("console");
   spdlog::set_pattern("[%H:%M:%S] %v");
+
   _events.subscribe<event::Quit>(*this);
+
+  // Create window (TODO Move?)
+  _window = std::make_shared<Window>(_events); // Will also initlize glfw/glad
 }
 
+Application::~Application(){
+}
 
 void Application::run(){
+  // TODO move
+  _events.emit(event::ActiveWindow(_window)); // This event will not buffer.
+
   using Clock = std::chrono::high_resolution_clock;
 
   constexpr nanoseconds timestep(16ms);

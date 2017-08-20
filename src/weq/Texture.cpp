@@ -45,8 +45,8 @@ void Texture::load(){
 
   bind();
 
-  glTexImage2D(_target, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _bits);
-  }
+  glTexImage2D(_target, 0, GL_RGB, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, _bits);
+}
 
 void Texture::unload(){
   _is_loaded = false;
@@ -101,7 +101,7 @@ Texture::load_texture(const std::string& filename){
   unsigned int w = FreeImage_GetWidth(data);
   unsigned int h = FreeImage_GetHeight(data);
 
-  FreeImage_Unload(data);
+  //FreeImage_Unload(data);
 
   return {bits, w, h};
 }
