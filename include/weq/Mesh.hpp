@@ -21,13 +21,14 @@ public:
       _vbo(gl::Usage::STATIC_DRAW, _data.interleaved),
       _ebo(gl::Usage::STATIC_DRAW, _data.elements){
 
-    _mapped_region = _vbo.map(gl::Access::READ_WRITE);
+    // dont map automatically
+    //_mapped_region = _vbo.map(gl::Access::READ_WRITE);
   }
 
   // Unmaps the VBO from memory and automatically calls
   // destructors for the VBO, EBO.
   ~Mesh(){
-    _vbo.unmap();
+    //_vbo.unmap();
   }
 
   // TODO remove

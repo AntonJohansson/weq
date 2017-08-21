@@ -46,6 +46,8 @@ void Texture::load(){
   bind();
 
   glTexImage2D(_target, 0, GL_RGB, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, _bits);
+
+  // TODO unload freeimage data after this.
 }
 
 void Texture::unload(){
@@ -101,7 +103,7 @@ Texture::load_texture(const std::string& filename){
   unsigned int w = FreeImage_GetWidth(data);
   unsigned int h = FreeImage_GetHeight(data);
 
-  //FreeImage_Unload(data);
+  //FreeImage_Unload(data); TODO this should be called after glTexImage2D - could cause problems otherwise
 
   return {bits, w, h};
 }

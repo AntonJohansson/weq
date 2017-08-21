@@ -75,8 +75,13 @@ void ShaderProgram::bind_attribute(const std::string& attribute,
 
   auto attrib_location = glGetAttribLocation(_program, attribute.c_str());
 
-  glVertexAttribPointer(attrib_location, size, type, GL_FALSE, stride, offset_pointer);
-  glEnableVertexAttribArray(attrib_location);
+  // Error check
+  if(attrib_location >= 0){ // TODO && < MAX
+    glVertexAttribPointer(attrib_location, size, type, GL_FALSE, stride, offset_pointer);
+    glEnableVertexAttribArray(attrib_location);
+  }else{
+    spdlog::get("console")->error("Shader Error: Attribute \"{}\" cannot be found for shader {}.\n\t Either it is being optimzed out, or isn't being declared.", attribute, _id);
+  }
 }
 
 void ShaderProgram::set_feedback(std::vector<const GLchar*> varyings){

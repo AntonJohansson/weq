@@ -79,13 +79,14 @@ public:
     scene_p->link();
 
     // Mesh for wave plane
+    // TODO This operation takes a really long time, which doesn't make sense.
     auto wave_mesh_data = primitive::plane::solid(resolution,
                                                   resolution,
                                                   size/resolution,
                                                   gl::format::VNCT);
 
     auto wave_mesh = std::make_shared<Mesh>(wave_mesh_data, gl::DrawMode::TRIANGLES);
-    wave_mesh->generate_vao(scene_p);
+    wave_mesh->generate_vao(scene_p); // TODO this code is currently generating an error, because unused shader attributes is being optimzed away => glGetAttribLocation == -1
 
     auto wave = _entities.create();
     auto wave_gpu = wave.assign<component::WaveGPU>(resolution,

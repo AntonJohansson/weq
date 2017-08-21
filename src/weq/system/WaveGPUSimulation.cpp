@@ -95,7 +95,6 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
 void WaveGPUSimulation::update(ex::EntityManager& entities,
                             ex::EventManager& events,
                             ex::TimeDelta dt){
-
   (void)events;
   (void)dt;
 

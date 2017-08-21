@@ -114,7 +114,7 @@ void Camera::receive(const event::ActiveInput& event){
     _movement_amount.z = -0.5*event.ranges.at(InputRange::CURSOR_SCROLL_Y);
   }
 
-  /*
+  /* First person camera
   // Update camera movement vector
   float speed = 0.05f;
   if(event.has(InputState::MOVE_LEFT)){

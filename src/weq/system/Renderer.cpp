@@ -28,6 +28,10 @@ std::shared_ptr<gl::Framebuffer> scene_fbo;
 glm::mat4 view;
 glm::mat4 proj;
 glm::mat4 model;
+
+// TEMP
+ImVec2 menu_pos;
+ImVec2 menu_size;
 }
 
 using component::Renderable;
@@ -79,7 +83,18 @@ void Renderer::configure(ex::EventManager& events){
   screen_mesh->generate_vao(screen_p);
 
   // Dependant on the current window, move to event receiver?
-  
+  //scene_fbo = std::make_shared<gl::Framebuffer>(_window->width(), _window->height());
+  scene_fbo = std::make_shared<gl::Framebuffer>(1280, 720);
+  scene_fbo->texture()->set_parameters({
+      {GL_TEXTURE_BASE_LEVEL, 0},
+      {GL_TEXTURE_MAX_LEVEL, 0},
+
+      {GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
+      {GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE},
+
+      {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
+      {GL_TEXTURE_MAG_FILTER, GL_LINEAR},
+      });
 
   // Setup cubemap
   texture = std::make_shared<Texture>("cloudtop_bk.tga", GL_TEXTURE_2D);
@@ -99,6 +114,7 @@ void Renderer::configure(ex::EventManager& events){
 void Renderer::update(ex::EntityManager& entities,
                       ex::EventManager& events,
                       ex::TimeDelta dt){
+
   (void)events;
 
   static glm::mat4 mvp; // should prob not be static (mem.?).
@@ -127,7 +143,8 @@ void Renderer::update(ex::EntityManager& entities,
   entities.each<Renderable, Transform>([dt, &active_camera](ex::Entity e,
                                                             Renderable& r,
                                                             Transform& t){
-                                         tmp_model = t.model();
+      tmp_model = t.model();
+
       // calculate mvp for each model
       mvp = active_camera.viewproj * t.model();
       r.scene->use();
@@ -194,6 +211,15 @@ void Renderer::render_ui(ex::EntityManager& entities,
       if(i._register_ui)i._register_ui(events);
     });
 
+  // Get position and size of menu
+  // TODO this couples the "menu" and render system, which is not nice.
+  ImGui::Begin("Menu");
+  menu_pos = ImGui::GetWindowPos();
+  menu_size = ImGui::GetWindowSize();
+  ImGui::End();
+
+
+
   ImGui::PopStyleVar();
   ImGui::PopStyleColor(6);
 
@@ -201,36 +227,46 @@ void Renderer::render_ui(ex::EntityManager& entities,
 }
 
 void Renderer::receive(const event::ActiveInput& event){
+  // TODO hardcoded width and height.
   if(event.has(InputRange::CURSOR_X) && event.has(InputRange::CURSOR_Y)){
-    scene_fbo->bind();
+    // Unproject mouse coords.
+    scene_fbo->bind(); // Read depth from scene-fbo
     float x = event.ranges.at(InputRange::CURSOR_X);
     float y = event.ranges.at(InputRange::CURSOR_Y);
     float z = scene_fbo->depth(x*1280.0f, y*720.0f);
     glm::vec3 win = {x*1280.0f, y*720.0f, z};
     auto vec = glm::unProject(win, view*model, proj, glm::vec4{0, 0, 1280.0f, 720.0f});
-    spdlog::get("console")->info("{}, {}, {} - depth {}", vec.x, vec.y, vec.z, z);
+    //spdlog::get("console")->info("{}, {}, {} - depth {}", vec.x, vec.y, vec.z, z);
     scene_fbo->unbind();
+
+    // Set cursor mode if the mouse is not in the menu => mouse will not be captured in menu.
+    x = x*1280.0f;
+    y = y*720.0f;
+    spdlog::get("console")->info("{}, {} -- {}, {}", menu_pos.x, menu_pos.y, menu_size.x, menu_size.y);
+    if(x < menu_pos.x || x > (menu_pos.x + menu_size.x) ||
+       y < menu_pos.y || y > (menu_pos.y + menu_size.y)){
+      if(event.has(InputState::CURSOR_DOWN)){
+        _window->set_cursor_mode(CursorMode::DISABLED);
+
+      }else{
+        // TODO should probably sent out a "state-changed" event
+        _window->set_cursor_mode(CursorMode::NORMAL);
+      }
+    }
   }
 
-  if(event.has(InputState::CURSOR_DOWN)){
-    _window->set_cursor_mode(CursorMode::DISABLED);
 
-  }else{
-    // TODO should probably sent out a "state-changed" event
-    _window->set_cursor_mode(CursorMode::NORMAL);
-  }
-
+  // Set render mode (TODO remove?)
   if(event.has(InputAction::RENDER_WIREFRAME)){
     glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
   }else if(event.has(InputAction::RENDER_SOLID)){
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
   }
-
 }
 
 void Renderer::receive(const event::ActiveWindow& event){
   _window = event.window;
-  configure_scene_fbo();
+  //configure_scene_fbo();
 }
 
 // Private functions
