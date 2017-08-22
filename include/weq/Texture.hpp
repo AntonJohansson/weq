@@ -36,6 +36,9 @@ public:
   // Set texture parameters as pairs of parameters and values.
   void set_parameters(std::map<GLenum, GLenum> params);
 
+  // Set the texture data manually, retains size and format.
+  void set_data(void* bits);
+
   // Handles loading the texture from file or memory to a
   // format useable by OpenGL.
   void load() override;

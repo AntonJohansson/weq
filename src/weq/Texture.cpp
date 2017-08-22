@@ -39,6 +39,13 @@ void Texture::set_parameters(std::map<GLenum, GLenum> params){
   }
 }
 
+void Texture::set_data(void* bits){
+  bind();
+  _bits = bits;
+  //glTexSubImage2D(_target, 0, 0, 0, _width, _height, _format_external, _format_type, _bits);
+  glTexImage2D(_target, 0, _format_internal, _width, _height, 0, _format_external, _format_type, _bits);
+}
+
 void Texture::load(){
   _is_loaded = true;
 
@@ -50,7 +57,6 @@ void Texture::load(){
   }
 
   bind();
-
   glTexImage2D(_target, 0, _format_internal, _width, _height, 0, _format_external, _format_type, _bits);
 
   // TODO unload freeimage data after this.

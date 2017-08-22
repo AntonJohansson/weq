@@ -15,14 +15,19 @@
 using component::Renderable;
 using component::WaveGPU;
 
-// TODO change format of texture buffers.
+namespace{
+  bool clear = false;
+  bool set_c = false;
+  float c = 0.2f;
+}
 
 namespace weq::system{
 
 namespace{
   std::shared_ptr<Mesh> screen_mesh;
-  std::shared_ptr<gl::ShaderProgram> vel_shader;
   std::shared_ptr<gl::ShaderProgram> drop_shader;
+  std::shared_ptr<gl::ShaderProgram> clear_shader;
+  std::shared_ptr<gl::ShaderProgram> vel_shader;
   std::shared_ptr<gl::ShaderProgram> height_shader;
   bool spawn_drop = false;
 }
@@ -66,6 +71,17 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
   drop_shader->load();
   drop_shader->link();
 
+  // Clear shader
+
+  auto clear_v = std::make_shared<gl::Shader>("clear.vert");
+  auto clear_f = std::make_shared<gl::Shader>("clear.frag");
+  clear_v->load();
+  clear_f->load();
+  clear_shader = std::make_shared<gl::ShaderProgram>("clear.prog",
+                                                     clear_v,
+                                                     clear_f);
+  clear_shader->load();
+  clear_shader->link();
 
   // Setup 2D mesh for rendering textures
   gl::VertexFormat VT2 = {{
@@ -91,6 +107,7 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
   screen_mesh->generate_vao(height_shader);
   screen_mesh->generate_vao(vel_shader);
   screen_mesh->generate_vao(drop_shader);
+  screen_mesh->generate_vao(clear_shader);
 }
 
 void WaveGPUSimulation::update(ex::EntityManager& entities,
@@ -99,6 +116,8 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
   (void)events;
   (void)dt;
 
+  add_ui();
+
   entities.each<WaveGPU, Renderable>([dt](ex::Entity e, WaveGPU& wave, Renderable& r){
       (void)e;
 
@@ -106,6 +125,26 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       GLint old_viewport[4];
       glGetIntegerv(GL_VIEWPORT, old_viewport);
       glViewport(0, 0, wave.width, wave.height);
+
+      // Handle interactivity
+      if(set_c){wave.set_c(c); set_c = false;}
+      if(clear){
+        clear_shader->use();
+        wave.vel_fbo.bind();
+        wave.vel_fbo.texture()->bind();
+        screen_mesh->vao(clear_shader->id()).bind();
+        screen_mesh->ebo().bind();
+        glDrawElements(GLenum(screen_mesh->draw_mode()),
+                       screen_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
+
+        wave.height_fbo.bind();
+        wave.height_fbo.texture()->bind();
+        screen_mesh->vao(clear_shader->id()).bind();
+        screen_mesh->ebo().bind();
+        glDrawElements(GLenum(screen_mesh->draw_mode()),
+                       screen_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
+        clear = false;
+      }
 
       // Bind height fbo
       wave.height_fbo.bind();
@@ -189,6 +228,22 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
         ImGui::Image((void*)wave.height_fbo.texture()->handle(), ImVec2(200, 200));
       ImGui::End();
     });
+}
+
+void WaveGPUSimulation::add_ui(){
+  ImGui::Begin("Menu");
+
+  if(ImGui::CollapsingHeader("simulation")){
+    if(ImGui::InputFloat("Wave velocity (c)", &c)){
+      set_c = true;
+    }
+
+    if(ImGui::Button("Clear")){
+      clear = true;
+    }
+  }
+
+  ImGui::End();
 }
 
 void WaveGPUSimulation::receive(const event::ActiveInput& event){

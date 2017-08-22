@@ -133,9 +133,6 @@ public:
         ImGui::SetWindowPos("Menu", ImVec2(10,10), ImGuiSetCond_FirstUseEver);
         ImGui::SetWindowSize("Menu", ImVec2(200,500), ImGuiSetCond_FirstUseEver);
 
-        if(ImGui::CollapsingHeader("simulation")){
-        }
-
         if(ImGui::CollapsingHeader("settings")){
         }
 

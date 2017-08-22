@@ -6,6 +6,8 @@ namespace ex = entityx;
 
 // Defined in <weq/event/Input.hpp>
 namespace event{struct ActiveInput;}
+// Defined in <weq/event/UI.hpp>
+namespace event{struct UI;}
 
 namespace weq::system{
 
@@ -17,6 +19,8 @@ public:
   void update(ex::EntityManager& entities,
               ex::EventManager& events,
               ex::TimeDelta dt) override;
+
+  void add_ui();
 
   void receive(const event::ActiveInput& event);
 private:
