@@ -15,7 +15,6 @@
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw_gl3.h>
 #include <spdlog/spdlog.h>
 
 namespace weq::system{
@@ -28,10 +27,6 @@ std::shared_ptr<gl::Framebuffer> scene_fbo;
 glm::mat4 view;
 glm::mat4 proj;
 glm::mat4 model;
-
-// TEMP
-ImVec2 menu_pos;
-ImVec2 menu_size;
 }
 
 using component::Renderable;
@@ -181,8 +176,8 @@ void Renderer::update(ex::EntityManager& entities,
   glDrawElements(GLenum(screen_mesh->draw_mode()),
                  screen_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
 
-  // Render ui
-  render_ui(entities, events, dt);
+  // Render UI
+  ImGui::Render();
 
   _window->swap_buffers();
 
@@ -191,39 +186,6 @@ void Renderer::update(ex::EntityManager& entities,
   while((err = glGetError()) != GL_NO_ERROR){
     spdlog::get("console")->error("GL-error: {}", err);
   }
-}
-
-void Renderer::render_ui(ex::EntityManager& entities,
-                         ex::EventManager& events,
-                         ex::TimeDelta dt){
-  ImGui_ImplGlfwGL3_NewFrame();
-
-  ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, ImVec4(20/255.f, 20/255.f, 20/255.f, 1.0f));
-  ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(40/255.f, 40/255.f, 40/255.f, 1.0f));
-  ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(135/255.f, 135/255.f, 135/255.f, 1.0f));
-  ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(20/255.f, 20/255.f, 20/255.f, 1.0f));
-  ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(40/255.f, 40/255.f, 40/255.f, 1.0f));
-  ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(135/255.f, 135/255.f, 135/255.f, 1.0f));
-
-  ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-
-  entities.each<component::ImGui>([dt, &events](ex::Entity e, component::ImGui& i){
-      if(i._register_ui)i._register_ui(events);
-    });
-
-  // Get position and size of menu
-  // TODO this couples the "menu" and render system, which is not nice.
-  ImGui::Begin("Menu");
-  menu_pos = ImGui::GetWindowPos();
-  menu_size = ImGui::GetWindowSize();
-  ImGui::End();
-
-
-
-  ImGui::PopStyleVar();
-  ImGui::PopStyleColor(6);
-
-  ImGui::Render();
 }
 
 void Renderer::receive(const event::ActiveInput& event){
@@ -238,23 +200,15 @@ void Renderer::receive(const event::ActiveInput& event){
     auto vec = glm::unProject(win, view*model, proj, glm::vec4{0, 0, 1280.0f, 720.0f});
     //spdlog::get("console")->info("{}, {}, {} - depth {}", vec.x, vec.y, vec.z, z);
     scene_fbo->unbind();
-
-    // Set cursor mode if the mouse is not in the menu => mouse will not be captured in menu.
-    x = x*1280.0f;
-    y = y*720.0f;
-    spdlog::get("console")->info("{}, {} -- {}, {}", menu_pos.x, menu_pos.y, menu_size.x, menu_size.y);
-    if(x < menu_pos.x || x > (menu_pos.x + menu_size.x) ||
-       y < menu_pos.y || y > (menu_pos.y + menu_size.y)){
-      if(event.has(InputState::CURSOR_DOWN)){
-        _window->set_cursor_mode(CursorMode::DISABLED);
-
-      }else{
-        // TODO should probably sent out a "state-changed" event
-        _window->set_cursor_mode(CursorMode::NORMAL);
-      }
-    }
   }
 
+  if(event.has(InputState::CURSOR_DOWN)){
+    _window->set_cursor_mode(CursorMode::DISABLED);
+
+  }else{
+    // TODO should probably sent out a "state-changed" event
+    _window->set_cursor_mode(CursorMode::NORMAL);
+  }
 
   // Set render mode (TODO remove?)
   if(event.has(InputAction::RENDER_WIREFRAME)){

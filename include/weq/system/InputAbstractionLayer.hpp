@@ -1,5 +1,7 @@
 #pragma once
 
+#include <weq/event/Input.hpp> // temporary
+
 #include <entityx/entityx.h>
 
 #include <memory>
@@ -10,10 +12,10 @@ namespace ex = entityx;
 // TODO move event handling to input system and forward.
 
 // Defined in <weq/event/Input.hpp>
-namespace event{
-struct ActiveInput;
-struct ChangeInputContext;
-}
+//namespace event{
+//struct ActiveInput;
+//struct ChangeInputContext;
+//}
 
 // Defined in <weq/system/InputContext.hpp>
 class InputContext;
@@ -28,6 +30,6 @@ public:
 
   void receive(const event::ChangeInputContext& event);
 
-  const event::ActiveInput& get_active();
+  const event::ActiveInput get_active();
   void clear();
 };

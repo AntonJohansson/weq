@@ -30,6 +30,7 @@ add_executable(weq
   src/weq/system/Camera.cpp
   src/weq/system/Input.cpp
   src/weq/system/InputAbstractionLayer.cpp
+  src/weq/system/UserInterface.cpp
   src/weq/system/Renderer.cpp
   src/weq/system/WaveGPUSimulation.cpp
   src/weq/system/WaveSimulation.cpp

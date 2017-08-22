@@ -32,6 +32,30 @@ struct ActiveInput{
   bool has(InputRange range) const {
     return ranges.find(range) != ranges.end();
   }
+
+  // Consumes (removes) the specified InputAction, if it exists.
+  void consume(InputAction action){
+    auto it = std::find(actions.begin(), actions.end(), action);
+    if(it != actions.end()){
+      actions.erase(it);
+    }
+  }
+
+  // Consumes (removes) the specified InputState, if it exists.
+  void consume(InputState state){
+    auto it = std::find(states.begin(), states.end(), state);
+    if(it != states.end()){
+      states.erase(it);
+    }
+  }
+
+  // Consumes (removes) the specified InputRange, if it exists.
+  void consume(InputRange range){
+    auto it = ranges.find(range);
+    if(it != ranges.end()){
+      ranges.erase(it);
+    }
+  }
 };
 
 // TODO requried?

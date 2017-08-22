@@ -5,6 +5,16 @@
 
 #include <glfw/glfw3.h>
 
+
+// COMMENT TO FUTURE SNYYGGING
+// COMMENT TO FUTURE SNYYGGING
+// COMMENT TO FUTURE SNYYGGING
+// COMMENT TO FUTURE SNYYGGING
+// COMMENT TO FUTURE SNYYGGING
+// COMMENT TO FUTURE SNYYGGING
+// tror jag sparar input-datan i ett event-objekt
+// => consumes rensar states.
+
 namespace{
   event::ActiveInput _active_input;
   std::shared_ptr<InputContext> _context;
@@ -68,7 +78,7 @@ void InputAbstractionLayer::register_scroll(double xoffset, double yoffset){
   }
 }
 
-const event::ActiveInput& InputAbstractionLayer::get_active(){
+const event::ActiveInput InputAbstractionLayer::get_active(){
   return _active_input;
 }
 

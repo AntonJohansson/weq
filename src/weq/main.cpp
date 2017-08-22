@@ -12,6 +12,7 @@
 
 #include <weq/Application.hpp>
 #include <weq/system/Input.hpp>
+#include <weq/system/UserInterface.hpp>
 #include <weq/system/WaveGPUSimulation.hpp>
 #include <weq/system/Camera.hpp>
 #include <weq/system/Renderer.hpp>
@@ -28,8 +29,9 @@ class Simulation : public weq::Application{
 public:
   Simulation()
     : Application(){
-	
+
     _systems.add<weq::system::Input>();
+    _systems.add<weq::system::UserInterface>();
 
     //_systems.add<weq::system::WaveSimulation>();
     _systems.add<weq::system::WaveGPUSimulation>();
@@ -126,6 +128,7 @@ public:
     auto ui = _entities.create();
     ui.assign<component::ImGui>([](ex::EventManager& e){
         //ImGui::ShowTestWindow();
+        spdlog::get("console")->info("test");
         ImGui::Begin("Menu");
         ImGui::SetWindowCollapsed("Menu", false, ImGuiSetCond_FirstUseEver);
         ImGui::SetWindowPos("Menu", ImVec2(10,10), ImGuiSetCond_Appearing);

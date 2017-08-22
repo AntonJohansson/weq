@@ -80,6 +80,7 @@ void Input::configure(ex::EventManager& events){
   //glfwSetCharModsCallback(_window_context, charmods_callback);
 
   // Setup ImGui binding
+  // TODO move?
   ImGui_ImplGlfwGL3_Init(_window_context, false);
 
   // Inputsmaps
