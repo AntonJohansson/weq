@@ -25,7 +25,8 @@ Camera::~Camera(){
 }
 
 void Camera::configure(ex::EventManager& events){
-  events.subscribe<event::WindowUpdate>(*this);
+  //events.subscribe<event::WindowUpdate>(*this);
+  events.subscribe<event::ActiveWindow>(*this);
   events.subscribe<event::ActiveInput>(*this);
 }
 
@@ -36,6 +37,13 @@ void Camera::update(ex::EntityManager& entities,
   auto update_perspective = [dt, this](ex::Entity e,
                                          component::Camera& c,
                                          component::Transform& t){
+    // Check aspect ratio
+    if(c.inherit_aspect){
+      c.aspect_ratio = _aspect_ratio;
+      c.update_projection = true;
+    }
+
+    // Update look direction for both camera modes.
     if(c.look_mode == LookMode::TARGET){
       update_target(c, t);
       c.view = glm::lookAt(t._translate, c.target, c.up);
@@ -94,8 +102,8 @@ void Camera::update_direction(component::Camera& camera, component::Transform& t
   _movement_amount = {0,0,0};
 }
 
-void Camera::receive(const event::WindowUpdate& event){
-  _aspect_ratio = event.aspect_ratio;
+void Camera::receive(const event::ActiveWindow& event){
+  _aspect_ratio = event.window->aspect_ratio();
 }
 
 void Camera::receive(const event::ActiveInput& event){

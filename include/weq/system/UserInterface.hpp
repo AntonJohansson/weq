@@ -8,6 +8,8 @@ namespace ex = entityx;
 class Window;
 // Defined in <weq/event/Input.hpp>
 namespace event{struct ActiveInput;}
+// Defined in <weq/event/Window.hpp>
+namespace event{struct ActiveWindow;}
 
 namespace weq::system{
 
@@ -23,6 +25,7 @@ public:
               ex::TimeDelta dt) override;
 
   void receive(const event::ActiveInput& event);
+  void receive(const event::ActiveWindow& event);
 };
 
 }

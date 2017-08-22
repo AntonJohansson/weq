@@ -79,6 +79,7 @@ public:
   // Returns width and height of the window.
   unsigned int width()  const {return _width;}
   unsigned int height() const {return _height;}
+  float aspect_ratio() const {return static_cast<float>(_width)/static_cast<float>(_height);}
 
   // Returns the (x,y) position of the window on the current monitor.
   // TODO combine.

@@ -17,6 +17,12 @@
 #include <weq/system/Camera.hpp>
 #include <weq/system/Renderer.hpp>
 
+// DILEMMA
+// fönstret behöver skapas före configure() för att de funktionerna ska ha tillgång till ett OpenGL context.
+// fönstret behöver skapas efter configure() för att de funktionerna ska kunna registrera sig på WindowUpdate() eventet.
+
+// TODO ActiveWindow skickas ut i början av run(), move.
+// TODO window is currently created in application.cpp, move this!
 /* TODO
    I should implement sub-systems (for mt)*/
 /* TODO

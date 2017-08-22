@@ -3,6 +3,7 @@
 #include <weq/system/InputRaw.hpp>
 #include <weq/system/InputTypes.hpp>
 #include <weq/system/InputContext.hpp>
+#include <weq/event/Window.hpp>
 #include <weq/Window.hpp>
 
 #include <imgui/imgui.h>
@@ -14,6 +15,11 @@
 #include <initializer_list>
 
 // TODO read input from config file instead of hard coded.
+
+namespace{
+  unsigned int window_width;
+  unsigned int window_height;
+}
 
 namespace weq::system{
 
@@ -34,7 +40,7 @@ namespace{
     (void)window;
     (void)x;
     (void)y;
-    _ial->register_mouse(x, y, 1280, 720); //@TODO this shouldn't be hardcoded
+    _ial->register_mouse(x, y, window_width, window_height); 
   }
 
   static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods){
@@ -65,6 +71,9 @@ namespace{
 
 void Input::configure(ex::EventManager& events){
   (void)events;
+
+  // Events
+  events.subscribe<event::ActiveWindow>(*this);
 
   // set the context to the current one
   // @TODO easy way to switch between contexts
@@ -138,6 +147,11 @@ void Input::update(ex::EntityManager& entities,
   glfwPollEvents();
   events.emit(_ial->get_active());
   _ial->clear();
+}
+
+void Input::receive(const event::ActiveWindow& event){
+  window_width = event.window->width();
+  window_height = event.window->height();
 }
 
 }

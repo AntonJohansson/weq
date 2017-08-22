@@ -14,7 +14,7 @@ struct Transform;
 
 namespace event{
 // Defined in <weq/event/Window.hpp>
-struct WindowUpdate;
+struct ActiveWindow;
 // Defined in <weq/event/Input.hpp>
 struct ActiveInput;
 }
@@ -35,7 +35,7 @@ public:
   void update_target(component::Camera& camera, component::Transform& t);
   void update_direction(component::Camera& camera, component::Transform& t);
 
-  void receive(const event::WindowUpdate& event);
+  void receive(const event::ActiveWindow& event);
   void receive(const event::ActiveInput& event);
 
 private:

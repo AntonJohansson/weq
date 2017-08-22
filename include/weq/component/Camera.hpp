@@ -26,15 +26,20 @@ struct Camera{
          float n = 1.0f,
          float f = 100.0f,
          float fov = 45.0f,
+         float a_ratio = 0.0f,
          glm::vec3 target = {0, 0, 0})
     : look_mode(look_mode),
       _near(n),
       _far(f),
       fov(fov),
-      aspect_ratio(1280.0f/720.0f),
+      aspect_ratio(a_ratio),
       target(target),
       up({0, 0, 1}),
-      update_projection(true){
+      update_projection(true),
+      inherit_aspect(false){
+    if(aspect_ratio == 0.0f){
+      inherit_aspect = true;
+    }
   }
 
   LookMode look_mode;
@@ -62,6 +67,9 @@ struct Camera{
   //           This tags the component to be updated by the camera system.
   //           TODO use same flags variable?
   bool update_projection;
+  // If true - inherit aspect ratio from the active window,
+  //           useful for the main camera.
+  bool inherit_aspect;
 };
 
 } // namespace component

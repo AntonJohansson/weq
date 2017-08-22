@@ -77,7 +77,7 @@ Window::Window(entityx::EventManager& events, std::string title, unsigned int wi
 
   // Calculate aspect ratio and send an update event.
   float aspect_ratio = static_cast<float>(_width)/static_cast<float>(_height);
-  _events.emit(event::WindowUpdate(_width, _height, _refresh_rate, aspect_ratio));
+  //_events.emit(event::WindowUpdate(_width, _height, _refresh_rate, aspect_ratio));
 }
 
 Window::~Window(){

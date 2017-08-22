@@ -17,11 +17,16 @@ using std::chrono::duration;
 // YO SNYGGING
 // get width/height/mode from runtime options (ezpz).
 
+// Temporary anonymous namspace, used to store window info
+// inferred from cmd args.
+namespace{
+  unsigned int width, height;
+  WindowMode mode;
+}
+
 namespace weq{
 
 Application::Application(int argc, char** argv){
-  int width, height;
-  WindowMode mode;
 
   // Initialize Logging context
   _console = spdlog::stdout_color_mt("console");
@@ -54,7 +59,7 @@ Application::Application(int argc, char** argv){
   // Subscribe to internal engine events
   _events.subscribe<event::Quit>(*this);
 
-  // Create window (TODO Move?)
+  // Create window (TODO Move!!)
   _window = std::make_shared<Window>(_events, "Wave Simulation", width, height, mode); // Will also initlize glfw/glad
 }
 

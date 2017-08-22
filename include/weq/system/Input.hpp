@@ -4,12 +4,14 @@
 
 namespace ex = entityx;
 
+// Defined in <weq/event/Window.hpp>
+namespace event{struct ActiveWindow;}
 // Defined in <GLFW/glfw3.h>
 struct GLFWwindow;
 
 namespace weq::system{
 
-class Input : public ex::System<Input>{
+class Input : public ex::System<Input>, public ex::Receiver<Input>{
 public:
   Input(){}
   ~Input(){}
@@ -19,6 +21,8 @@ public:
   void update(ex::EntityManager& entities,
               ex::EventManager& events,
               ex::TimeDelta dt) override;
+
+  void receive(const event::ActiveWindow& event);
 private:
   GLFWwindow* _window_context;
 };

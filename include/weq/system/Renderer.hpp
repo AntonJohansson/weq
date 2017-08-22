@@ -25,8 +25,7 @@ public:
               ex::TimeDelta dt) override;
 
   void receive(const event::ActiveInput& event);
-  void receive(const event::ActiveWindow& window);
-
+  void receive(const event::ActiveWindow& event);
 private:
   void configure_scene_fbo();
   std::shared_ptr<Window> _window;

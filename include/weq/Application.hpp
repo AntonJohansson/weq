@@ -33,6 +33,9 @@ public:
   // Function that should add and configure all systems.
   virtual void configure(){}
 
+  // Temporary function what will open a window.
+  void open_window();
+
   // Responsible for updating systems, called from main_loop().
   virtual void update(double dt){(void)dt;}
 

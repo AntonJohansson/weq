@@ -1,6 +1,7 @@
 #include <weq/system/UserInterface.hpp>
 #include <weq/component/ImGui.hpp>
 #include <weq/event/Input.hpp>
+#include <weq/event/Window.hpp>
 
 #include <spdlog/spdlog.h>
 #include <imgui/imgui.h>
@@ -9,6 +10,8 @@
 namespace{
   ImVec2 menu_pos;
   ImVec2 menu_size;
+  unsigned int window_width;
+  unsigned int window_height;
 }
 
 namespace weq::system{
@@ -18,6 +21,7 @@ UserInterface::~UserInterface(){}
 
 void UserInterface::configure(ex::EventManager& events){
   events.subscribe<event::ActiveInput>(*this);
+  events.subscribe<event::ActiveWindow>(*this);
 }
 
 void UserInterface::update(ex::EntityManager& entities,
@@ -62,8 +66,8 @@ void UserInterface::receive(const event::ActiveInput& event){
     float x = non_const_event.ranges.at(InputRange::CURSOR_X);
     float y = non_const_event.ranges.at(InputRange::CURSOR_Y);
 
-    x = x*1280.0f;
-    y = y*720.0f;
+    x = x*window_width;
+    y = y*window_height;
 
     if((x >= menu_pos.x && x <= (menu_pos.x + menu_size.x)) &&
        (y >= menu_pos.y && y <= (menu_pos.y + menu_size.y))){
@@ -71,6 +75,11 @@ void UserInterface::receive(const event::ActiveInput& event){
     }
     //spdlog::get("console")->info("{}, {} - {}, {}", menu_pos.x, menu_pos.y, menu_size.x, menu_size.y);
   }
+}
+
+void UserInterface::receive(const event::ActiveWindow& event){
+  window_width = event.window->width();
+  window_height = event.window->height();
 }
 
 }

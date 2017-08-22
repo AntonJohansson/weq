@@ -77,20 +77,6 @@ void Renderer::configure(ex::EventManager& events){
                                        gl::DrawMode::TRIANGLES);
   screen_mesh->generate_vao(screen_p);
 
-  // Dependant on the current window, move to event receiver?
-  //scene_fbo = std::make_shared<gl::Framebuffer>(_window->width(), _window->height());
-  scene_fbo = std::make_shared<gl::Framebuffer>(1280, 720);
-  scene_fbo->texture()->set_parameters({
-      {GL_TEXTURE_BASE_LEVEL, 0},
-      {GL_TEXTURE_MAX_LEVEL, 0},
-
-      {GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
-      {GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE},
-
-      {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
-      {GL_TEXTURE_MAG_FILTER, GL_LINEAR},
-      });
-
   // Setup cubemap
   texture = std::make_shared<Texture>("cloudtop_bk.tga", GL_TEXTURE_2D);
   texture->load();
@@ -195,9 +181,9 @@ void Renderer::receive(const event::ActiveInput& event){
     scene_fbo->bind(); // Read depth from scene-fbo
     float x = event.ranges.at(InputRange::CURSOR_X);
     float y = event.ranges.at(InputRange::CURSOR_Y);
-    float z = scene_fbo->depth(x*1280.0f, y*720.0f);
-    glm::vec3 win = {x*1280.0f, y*720.0f, z};
-    auto vec = glm::unProject(win, view*model, proj, glm::vec4{0, 0, 1280.0f, 720.0f});
+    float z = scene_fbo->depth(x*_window->width(), y*_window->height());
+    glm::vec3 win = {x*_window->width(), y*_window->height(), z};
+    auto vec = glm::unProject(win, view*model, proj, glm::vec4{0, 0, _window->width(), _window->height()});
     //spdlog::get("console")->info("{}, {}, {} - depth {}", vec.x, vec.y, vec.z, z);
     scene_fbo->unbind();
   }
@@ -220,7 +206,7 @@ void Renderer::receive(const event::ActiveInput& event){
 
 void Renderer::receive(const event::ActiveWindow& event){
   _window = event.window;
-  //configure_scene_fbo();
+  configure_scene_fbo();
 }
 
 // Private functions
