@@ -35,7 +35,20 @@ Window::Window(entityx::EventManager& events, std::string title, unsigned int wi
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-  _window = glfwCreateWindow(_width, _height, title.c_str(), nullptr, nullptr);
+  if(_mode == WindowMode::WINDOWED){
+    _window = glfwCreateWindow(_width, _height, title.c_str(), nullptr, nullptr);
+  }else if(_mode == WindowMode::FULLSCREEN){
+    _window = glfwCreateWindow(_width, _height, title.c_str(), glfwGetPrimaryMonitor(), nullptr);
+  }else if(_mode == WindowMode::WINDOWED_FULLSCREEN){
+    auto* video_mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+    glfwWindowHint(GLFW_RED_BITS, video_mode->redBits);
+    glfwWindowHint(GLFW_GREEN_BITS, video_mode->greenBits);
+    glfwWindowHint(GLFW_BLUE_BITS, video_mode->blueBits);
+    glfwWindowHint(GLFW_REFRESH_RATE, video_mode->refreshRate);
+
+    _window = glfwCreateWindow(video_mode->width, video_mode->height, title.c_str(), glfwGetPrimaryMonitor(), nullptr);
+  }
 
   if(!_window){
     spdlog::get("console")->error("GLFW: Failed to create window!");
