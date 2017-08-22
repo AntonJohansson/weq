@@ -10,5 +10,11 @@ uniform sampler2D height_field;
 //uniform sampler3D cubemap;
 
 void main(){
-  frag_color = texture(height_field, v_texcoord);
+  float h = texture(height_field, v_texcoord).r;
+
+  if(h > 0){
+    frag_color = vec4(h, h, h, 1);
+  }else{
+    frag_color = vec4(0, h, 0, 1);
+  }
 }

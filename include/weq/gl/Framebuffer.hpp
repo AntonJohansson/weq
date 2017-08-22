@@ -19,7 +19,8 @@ public:
   // Handles creating the actual framebuffer, textures and
   // render targets.
   // TODO split.
-  Framebuffer(unsigned int w, unsigned int h);
+  Framebuffer(unsigned int w, unsigned int h, GLenum internal = GL_RGB,
+              GLenum external = GL_RGB, GLenum type = GL_UNSIGNED_BYTE);
 
   // Destroys the framebuffer, render buffers and texutres.
   ~Framebuffer();

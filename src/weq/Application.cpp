@@ -43,6 +43,10 @@ void Application::run(){
   nanoseconds delta_time;
 
   while(!_should_quit){
+    // Handle window quit events.
+    if(_window->should_close())_should_quit = true;
+
+    // Update delta t.
     new_time = Clock::now();
     delta_time = new_time - start_time;
     start_time = new_time;

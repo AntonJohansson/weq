@@ -6,6 +6,7 @@
 
 #include <map>
 
+// TODO CLEAN UP SPECIFICATION OF TEXTURE FORMAT
 // Resource class for representing a texture that is useable
 // by OpenGL.
 // TODO make more customizable (able to change width etc.)
@@ -22,7 +23,10 @@ public:
           GLenum target,
           unsigned int w,
           unsigned int h,
-          unsigned char* bits = nullptr);
+          GLenum internal = GL_RGB,
+          GLenum external = GL_RGB,
+          GLenum type = GL_UNSIGNED_BYTE,
+          void* bits = nullptr);
 
   // Destorys the previously generated texture id.
   ~Texture();
@@ -59,8 +63,11 @@ private:
   load_texture(const std::string& filename);
 
   GLenum _target;
+  GLenum _format_internal;
+  GLenum _format_external;
+  GLenum _format_type;
   unsigned int _width;
   unsigned int _height;
-  unsigned char* _bits;
+  void* _bits;
   GLuint _texture;
 };

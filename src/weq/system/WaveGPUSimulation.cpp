@@ -10,6 +10,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
 #include <glad/glad.h>
+#include <imgui/imgui.h>
 
 using component::Renderable;
 using component::WaveGPU;
@@ -111,7 +112,7 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       wave.height_fbo.texture()->bind(0);
 
       // Drop shader
-      if(true || spawn_drop){
+      if(spawn_drop){
         drop_shader->use();
         drop_shader->set("height_field", 0);
 
@@ -125,6 +126,10 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       }
 
       wave.height_fbo.bind();
+      ImGui::Begin("Debug");
+      ImGui::Text("Input to the velocity shader:");
+      ImGui::Image((void*)wave.height_fbo.texture()->handle(), ImVec2(200, 200));
+      ImGui::End();
 
       // Velocity shader
       wave.vel_fbo.bind();
@@ -172,12 +177,21 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
                  old_viewport[3]);
 
       r.texture = wave.height_fbo.texture();
+
+      // Visualize the output from each shader.
+      ImGui::Begin("Debug");
+        ImGui::Text("Output from velocity shader:");
+        ImGui::Image((void*)wave.vel_fbo.texture()->handle(), ImVec2(200, 200));
+
+        ImGui::Text("Output from height shader:");
+        ImGui::Image((void*)wave.height_fbo.texture()->handle(), ImVec2(200, 200));
+      ImGui::End();
     });
 }
 
 void WaveGPUSimulation::receive(const event::ActiveInput& event){
   (void)event;
-  if(event.has(InputState::CURSOR_DOWN)){
+  if(event.has(InputAction::SPAWN_WAVELET)){
     spawn_drop = true;
   }
 }

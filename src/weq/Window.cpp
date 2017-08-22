@@ -139,6 +139,10 @@ void Window::set_cursor_mode(CursorMode mode){
   }
 }
 
+bool Window::should_close() const {
+  return glfwWindowShouldClose(_window);
+}
+
 // Get stuff
 
 GLFWwindow* Window::current(){

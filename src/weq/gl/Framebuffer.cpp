@@ -5,12 +5,12 @@
 
 namespace gl{
 
-Framebuffer::Framebuffer(unsigned int w, unsigned int h){
+Framebuffer::Framebuffer(unsigned int w, unsigned int h, GLenum internal, GLenum external, GLenum type){
      // Generate framebuffer
     glGenFramebuffers(1, &_id);
     bind();
 
-    _texture = std::make_shared<Texture>("fbo", GL_TEXTURE_2D, w, h);
+    _texture = std::make_shared<Texture>("fbo", GL_TEXTURE_2D, w, h, internal, external, type);
     _texture->load();
 
     //glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, _texture, 0);

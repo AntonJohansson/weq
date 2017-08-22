@@ -24,8 +24,8 @@ struct WaveGPU{
       height(h),
       gridsize(gridsz),
       r(c*c/(gridsz*gridsz)),
-      vel_fbo(w, h),
-      height_fbo(w, h){
+      vel_fbo(w, h, GL_R32F, GL_RED, GL_FLOAT),
+      height_fbo(w, h, GL_R32F, GL_RED, GL_FLOAT){
   }
 
   unsigned int width;

@@ -94,7 +94,7 @@ public:
     auto wave_gpu = wave.assign<component::WaveGPU>(resolution,
                                                     resolution,
                                                     size/resolution,
-                                                    0.02f);
+                                                    0.019f);
 
     wave_gpu->vel_fbo.texture()->set_parameters({
         {GL_TEXTURE_BASE_LEVEL, 0},
@@ -128,11 +128,10 @@ public:
     auto ui = _entities.create();
     ui.assign<component::ImGui>([](ex::EventManager& e){
         //ImGui::ShowTestWindow();
-        spdlog::get("console")->info("test");
         ImGui::Begin("Menu");
         ImGui::SetWindowCollapsed("Menu", false, ImGuiSetCond_FirstUseEver);
-        ImGui::SetWindowPos("Menu", ImVec2(10,10), ImGuiSetCond_Appearing);
-        ImGui::SetWindowSize("Menu", ImVec2(200,500), ImGuiSetCond_Appearing);
+        ImGui::SetWindowPos("Menu", ImVec2(10,10), ImGuiSetCond_FirstUseEver);
+        ImGui::SetWindowSize("Menu", ImVec2(200,500), ImGuiSetCond_FirstUseEver);
 
         if(ImGui::CollapsingHeader("simulation")){
         }

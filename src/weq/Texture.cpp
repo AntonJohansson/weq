@@ -13,9 +13,15 @@ Texture::Texture(const std::string& id,
                  GLenum target,
                  unsigned int w,
                  unsigned int h,
-                 unsigned char* bits)
+                 GLenum internal,
+                 GLenum external,
+                 GLenum type,
+                 void* bits)
   : Resource(id, ResourceType::MEMORY),
     _target(target),
+    _format_internal(internal),
+    _format_external(external),
+    _format_type(type),
     _width(w),
     _height(h),
     _bits(bits){
@@ -40,12 +46,12 @@ void Texture::load(){
     const auto& [bits, width, height] = load_texture(_resource_path + _id);
     _width = width;
     _height = height;
-    _bits = bits;
+    _bits = (void*)bits;
   }
 
   bind();
 
-  glTexImage2D(_target, 0, GL_RGB, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, _bits);
+  glTexImage2D(_target, 0, _format_internal, _width, _height, 0, _format_external, _format_type, _bits);
 
   // TODO unload freeimage data after this.
 }
