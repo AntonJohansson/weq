@@ -13,7 +13,7 @@ void main(){
   float h = texture(height_field, v_texcoord).r;
 
   if(h > 0){
-    frag_color = vec4(h, h, h, 1);
+    frag_color = vec4(h, 0, 0, 1);
   }else{
     frag_color = vec4(0, h, 0, 1);
   }

@@ -5,6 +5,7 @@ in vec2 v_texcoord;
 out vec4 frag_color;
 
 uniform sampler2D height_field;
+uniform sampler2D vel_field; // TEMPORARY - addition can be performed by OpenGL blending.
 uniform vec2 gridsize;
 uniform float r;
 
@@ -23,7 +24,10 @@ void main(){
 
   float f = r*(w + e + n + s - 4.0*t);
 
-  frag_color = vec4(-0.05, 0, 0 ,0);
+  float dv = f*dt;
+  float v = texture(vel_field, v_texcoord).r + dv;
+
+  frag_color = vec4(v, 0, 0 ,0); // Blend mode will add to velocity texture.
 
   // Even if we read and write to the same texture, changes will not be
   // written after the entire draw call is complete -> no need for

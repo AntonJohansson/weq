@@ -135,9 +135,11 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       wave.vel_fbo.bind();
 
       wave.height_fbo.texture()->bind(0);
+      wave.vel_fbo.texture()->bind(1);
 
       vel_shader->use();
       vel_shader->set("height_field", 0);
+      vel_shader->set("vel_field", 1);
       vel_shader->set("dt", dt);
       vel_shader->set("gridsize", glm::vec2(1.0/wave.width, 1.0/wave.height));
       vel_shader->set("r", wave.r);

@@ -94,7 +94,7 @@ public:
     auto wave_gpu = wave.assign<component::WaveGPU>(resolution,
                                                     resolution,
                                                     size/resolution,
-                                                    0.019f);
+                                                    0.02f);
 
     wave_gpu->vel_fbo.texture()->set_parameters({
         {GL_TEXTURE_BASE_LEVEL, 0},
