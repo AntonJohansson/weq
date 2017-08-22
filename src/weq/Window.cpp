@@ -11,13 +11,14 @@ namespace{
   bool glad_initialized;
 }
 
-Window::Window(entityx::EventManager& events, WindowMode mode)
+Window::Window(entityx::EventManager& events, std::string title, unsigned int width,
+               unsigned int height, WindowMode mode)
   : _events(events),
-    _mode(mode),
     _x(0),
     _y(0),
-    _width(1280),
-    _height(720),
+    _width(width),
+    _height(height),
+    _mode(mode),
     _refresh_rate(60){
 
   // Initialize GLFW
@@ -34,7 +35,7 @@ Window::Window(entityx::EventManager& events, WindowMode mode)
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-  _window = glfwCreateWindow(_width, _height, "WEQ", nullptr, nullptr);
+  _window = glfwCreateWindow(_width, _height, title.c_str(), nullptr, nullptr);
 
   if(!_window){
     spdlog::get("console")->error("GLFW: Failed to create window!");

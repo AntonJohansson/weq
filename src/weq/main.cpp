@@ -27,8 +27,8 @@
 
 class Simulation : public weq::Application{
 public:
-  Simulation()
-    : Application(){
+  Simulation(int argc, char** argv)
+    : Application(argc, argv){
 
     _systems.add<weq::system::Input>();
     _systems.add<weq::system::UserInterface>();
@@ -153,8 +153,8 @@ public:
   }
 };
 
-int main(){
-  Simulation sim;
+int main(int argc, char** argv){
+  Simulation sim(argc, argv);
   sim.configure();
   sim.run();
 

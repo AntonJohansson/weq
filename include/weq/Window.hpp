@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 // Defined in <glfw/glfw.h>
 struct GLFWwindow;
 struct GLFWmonitor;
@@ -30,7 +32,8 @@ public:
   // TODO remove event manager and forward events from renderer.
   // Also requests a 4.1 OpenGL context if one does not already
   // exist.
-  Window(entityx::EventManager& events, WindowMode mode = WindowMode::WINDOWED);
+  Window(entityx::EventManager& events, std::string title, unsigned int width,
+         unsigned int height, WindowMode mode = WindowMode::WINDOWED);
 
   // Destorys the current window and all of it's resources.
   // Terminates GLFW if and only if the current window is the last one.
@@ -95,11 +98,11 @@ private:
   GLFWmonitor* monitor(int index);
 
   entityx::EventManager& _events;
-  WindowMode _mode;
   unsigned int _x;
   unsigned int _y;
   unsigned int _width;
   unsigned int _height;
   unsigned int _refresh_rate;
+  WindowMode _mode;
   GLFWwindow* _window;
 };

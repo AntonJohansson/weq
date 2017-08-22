@@ -27,7 +27,7 @@ using ex::SystemManager;
 // (events, systems, entities, states, resources).
 class Application : public ex::Receiver<Application>{
 public:
-  Application();
+  Application(int argc, char** argv);
   virtual ~Application();
 
   // Function that should add and configure all systems.
