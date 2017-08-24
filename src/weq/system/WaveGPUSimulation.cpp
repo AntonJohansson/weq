@@ -36,6 +36,7 @@ namespace weq::system{
 namespace{
   std::shared_ptr<Mesh> screen_mesh;
   std::shared_ptr<gl::ShaderProgram> drop_shader;
+  std::shared_ptr<gl::ShaderProgram> edge_shader;
   std::shared_ptr<gl::ShaderProgram> clear_shader;
   std::shared_ptr<gl::ShaderProgram> vel_shader;
   std::shared_ptr<gl::ShaderProgram> height_shader;
@@ -82,7 +83,6 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
   drop_shader->link();
 
   // Clear shader
-
   auto clear_v = std::make_shared<gl::Shader>("clear.vert");
   auto clear_f = std::make_shared<gl::Shader>("clear.frag");
   clear_v->load();
@@ -92,6 +92,17 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
                                                      clear_f);
   clear_shader->load();
   clear_shader->link();
+
+  // Edge shader
+  auto edge_v = std::make_shared<gl::Shader>("edge.vert");
+  auto edge_f = std::make_shared<gl::Shader>("edge.frag");
+  edge_v->load();
+  edge_f->load();
+  edge_shader = std::make_shared<gl::ShaderProgram>("edge.prog",
+                                                    edge_v,
+                                                    edge_f);
+  edge_shader->load();
+  edge_shader->link();
 
   // Setup 2D mesh for rendering textures
   gl::VertexFormat VT2 = {{
@@ -118,6 +129,7 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
   screen_mesh->generate_vao(vel_shader);
   screen_mesh->generate_vao(drop_shader);
   screen_mesh->generate_vao(clear_shader);
+  screen_mesh->generate_vao(edge_shader);
 }
 
 void WaveGPUSimulation::update(ex::EntityManager& entities,
@@ -153,6 +165,17 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       // Bind height fbo
       wave.height_fbo.bind();
       wave.height_fbo.texture()->bind(0);
+
+      // Edge shader
+      if(true){
+        edge_shader->use();
+        edge_shader->set("height_field", 0);
+        edge_shader->set("gridsize", glm::vec2(1.0/wave.width, 1.0/wave.height));
+        edge_shader->set("c", wave.c);
+        edge_shader->set("dt", dt);
+        wave.height_fbo.texture()->bind(0);
+        apply_shader(screen_mesh, wave.height_fbo, edge_shader);
+      }
 
       // Drop shader
       if(spawn_drop){

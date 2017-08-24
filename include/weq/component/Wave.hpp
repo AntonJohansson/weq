@@ -18,17 +18,20 @@ struct WaveGPU{
   //   c - Wave velocity (unit?) used to calculate the constant
   //         r = c^2/gridsize^2,
   //       which is used to speed up force calculations.
+  // change name of wavespeed param -> members _name.
   WaveGPU(unsigned int w, unsigned int h,
-          float gridsz, float c)
+          float gridsz, float wavespeed)
     : width(w),
       height(h),
       gridsize(gridsz),
-      r(c*c/(gridsz*gridsz)),
+      c(wavespeed),
+      r(wavespeed*wavespeed/(gridsz*gridsz)),
       vel_fbo(w, h, GL_R32F, GL_RED, GL_FLOAT),
       height_fbo(w, h, GL_R32F, GL_RED, GL_FLOAT){
   }
 
-  void set_c(float c){
+  void set_c(float wavespeed){
+    c = wavespeed;
     r = (c*c)/(gridsize*gridsize);
   }
 
@@ -36,6 +39,7 @@ struct WaveGPU{
   unsigned int height;
 
   float gridsize;
+  float c;
   float r;
 
   gl::Framebuffer vel_fbo;

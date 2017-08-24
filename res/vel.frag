@@ -8,7 +8,6 @@ uniform sampler2D height_field;
 uniform sampler2D vel_field; // TEMPORARY - addition can be performed by OpenGL blending.
 uniform vec2 gridsize;
 uniform float r;
-
 uniform float dt;
 
 void main(){
