@@ -37,6 +37,9 @@ struct VertexAttribute{
 // Struct that combines VertexComponents to form a describtion of
 // a single vertex in a format.
 struct VertexFormat{
+  // Empty constructor.
+  VertexFormat(){}
+
   // Calculates attribute offset, format length (in values), and
   // the vertex stride (size in bytes).
   VertexFormat(std::vector<VertexAttribute> a);

@@ -35,8 +35,8 @@ template<GLenum buffer_target, typename T>
 class Buffer{
 public:
   // Does absolutely nothing.
-  Buffer()
-    : _usage(),
+  Buffer(Usage b = Usage::STATIC_DRAW)
+    : _usage(b),
       _data(nullptr),
       _size(0),
       _buffer(0){
@@ -65,6 +65,7 @@ public:
   // Copying not allowed.
   Buffer(const Buffer<buffer_target, T>&) = delete;
 
+  // Swap constructor
   Buffer(Buffer<buffer_target, T>&& rhs)
     : _usage(rhs._usage),
       _data(rhs._data),
@@ -109,6 +110,11 @@ public:
 
     glBufferData(buffer_target, _size * sizeof(T),
                  _data, GLenum(_usage));
+  }
+
+  // Overload of set_data(T*,size_t) making life a bit easier.
+  void set_data(std::vector<T>& data){
+    set_data(&data[0], data.size());
   }
 
   // Maps the GPU buffer to a memory region on the CPU so that

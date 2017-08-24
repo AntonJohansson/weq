@@ -5,6 +5,7 @@
 #include <weq/Texture.hpp>
 #include <weq/gl/ShaderProgram.hpp>
 #include <weq/gl/Shader.hpp>
+#include <weq/primitive/Plane.hpp>
 
 #include <spdlog/spdlog.h>
 #include <glm/gtc/matrix_transform.hpp>
@@ -18,6 +19,10 @@ using component::WaveGPU;
 namespace{
   bool clear = false;
   bool set_c = false;
+  bool recompute_mesh = false;
+
+  int resolution = 1000;
+  float mesh_size = 5.0f;
   float c = 0.2f;
 
   void apply_shader(std::shared_ptr<Mesh> mesh, gl::Framebuffer& fbo, std::shared_ptr<gl::ShaderProgram> shader){
@@ -143,10 +148,21 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
   entities.each<WaveGPU, Renderable>([dt](ex::Entity e, WaveGPU& wave, Renderable& r){
       (void)e;
 
+      // Grid resolution
+      if(recompute_mesh){
+        wave.width = resolution;
+        wave.height = resolution;
+        r.mesh->set_data(primitive::plane::solid(resolution, resolution,
+                                                 mesh_size/(float)resolution,
+                                                 gl::format::VNCT));
+        recompute_mesh = false;
+      }
+
       // Retrive old viewport settings.
       GLint old_viewport[4];
       glGetIntegerv(GL_VIEWPORT, old_viewport);
       glViewport(0, 0, wave.width, wave.height);
+
 
       // Handle interactivity
       if(set_c){wave.set_c(c); set_c = false;}
@@ -162,12 +178,8 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
         clear = false;
       }
 
-      // Bind height fbo
-      wave.height_fbo.bind();
-      wave.height_fbo.texture()->bind(0);
-
       // Edge shader
-      if(true){
+      if(false){
         edge_shader->use();
         edge_shader->set("height_field", 0);
         edge_shader->set("gridsize", glm::vec2(1.0/wave.width, 1.0/wave.height));
@@ -187,6 +199,7 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
         spawn_drop = false;
       }
 
+      // UI
       wave.height_fbo.bind();
       ImGui::Begin("Debug");
       ImGui::Text("Input to the velocity shader:");
@@ -239,12 +252,40 @@ void WaveGPUSimulation::add_ui(){
   ImGui::Begin("Menu");
 
   if(ImGui::CollapsingHeader("simulation")){
+    ImGui::Separator();
     if(ImGui::InputFloat("Wave velocity (c)", &c)){
       set_c = true;
     }
 
-    if(ImGui::Button("Clear")){
+    if(ImGui::Button("Clear waves")){
       clear = true;
+    }
+
+    ImGui::Separator(); // Grid related
+
+    // Grid resolution
+    if(ImGui::InputInt("Grid resolution", &resolution)){
+      recompute_mesh = true;
+    }
+
+    // Boundary behaviour
+    static int boundary_item = 0;
+    ImGui::Combo("Boundary behaviour", &boundary_item, "Reflect\0Radiate\0\0");
+
+    // Wall type
+    static int wall_item = 0;
+    ImGui::Combo("Wall type", &wall_item, "None\0Single Slit\0Double Slit\0Custom\0\0");
+
+    // Refractive index
+    static bool refractive_visible = false;
+    if(ImGui::Button("Change refractive index")){
+      refractive_visible ^= 1;
+    }
+
+    if(refractive_visible){
+      ImGui::Begin("Refractive Index");
+      ImGui::Text("Paint obstructions on the white grid.");
+      ImGui::End();
     }
   }
 

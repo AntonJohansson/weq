@@ -6,6 +6,9 @@
 // Represents mesh data in an engine-friendly format
 // as described by gl::VertexFormat.
 struct MeshData{
+  MeshData(){
+  }
+
   MeshData(gl::VertexFormat format)
     : format(format){
   }

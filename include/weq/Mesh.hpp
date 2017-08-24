@@ -12,6 +12,12 @@
 // used for rendering.
 class Mesh{
 public:
+  // "Empty" contstructor for when settings data seperately.
+  // The user is responsible for providing mesh data before
+  // using the class.
+  Mesh(gl::DrawMode mode = gl::DrawMode::TRIANGLES)
+    : _draw_mode(mode){
+  }
   // Convertes MeshData to a VBO and EBO. The OpenGL draw mode is stored
   // for later use. Currently maps VBO-region to memory for easy
   // modification.
@@ -29,6 +35,12 @@ public:
   // destructors for the VBO, EBO.
   ~Mesh(){
     //_vbo.unmap();
+  }
+
+  void set_data(MeshData data){
+    _data = data;
+    _vbo.set_data(_data.interleaved);
+    _ebo.set_data(_data.elements);
   }
 
   // TODO remove

@@ -81,6 +81,9 @@ public:
                                                             scene_f);
     scene_p->link();
 
+
+    auto wave_mesh = std::make_shared<Mesh>(gl::DrawMode::TRIANGLES);
+
     // Mesh for wave plane
     // TODO This operation takes a really long time, which doesn't make sense.
     auto wave_mesh_data = primitive::plane::solid(resolution,
@@ -88,8 +91,9 @@ public:
                                                   size/resolution,
                                                   gl::format::VNCT);
 
-    auto wave_mesh = std::make_shared<Mesh>(wave_mesh_data, gl::DrawMode::TRIANGLES);
-    wave_mesh->generate_vao(scene_p); // TODO this code is currently generating an error, because unused shader attributes is being optimzed away => glGetAttribLocation == -1
+    wave_mesh->set_data(wave_mesh_data);
+    // TODO this code is currently generating an error, because unused shader attributes is being optimzed away => glGetAttribLocation == -1
+    wave_mesh->generate_vao(scene_p);
 
     auto wave = _entities.create();
     auto wave_gpu = wave.assign<component::WaveGPU>(resolution,
@@ -128,7 +132,7 @@ public:
   void add_ui(){
     auto ui = _entities.create();
     ui.assign<component::ImGui>([](ex::EventManager& e){
-        //ImGui::ShowTestWindow();
+        ImGui::ShowTestWindow();
         ImGui::Begin("Menu");
         ImGui::SetWindowCollapsed("Menu", false, ImGuiSetCond_FirstUseEver);
         ImGui::SetWindowPos("Menu", ImVec2(10,10), ImGuiSetCond_FirstUseEver);
