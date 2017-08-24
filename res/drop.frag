@@ -12,7 +12,7 @@ float gaussian(float A, vec2 p, vec2 p0, vec2 sigma){
 }
 
 void main(){
-  vec4 color = texture(height_field, v_texcoord);
   float drop = gaussian(0.1, v_texcoord, vec2(0.5, 0.5), vec2(0.1, 0.1));
-  frag_color = vec4(drop, drop, 1.0, 1);
+  float height = texture(height_field, v_texcoord).r;
+  frag_color = vec4(height + drop, 0, 0, 0); // Addition should be done with OpenGL blend
 }

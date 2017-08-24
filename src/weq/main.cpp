@@ -17,25 +17,6 @@
 #include <weq/system/Camera.hpp>
 #include <weq/system/Renderer.hpp>
 
-// DILEMMA
-// fönstret behöver skapas före configure() för att de funktionerna ska ha tillgång till ett OpenGL context.
-// fönstret behöver skapas efter configure() för att de funktionerna ska kunna registrera sig på WindowUpdate() eventet.
-
-
-// TJA SNYGGING
-// TJA SNYGGING
-// TJA SNYGGING
-// TJA SNYGGING
-// TJA SNYGGING
-// TJA SNYGGING
-// last thing I did:
-//   Systems should no longer use a hardcoded window size,
-//   the "Active" window size is sent out in an event.
-//   This might cause problems if systems try to use the window size,
-//   before the event is sent out (eg. in configure()).
-//   DOUBLECHECK THIS
-
-
 // TODO ActiveWindow skickas ut i början av run(), move.
 // TODO window is currently created in application.cpp, move this!
 /* TODO
@@ -44,7 +25,6 @@
  * Reimplement GLFW->IMGUI bindings so they're implemented more nicely
  */
 // TODO config files
-// TODO R32F for height map textures!!!! (IMPORTANT)
 
 class Simulation : public weq::Application{
 public:

@@ -19,6 +19,16 @@ namespace{
   bool clear = false;
   bool set_c = false;
   float c = 0.2f;
+
+  void apply_shader(std::shared_ptr<Mesh> mesh, gl::Framebuffer& fbo, std::shared_ptr<gl::ShaderProgram> shader){
+    fbo.bind();
+
+    mesh->vao(shader->id()).bind();
+    mesh->ebo().bind();
+
+    glDrawElements(GLenum(mesh->draw_mode()),
+                   mesh->ebo().size(), GL_UNSIGNED_INT, 0);
+  }
 }
 
 namespace weq::system{
@@ -129,20 +139,14 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       // Handle interactivity
       if(set_c){wave.set_c(c); set_c = false;}
       if(clear){
+        // Apply clear shader on height_fbo and vel_fbo
         clear_shader->use();
-        wave.vel_fbo.bind();
         wave.vel_fbo.texture()->bind();
-        screen_mesh->vao(clear_shader->id()).bind();
-        screen_mesh->ebo().bind();
-        glDrawElements(GLenum(screen_mesh->draw_mode()),
-                       screen_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
+        apply_shader(screen_mesh, wave.vel_fbo, clear_shader);
 
-        wave.height_fbo.bind();
         wave.height_fbo.texture()->bind();
-        screen_mesh->vao(clear_shader->id()).bind();
-        screen_mesh->ebo().bind();
-        glDrawElements(GLenum(screen_mesh->draw_mode()),
-                       screen_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
+        apply_shader(screen_mesh, wave.height_fbo, clear_shader);
+
         clear = false;
       }
 
@@ -154,12 +158,8 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       if(spawn_drop){
         drop_shader->use();
         drop_shader->set("height_field", 0);
-
-        screen_mesh->vao(drop_shader->id()).bind();
-        screen_mesh->ebo().bind();
-
-        glDrawElements(GLenum(screen_mesh->draw_mode()),
-                       screen_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
+        wave.height_fbo.texture()->bind(0);
+        apply_shader(screen_mesh, wave.height_fbo, drop_shader);
 
         spawn_drop = false;
       }
@@ -171,11 +171,6 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       ImGui::End();
 
       // Velocity shader
-      wave.vel_fbo.bind();
-
-      wave.height_fbo.texture()->bind(0);
-      wave.vel_fbo.texture()->bind(1);
-
       vel_shader->use();
       vel_shader->set("height_field", 0);
       vel_shader->set("vel_field", 1);
@@ -183,33 +178,20 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       vel_shader->set("gridsize", glm::vec2(1.0/wave.width, 1.0/wave.height));
       vel_shader->set("r", wave.r);
 
-      screen_mesh->vao(vel_shader->id()).bind();
-      screen_mesh->ebo().bind();
-
-      glDrawElements(GLenum(screen_mesh->draw_mode()),
-                     screen_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
-
-      wave.vel_fbo.unbind();
-
-      // Height update shader
-
-      wave.height_fbo.bind();
-
       wave.height_fbo.texture()->bind(0);
       wave.vel_fbo.texture()->bind(1);
 
+      apply_shader(screen_mesh, wave.vel_fbo, vel_shader);
+
+      // Height update shader
       height_shader->use();
       height_shader->set("height_field", 0);
       height_shader->set("vel_field", 1);
       height_shader->set("dt", dt);
+      wave.height_fbo.texture()->bind(0);
+      wave.vel_fbo.texture()->bind(1);
 
-      screen_mesh->vao(height_shader->id()).bind();
-      screen_mesh->ebo().bind();
-
-      glDrawElements(GLenum(screen_mesh->draw_mode()),
-                     screen_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
-
-      wave.height_fbo.unbind();
+      apply_shader(screen_mesh, wave.height_fbo, height_shader);
 
       // Reset viewport settings.
       glViewport(old_viewport[0],
