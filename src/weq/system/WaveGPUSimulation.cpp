@@ -152,6 +152,8 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       if(recompute_mesh){
         wave.width = resolution;
         wave.height = resolution;
+        wave.height_fbo.resize(resolution, resolution);
+        wave.vel_fbo.resize(resolution, resolution);
         r.mesh->set_data(primitive::plane::solid(resolution, resolution,
                                                  mesh_size/(float)resolution,
                                                  gl::format::VNCT));

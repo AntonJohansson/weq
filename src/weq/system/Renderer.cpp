@@ -175,18 +175,18 @@ void Renderer::update(ex::EntityManager& entities,
 }
 
 void Renderer::receive(const event::ActiveInput& event){
-  // TODO hardcoded width and height.
-  if(event.has(InputRange::CURSOR_X) && event.has(InputRange::CURSOR_Y)){
-    // Unproject mouse coords.
-    scene_fbo->bind(); // Read depth from scene-fbo
-    float x = event.ranges.at(InputRange::CURSOR_X);
-    float y = event.ranges.at(InputRange::CURSOR_Y);
-    float z = scene_fbo->depth(x*_window->width(), y*_window->height());
-    glm::vec3 win = {x*_window->width(), y*_window->height(), z};
-    auto vec = glm::unProject(win, view*model, proj, glm::vec4{0, 0, _window->width(), _window->height()});
-    //spdlog::get("console")->info("{}, {}, {} - depth {}", vec.x, vec.y, vec.z, z);
-    scene_fbo->unbind();
-  }
+  // Unproject doesn't work correctly.
+  //if(event.has(InputRange::CURSOR_X) && event.has(InputRange::CURSOR_Y)){
+  //  // Unproject mouse coords.
+  //  scene_fbo->bind(); // Read depth from scene-fbo
+  //  float x = event.ranges.at(InputRange::CURSOR_X);
+  //  float y = event.ranges.at(InputRange::CURSOR_Y);
+  //  float z = scene_fbo->depth(x*_window->width(), y*_window->height());
+  //  glm::vec3 win = {x*_window->width(), y*_window->height(), z};
+  //  auto vec = glm::unProject(win, view*model, proj, glm::vec4{0, 0, _window->width(), _window->height()});
+  //  //spdlog::get("console")->info("{}, {}, {} - depth {}", vec.x, vec.y, vec.z, z);
+  //  scene_fbo->unbind();
+  //}
 
   if(event.has(InputState::CURSOR_DOWN)){
     _window->set_cursor_mode(CursorMode::DISABLED);
