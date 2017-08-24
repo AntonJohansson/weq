@@ -21,10 +21,11 @@ Framebuffer::Framebuffer(unsigned int w, unsigned int h, GLenum internal, GLenum
     glDrawBuffers(1, DrawBuffers);
 
     // Renderbuffer Depth
-    glGenRenderbuffers(1, &_rbo_depth);
-    glBindRenderbuffer(GL_RENDERBUFFER, _rbo_depth);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, w, h);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _rbo_depth);
+    // TODO support resizing rbos
+    //glGenRenderbuffers(1, &_rbo_depth);
+    //glBindRenderbuffer(GL_RENDERBUFFER, _rbo_depth);
+    //glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, w, h);
+    //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _rbo_depth);
 
     if(!check_complete()){
       spdlog::get("console")->error("Failed to create a complete frambuffer {}!", _id);
@@ -47,6 +48,10 @@ float Framebuffer::depth(float x, float y){
   glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &pixel);
 
   return pixel;
+}
+
+void Framebuffer::resize(unsigned int w, unsigned int h){
+  _texture->resize(w, h);
 }
 
 void Framebuffer::bind(){

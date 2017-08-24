@@ -30,7 +30,11 @@ public:
 
   // Reads the depth buffer (if the fbo has one) at
   // coordnates (x, y).
+  // TODO This should obviosly not work if the fbo doesn't support depth.
   float depth(float x, float y);
+
+  // Resizes frambuffer attachments
+  void resize(unsigned int w, unsigned int h);
 
   // Returns a pointer to the underlying fbo texture.
   std::shared_ptr<Texture> texture(){return _texture;}

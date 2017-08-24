@@ -41,7 +41,14 @@ void Texture::set_parameters(std::map<GLenum, GLenum> params){
 
 void Texture::set_data(void* bits){
   bind();
+
+  // I think OpenGL manages this memory.
+  //if(_bits != nullptr){
+  //  delete _bits;
+  //}
+
   _bits = bits;
+
   //glTexSubImage2D(_target, 0, 0, 0, _width, _height, _format_external, _format_type, _bits);
   glTexImage2D(_target, 0, _format_internal, _width, _height, 0, _format_external, _format_type, _bits);
 }
@@ -56,8 +63,7 @@ void Texture::load(){
     _bits = (void*)bits;
   }
 
-  bind();
-  glTexImage2D(_target, 0, _format_internal, _width, _height, 0, _format_external, _format_type, _bits);
+  set_data(_bits);
 
   // TODO unload freeimage data after this.
 }
@@ -75,6 +81,10 @@ void Texture::resize(unsigned int w, unsigned int h){
   if(_is_loaded){
     _width = w;
     _height = h;
+
+    delete _bits;
+    _bits = nullptr;
+
     reload();
   }
 }
