@@ -16,7 +16,8 @@ endif()
 #find_library(glfw HINTS ${library_path} NAMES glfw3 REQUIRED)
 find_library(freeimage HINTS ${library_path} NAMES FreeImage REQUIRED)
 find_library(entityx HINTS ${library_path} NAMES entityx REQUIRED)
-find_package(glfw3 3.2 REQUIRED)
+find_library(glfw HINTS ${library_path} NAMES glfw3 REQUIRED)
+#find_package(glfw3 3.2 REQUIRED)
 find_package(OpenGL REQUIRED)
 
 add_executable(weq
@@ -55,7 +56,7 @@ endif()
 
 set_target_properties(weq PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(weq PUBLIC
-  #$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external/x32/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external/x32/include> # SHOULD ONLY BE ADDED ON WINDOWS
   $<BUILD_INTERFACE:/usr/local/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE: include>)
@@ -63,6 +64,6 @@ target_include_directories(weq PUBLIC
 target_compile_definitions(weq PRIVATE FREEIMAGE_LIB)
 
 target_link_libraries(weq
-  glfw ${freeimage} ${entityx}
+  ${glfw} ${freeimage} ${entityx}
   ${OPENGL_gl_LIBRARY}
   )
