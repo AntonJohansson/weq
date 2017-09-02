@@ -3,9 +3,16 @@
 #include <spdlog/spdlog.h>
 #include <FreeImage.h>
 
+namespace{ // Anonymous namespace to keep track of texture data. // TODO TEMP
+  FIBITMAP* _data(0);
+}
+
 Texture::Texture(const std::string& id, GLenum target)
   : Resource(id, ResourceType::FILE),
-    _target(target) {
+    _target(target),
+    _format_internal(GL_RGB),
+    _format_external(GL_RGB),
+    _format_type(GL_UNSIGNED_BYTE){
   glGenTextures(1, &_texture);
 }
 
@@ -50,7 +57,9 @@ void Texture::set_data(void* bits){
   _bits = bits;
 
   //glTexSubImage2D(_target, 0, 0, 0, _width, _height, _format_external, _format_type, _bits);
+  spdlog::get("console")->info(glGetError());
   glTexImage2D(_target, 0, _format_internal, _width, _height, 0, _format_external, _format_type, _bits);
+  spdlog::get("console")->info(glGetError());
 }
 
 void Texture::load(){
@@ -65,7 +74,8 @@ void Texture::load(){
 
   set_data(_bits);
 
-  // TODO unload freeimage data after this.
+  // TODO unload freeimage data after this. TEMP
+  if(_type == ResourceType::FILE)FreeImage_Unload(_data);
 }
 
 void Texture::unload(){
@@ -94,7 +104,6 @@ void Texture::resize(unsigned int w, unsigned int h){
 std::tuple<unsigned char*, unsigned int, unsigned int>
 Texture::load_texture(const std::string& filename){
   FREE_IMAGE_FORMAT fif;
-  FIBITMAP* data(0);
   BYTE* bits(0);
 
   fif = FIF_UNKNOWN;
@@ -110,9 +119,9 @@ Texture::load_texture(const std::string& filename){
   }
 
   if(FreeImage_FIFSupportsReading(fif)){
-    data = FreeImage_Load(fif, filename.c_str());
+    _data = FreeImage_Load(fif, filename.c_str());
 
-    if(!data){
+    if(!_data){
       spdlog::get("console")->error("Failed to read data for {}!", filename);
       return {nullptr, 0, 0};
     }
@@ -121,9 +130,9 @@ Texture::load_texture(const std::string& filename){
     return {nullptr, 0, 0};
   }
 
-  bits = FreeImage_GetBits(data);
-  unsigned int w = FreeImage_GetWidth(data);
-  unsigned int h = FreeImage_GetHeight(data);
+  bits = FreeImage_GetBits(_data);
+  unsigned int w = FreeImage_GetWidth(_data);
+  unsigned int h = FreeImage_GetHeight(_data);
 
   //FreeImage_Unload(data); TODO this should be called after glTexImage2D - could cause problems otherwise
 
