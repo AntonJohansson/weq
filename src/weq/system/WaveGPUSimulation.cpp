@@ -19,7 +19,7 @@ using component::WaveGPU;
 namespace{
   bool clear = false;
   bool set_c = false;
-  bool recompute_mesh = false;
+  bool recompute_mesh = true; // Generate a mesh with default resolution and mesh_size.
 
   int resolution = 1000;
   float mesh_size = 5.0f;
@@ -28,7 +28,7 @@ namespace{
   void apply_shader(std::shared_ptr<Mesh> mesh, gl::Framebuffer& fbo, std::shared_ptr<gl::ShaderProgram> shader){
     fbo.bind();
 
-    mesh->vao(shader->id()).bind();
+    mesh->vao(shader).bind();
     mesh->ebo().bind();
 
     glDrawElements(GLenum(mesh->draw_mode()),
@@ -148,7 +148,7 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
   entities.each<WaveGPU, Renderable>([dt](ex::Entity e, WaveGPU& wave, Renderable& r){
       (void)e;
 
-      // Grid resolution
+      // Recompute grid mesh from new resolution
       if(recompute_mesh){
         wave.width = resolution;
         wave.height = resolution;

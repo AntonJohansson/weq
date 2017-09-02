@@ -50,6 +50,7 @@ public:
   }
 
   void configure_states(){
+    // Not implemented!:):):):)
     //  _state_manager.add({"default", {
     //          {},
     //          {},
@@ -84,16 +85,16 @@ public:
 
     auto wave_mesh = std::make_shared<Mesh>(gl::DrawMode::TRIANGLES);
 
+    //wave_mesh->generate_vao(scene_p);
     // Mesh for wave plane
     // TODO This operation takes a really long time, which doesn't make sense.
-    auto wave_mesh_data = primitive::plane::solid(resolution,
-                                                  resolution,
-                                                  size/resolution,
-                                                  gl::format::VNCT);
+    //auto wave_mesh_data = primitive::plane::solid(resolution,
+    //                                              resolution,
+    //                                              size/resolution,
+    //                                              gl::format::VNCT);
 
-    wave_mesh->set_data(wave_mesh_data);
+    //wave_mesh->set_data(wave_mesh_data);
     // TODO this code is currently generating an error, because unused shader attributes is being optimzed away => glGetAttribLocation == -1
-    wave_mesh->generate_vao(scene_p);
 
     auto wave = _entities.create();
     auto wave_gpu = wave.assign<component::WaveGPU>(resolution,
