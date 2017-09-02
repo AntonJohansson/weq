@@ -37,7 +37,11 @@ public:
     //_vbo.unmap();
   }
 
+  // Sets the data of the mesh.
+  // Also recomputes vaos if vertex format changes.
   void set_data(MeshData data){
+    // TODO recompute vaos if format changes.
+
     _data = data;
     _vbo.set_data(_data.interleaved);
     _ebo.set_data(_data.elements);
@@ -56,15 +60,28 @@ public:
   float& color_a(int index){return  _mapped_region[12*index + 9];}
 
   // Generate VAO passed in program
-  void generate_vao(std::shared_ptr<gl::ShaderProgram> program){
-    _vaos[program->id()] = {program, _vbo, _data.format};
+  const gl::VertexArray& generate_vao(std::shared_ptr<gl::ShaderProgram> program){
+    _vaos[program->id()] = { program, _vbo, _data.format };
+    return _vaos[program->id()];
   }
 
-  // returns the generated EBO
+  // returns the generated EBO.
   const gl::ElementBuffer& ebo() const {return _ebo;}
 
-  // returns the generated VAO
-  const gl::VertexArray& vao(const std::string& id) {return _vaos[id];}
+  // returns the generated VAO.
+  // Generates VAO if it does not exist for the current shader.
+  // TODO move? Generating VAOS when they are requested could cause
+  // unnecessary overhead in e.g. rendering.
+  const gl::VertexArray& vao(std::shared_ptr<gl::ShaderProgram> program) {
+    auto vao = _vaos.find(program->id());
+
+    // Generate vao if it does not exist.
+    if(vao == _vaos.end()){
+      return generate_vao(program);
+    }
+
+    return vao->second;
+  }
 
   // returns the given OpenGL draw mode
   gl::DrawMode draw_mode() const {return _draw_mode;}
