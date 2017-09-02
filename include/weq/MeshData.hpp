@@ -18,5 +18,6 @@ struct MeshData{
   std::vector<float> interleaved;
   std::vector<unsigned int> elements;
 
+  bool has_data() const {return !interleaved.empty();}
   bool has_elements() const {return !elements.empty();}
 };
