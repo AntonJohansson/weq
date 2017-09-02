@@ -41,6 +41,8 @@ public:
       _size(0),
       _buffer(0){
     glGenBuffers(1, &_buffer);
+    // Create an empty texture?
+    set_data(nullptr, 0);
   }
 
   // Generates the actual OpenGL buffer and calls
