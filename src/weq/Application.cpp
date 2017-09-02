@@ -20,8 +20,8 @@ using std::chrono::duration;
 // Temporary anonymous namspace, used to store window info
 // inferred from cmd args.
 namespace{
-  unsigned int width, height;
-  WindowMode mode;
+  unsigned int width = 1280, height = 720;
+  WindowMode mode = WindowMode::WINDOWED;
 }
 
 namespace weq{
