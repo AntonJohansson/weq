@@ -65,10 +65,10 @@ public:
     return _vaos[program->id()];
   }
 
-  // returns the generated EBO.
+  // Returns the generated EBO.
   const gl::ElementBuffer& ebo() const {return _ebo;}
 
-  // returns the generated VAO.
+  // Returns the generated VAO.
   // Generates VAO if it does not exist for the current shader.
   // TODO move? Generating VAOS when they are requested could cause
   // unnecessary overhead in e.g. rendering.
@@ -83,8 +83,11 @@ public:
     return vao->second;
   }
 
-  // returns the given OpenGL draw mode
+  // Returns the given OpenGL draw mode
   gl::DrawMode draw_mode() const {return _draw_mode;}
+
+  // Returns true if the current mesh is able to be drawn.
+  bool is_valid(){return (_data.has_data() && _data.has_elements());}
 
 private:
   MeshData _data;

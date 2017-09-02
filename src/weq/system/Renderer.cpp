@@ -77,9 +77,12 @@ void Renderer::configure(ex::EventManager& events){
                                        gl::DrawMode::TRIANGLES);
   screen_mesh->generate_vao(screen_p);
 
+
   // Setup cubemap
   texture = std::make_shared<Texture>("cloudtop_bk.tga", GL_TEXTURE_2D);
+  spdlog::get("console")->info("{}", glGetError() != GL_NO_ERROR);
   texture->load();
+  spdlog::get("console")->info("{}", glGetError() != GL_NO_ERROR);
   texture->set_parameters({
       {GL_TEXTURE_BASE_LEVEL, 0},
       {GL_TEXTURE_MAX_LEVEL, 0},
@@ -124,24 +127,26 @@ void Renderer::update(ex::EntityManager& entities,
   entities.each<Renderable, Transform>([dt, &active_camera](ex::Entity e,
                                                             Renderable& r,
                                                             Transform& t){
-      tmp_model = t.model();
+      // Draw the mesh if it is drawable.
+      if(r.mesh->is_valid()){
+        tmp_model = t.model();
+        // calculate mvp for each model
+        mvp = active_camera.viewproj * t.model();
+        r.scene->use();
+        r.scene->set("mvp", mvp);
+        r.scene->set("normal_matrix", active_camera.normal_matrix);
+        r.scene->set("height_field", 0);
 
-      // calculate mvp for each model
-      mvp = active_camera.viewproj * t.model();
-      r.scene->use();
-      r.scene->set("mvp", mvp);
-      r.scene->set("normal_matrix", active_camera.normal_matrix);
-      r.scene->set("height_field", 0);
+        if(r.texture){
+          r.texture->bind(0);
+        }
 
-      if(r.texture){
-        r.texture->bind(0);
+        r.mesh->vao(r.scene).bind();
+        r.mesh->ebo().bind();
+
+        glDrawElements(GLenum(r.mesh->draw_mode()),
+                       r.mesh->ebo().size(), GL_UNSIGNED_INT, 0);
       }
-
-      r.mesh->vao(r.scene->id()).bind();
-      r.mesh->ebo().bind();
-
-      glDrawElements(GLenum(r.mesh->draw_mode()),
-                     r.mesh->ebo().size(), GL_UNSIGNED_INT, 0);
     });
 
   model = tmp_model;
@@ -154,7 +159,7 @@ void Renderer::update(ex::EntityManager& entities,
   screen_p->use();
   screen_p->set("framebuffer", 0);
 
-  screen_mesh->vao(screen_p->id()).bind();
+  screen_mesh->vao(screen_p).bind();
   screen_mesh->ebo().bind();
 
   scene_fbo->texture()->bind(0);
