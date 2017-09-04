@@ -24,8 +24,8 @@ void main(){
     }
 
     float last_height = texture(height_field, v_texcoord + dot(gridsize, final)).r;
-    //height = (c*dt*height + last_height*gridsize.x)/(gridsize.x + c*dt);
-    height = (c*last_height + height)/(1.0 + c);
+    height = (c*dt*height + last_height*gridsize.x)/(gridsize.x + c*dt);
+    //height = (c*last_height + height)/(1.0 + c);
   }
 
   frag_color = vec4(height, 0, 0, 0);

@@ -62,7 +62,8 @@ void UserInterface::receive(const event::ActiveInput& event){
   auto& non_const_event = const_cast<event::ActiveInput&>(event);
 
   // Set cursor mode if the mouse is not in the menu => mouse will not be captured in menu.
-  if(non_const_event.has(InputRange::CURSOR_X) && non_const_event.has(InputRange::CURSOR_Y)){
+  if(non_const_event.has(InputRange::CURSOR_X)
+     && non_const_event.has(InputRange::CURSOR_Y)){
     float x = non_const_event.ranges.at(InputRange::CURSOR_X);
     float y = non_const_event.ranges.at(InputRange::CURSOR_Y);
 

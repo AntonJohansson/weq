@@ -22,6 +22,9 @@ namespace{
   bool clear = false;
   bool set_c = false;
   bool recompute_mesh = true; // Generate a mesh with default resolution and mesh_size.
+  bool refractive_visible = false;
+  int wall_item = 0; // 0 - none, 1 - single, 2, - double, 3 - custom
+  int boundary_item = 0; // 0 - reflect, 1 - radiate
 
   int resolution = 1000;
   float mesh_size = 5.0f;
@@ -185,8 +188,8 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
         clear = false;
       }
 
-      // Edge shader
-      if(false){
+      // Apply edge shader if boundary mode is set to radiate.
+      if(boundary_item == 1){ // Radiate
         edge_shader->use();
         edge_shader->set("height_field", 0);
         edge_shader->set("gridsize", glm::vec2(1.0/wave.width, 1.0/wave.height));
@@ -277,15 +280,12 @@ void WaveGPUSimulation::add_ui(){
     }
 
     // Boundary behaviour
-    static int boundary_item = 0;
     ImGui::Combo("Boundary behaviour", &boundary_item, "Reflect\0Radiate\0\0");
 
     // Wall type
-    static int wall_item = 0;
     ImGui::Combo("Wall type", &wall_item, "None\0Single Slit\0Double Slit\0Custom\0\0");
 
     // Refractive index
-    static bool refractive_visible = false;
     if(ImGui::Button("Change refractive index")){
       refractive_visible ^= 1;
     }
