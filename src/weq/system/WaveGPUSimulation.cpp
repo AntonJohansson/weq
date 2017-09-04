@@ -13,6 +13,8 @@
 #include <glad/glad.h>
 #include <imgui/imgui.h>
 
+#include <future>
+
 using component::Renderable;
 using component::WaveGPU;
 
@@ -154,10 +156,13 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
         wave.height = resolution;
         wave.height_fbo.resize(resolution, resolution);
         wave.vel_fbo.resize(resolution, resolution);
+
+        recompute_mesh = false;
+
+        // OpenGL is per thread, so this will be anoying to split out.
         r.mesh->set_data(primitive::plane::solid(resolution, resolution,
                                                  mesh_size/(float)resolution,
                                                  gl::format::VNCT));
-        recompute_mesh = false;
       }
 
       // Retrive old viewport settings.

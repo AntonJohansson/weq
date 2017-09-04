@@ -57,9 +57,7 @@ void Texture::set_data(void* bits){
   _bits = bits;
 
   //glTexSubImage2D(_target, 0, 0, 0, _width, _height, _format_external, _format_type, _bits);
-  spdlog::get("console")->info(glGetError());
   glTexImage2D(_target, 0, _format_internal, _width, _height, 0, _format_external, _format_type, _bits);
-  spdlog::get("console")->info(glGetError());
 }
 
 void Texture::load(){

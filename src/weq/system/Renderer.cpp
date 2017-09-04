@@ -80,9 +80,7 @@ void Renderer::configure(ex::EventManager& events){
 
   // Setup cubemap
   texture = std::make_shared<Texture>("cloudtop_bk.tga", GL_TEXTURE_2D);
-  spdlog::get("console")->info("{}", glGetError() != GL_NO_ERROR);
   texture->load();
-  spdlog::get("console")->info("{}", glGetError() != GL_NO_ERROR);
   texture->set_parameters({
       {GL_TEXTURE_BASE_LEVEL, 0},
       {GL_TEXTURE_MAX_LEVEL, 0},
