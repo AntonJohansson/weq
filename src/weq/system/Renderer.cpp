@@ -135,8 +135,11 @@ void Renderer::update(ex::EntityManager& entities,
         r.scene->set("normal_matrix", active_camera.normal_matrix);
         r.scene->set("height_field", 0);
 
-        if(r.texture){
-          r.texture->bind(0);
+        for(int i = 0; i < r.textures.size(); i++){
+          auto ptr = r.textures[i];
+          if(ptr){
+            ptr->bind(i);
+          }
         }
 
         r.mesh->vao(r.scene).bind();

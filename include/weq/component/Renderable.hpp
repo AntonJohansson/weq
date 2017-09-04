@@ -4,6 +4,8 @@
 #include <weq/Mesh.hpp>
 #include <weq/Texture.hpp>
 
+#include <vector>
+
 namespace component{
 
 // Component describing all the data necessary for the render to draw a single
@@ -17,7 +19,9 @@ struct Renderable{
 
   std::shared_ptr<Mesh> mesh;
   std::shared_ptr<gl::ShaderProgram> scene;
-  std::shared_ptr<Texture> texture;
+  // TODO there is a better data type for this.
+  // should also keep track of name to bind to in shaders.
+  std::vector<std::shared_ptr<Texture>> textures;
 };
 
 } // namespace component

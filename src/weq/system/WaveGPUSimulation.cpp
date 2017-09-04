@@ -242,7 +242,8 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
                  old_viewport[2],
                  old_viewport[3]);
 
-      r.texture = wave.height_fbo.texture();
+      r.textures.clear();
+      r.textures.push_back(wave.height_fbo.texture());
 
       // Visualize the output from each shader.
       ImGui::Begin("Debug");

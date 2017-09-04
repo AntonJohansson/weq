@@ -8,6 +8,7 @@ in vec2 texcoord;
 out vec3 v_normal;
 out vec4 v_color;
 out vec2 v_texcoord;
+out float v_height;
 
 uniform mat4 mvp;
 uniform mat4 normal_matrix;
@@ -21,4 +22,5 @@ void main(){
   v_normal = normal;
   v_color = color;
   v_texcoord = texcoord;
+  v_height = height;
 }
