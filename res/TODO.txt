@@ -1,5 +1,7 @@
 TODO
 
+- North facing camera issue
+  https://gamedev.stackexchange.com/questions/73588/how-do-i-fix-my-planet-facing-camera
 - Unproject mouse
 - Texture for materials (refractive index)
 - Edge shader (radiate properly)
