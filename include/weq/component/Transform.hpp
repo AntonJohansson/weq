@@ -14,7 +14,7 @@ struct Transform{
   //      and position.
   Transform()
     : _direction(0.0f, 0.0f, -1.0f),
-      _translate(0.0f, 0.0f, 10.0f),
+      _translate(0.0f, 0.0f, 0.0f),
       _scale(1.0f, 1.0f, 1.0f){}
 
   // Updates the quaternion by adding a relative rotation given in

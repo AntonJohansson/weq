@@ -34,6 +34,8 @@ void Camera::update(ex::EntityManager& entities,
                     ex::EventManager& events,
                     ex::TimeDelta dt){
 
+  // TODO don't use glm lookat -> manual rot with quaternions.
+
   auto update_perspective = [dt, this](ex::Entity e,
                                          component::Camera& c,
                                          component::Transform& t){
@@ -65,6 +67,12 @@ void Camera::update(ex::EntityManager& entities,
 }
 
 void Camera::update_target(component::Camera& camera, component::Transform& t){
+  // TODO This positioning is not being done with quaternions.
+  // get the vector from the target to the camera and rotate that one.
+  // Utilize "transform" more.
+
+  // Vad händer när target - translate = - up?
+
   static float r = 10.0f, theta = 45.0f, phi = 45.0f;
   r     += _movement_amount.z;
   // phi increases counter clockwise according to ISO standard.
@@ -76,6 +84,7 @@ void Camera::update_target(component::Camera& camera, component::Transform& t){
   // clamp minimum sphere radius
   if(r < 0.01f) r = 0.01f;
 
+  // Update translate vector
   t._translate = camera.target;
   t._translate.x += r*glm::sin(theta)*glm::cos(phi);
   t._translate.y += r*glm::sin(theta)*glm::sin(phi);
