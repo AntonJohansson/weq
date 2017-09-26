@@ -8,6 +8,8 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <glm/ext.hpp>
+//#include <glm/gtx/quaternion.hpp>
 
 /* TODO (bug)
    something weird happens when the camera is looking along the "up" vector,
@@ -15,6 +17,32 @@
 */
 
 // TODO inverted x-movement
+
+namespace{
+  glm::vec3 orthogonal(glm::vec3 v){
+    static glm::vec3 x_axis = {1,0,0};
+    static glm::vec3 y_axis = {0,1,0};
+    static glm::vec3 z_axis = {0,0,1};
+
+    float x = glm::abs(v.x);
+    float y = glm::abs(v.y);
+    float z = glm::abs(v.z);
+
+    glm::vec3 other = (x < y) ? (x < z ? x_axis : z_axis) : (y < z ? y_axis : z_axis);
+    return glm::cross(v, other);
+  }
+
+  glm::quat rotate_between(glm::vec3 start, glm::vec3 end){
+    float cos_theta = glm::dot(start, end);
+    float k = glm::sqrt(glm::length2(start)*glm::length2(end));
+
+    if(cos_theta / k == -1){
+      return glm::quat(0, glm::normalize(orthogonal(start)));
+    }
+
+    return glm::normalize(glm::quat(cos_theta + k, glm::cross(start, end)));
+  }
+}
 
 namespace weq::system{
 
@@ -48,7 +76,8 @@ void Camera::update(ex::EntityManager& entities,
     // Update look direction for both camera modes.
     if(c.look_mode == LookMode::TARGET){
       update_target(c, t);
-      c.view = glm::lookAt(t._translate, c.target, c.up);
+      //c.view = glm::lookAt(t._translate, c.target, c.up);
+      look_at(c, t);
     }else if(c.look_mode == LookMode::DIRECTION){
       update_direction(c, t);
       c.view = glm::lookAt(t._translate, t._translate + t._direction, c.up);
@@ -73,23 +102,26 @@ void Camera::update_target(component::Camera& camera, component::Transform& t){
 
   // Vad händer när target - translate = - up?
 
-  static float r = 10.0f, theta = 45.0f, phi = 45.0f;
+  static float r = 10.0f, theta = 0.0f, phi = 0.0f;
+  //theta -= 0.0001f;
   r     += _movement_amount.z;
-  // phi increases counter clockwise according to ISO standard.
-  // +x -> rotate left.
-  phi   -= _delta_cursor.x;
-  // theta increases clockwise around the +x axis, +y -> rotate down.
-  theta -= _delta_cursor.y;
+  //// phi increases counter clockwise according to ISO standard.
+  //// +x -> rotate left.
+  //phi   -= _delta_cursor.x;
+  //// theta increases clockwise around the +x axis, +y -> rotate down.
+  //theta -= _delta_cursor.y;
 
   // clamp minimum sphere radius
   if(r < 0.01f) r = 0.01f;
 
   // Update translate vector
-  t._translate = camera.target;
-  t._translate.x += r*glm::sin(theta)*glm::cos(phi);
-  t._translate.y += r*glm::sin(theta)*glm::sin(phi);
-  t._translate.z += r*glm::cos(theta);
+  //t._translate = camera.target;
+  //t._translate.x += r*glm::sin(theta)*glm::cos(phi);
+  //t._translate.y += r*glm::sin(theta)*glm::sin(phi);
+  //t._translate.z += r*glm::cos(theta);
 
+  t._translate.x += 0.001f;
+  t._translate.z = 10.0f;
   _delta_cursor = {0,0};
   _movement_amount = {0,0,0};
 }
@@ -109,6 +141,26 @@ void Camera::update_direction(component::Camera& camera, component::Transform& t
                    t._direction*_movement_amount.z);
   _delta_cursor = {0,0};
   _movement_amount = {0,0,0};
+}
+
+void Camera::look_at(component::Camera& camera, component::Transform& t){
+  glm::vec3 start = {0, 0, -1};
+  glm::vec3 end = -(camera.target - t._translate);
+
+  auto rot1 = rotate_between(start, end);
+
+  glm::vec3 right = glm::normalize(glm::cross(end, {0,0,1}));
+  camera.up = glm::cross(right, end);
+  glm::vec3 new_up = rot1 * glm::vec3({0,0,1});
+
+  auto rot2 = rotate_between(new_up, camera.up);
+
+  //camera.orientation = rot2 * rot1;
+  camera.orientation = rot1;
+  camera.view = glm::translate(glm::mat4(1.0f), -t._translate) * glm::inverse(glm::mat4_cast(camera.orientation));
+  spdlog::get("console")->info("pos:\n{}\n", glm::to_string(t._translate));
+  spdlog::get("console")->info("Quaterion View:\n{}\n", glm::to_string(camera.view));
+  spdlog::get("console")->info("LookAt View:\n{}\n\n", glm::to_string(glm::lookAt(t._translate, camera.target, camera.up)));
 }
 
 void Camera::receive(const event::ActiveWindow& event){

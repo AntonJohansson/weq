@@ -25,6 +25,14 @@ struct Transform{
     _direction = glm::normalize(new_rot * _direction);
   }
 
+  //Updates the quaternion by adding a relative rotation around a
+  // given axis. Note: also updates the direction vector.
+  void rotate(float angle, glm::vec3 axis){
+    glm::quat new_rot = glm::quat(angle, axis);
+    _rotation = new_rot * _rotation;
+    _direction = glm::normalize(new_rot * _direction);
+  }
+
   // Combines component data to form a model matrix.
   // model = translation * rotation * scale.
   glm::mat4 model(){

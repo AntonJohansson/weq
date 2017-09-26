@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 // Describes camera behaviour.
 // TARGET    - Forces the camera to look at a set position every update.
@@ -53,6 +54,7 @@ struct Camera{
   // -- View frustrum
   glm::vec3 target;
   glm::vec3 up;
+  glm::quat orientation;
 
   // -- Transformations
   glm::mat4 view;
