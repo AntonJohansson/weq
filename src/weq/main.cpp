@@ -16,6 +16,7 @@
 #include <weq/system/WaveGPUSimulation.hpp>
 #include <weq/system/Camera.hpp>
 #include <weq/system/Renderer.hpp>
+#include <weq/system/DebugDraw.hpp>
 
 // TODO ActiveWindow skickas ut i början av run(), move.
 // TODO window is currently created in application.cpp, move this!
@@ -38,11 +39,16 @@ public:
     _systems.add<weq::system::WaveGPUSimulation>();
 
     _systems.add<weq::system::Camera>();
+    _systems.add<weq::system::DebugDraw>();
     _systems.add<weq::system::Renderer>();
     _systems.configure();
   }
 
   void configure() override{
+    // Add on top (doesnt work)
+    _events.emit<event::DebugDraw>({VECTOR, {1,0,0}, {0,0,0}});
+    _events.emit<event::DebugDraw>({VECTOR, {0,1,0}, {0,0,0}});
+    _events.emit<event::DebugDraw>({VECTOR, {0,0,1}, {0,0,0}});
     configure_states();
     add_camera();
     add_wave();
