@@ -40,6 +40,7 @@ add_executable(weq
   src/weq/system/Renderer.cpp
   src/weq/system/WaveGPUSimulation.cpp
   src/weq/system/WaveSimulation.cpp
+  src/weq/system/DebugDraw.cpp
 
   src/glad/glad.cpp
   src/imgui/imgui.cpp
