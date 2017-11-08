@@ -76,8 +76,9 @@ void Camera::update(ex::EntityManager& entities,
     // Update look direction for both camera modes.
     if(c.look_mode == LookMode::TARGET){
       update_target(c, t);
-      //c.view = glm::lookAt(t._translate, c.target, c.up);
-      look_at(c, t);
+      c.view = glm::lookAt(t._translate, c.target, c.up);
+      c.target.x += 0.001f;
+      //look_at(c, t);
     }else if(c.look_mode == LookMode::DIRECTION){
       update_direction(c, t);
       c.view = glm::lookAt(t._translate, t._translate + t._direction, c.up);
@@ -102,9 +103,9 @@ void Camera::update_target(component::Camera& camera, component::Transform& t){
 
   // Vad händer när target - translate = - up?
 
-  static float r = 10.0f, theta = 0.0f, phi = 0.0f;
-  //theta -= 0.0001f;
-  r     += _movement_amount.z;
+  static float r = 10.0f, theta = 45.0f, phi = 45.0f;
+  theta -= 0.0001f;
+  //r     += _movement_amount.z;
   //// phi increases counter clockwise according to ISO standard.
   //// +x -> rotate left.
   //phi   -= _delta_cursor.x;
@@ -115,13 +116,14 @@ void Camera::update_target(component::Camera& camera, component::Transform& t){
   if(r < 0.01f) r = 0.01f;
 
   // Update translate vector
-  //t._translate = camera.target;
-  //t._translate.x += r*glm::sin(theta)*glm::cos(phi);
-  //t._translate.y += r*glm::sin(theta)*glm::sin(phi);
-  //t._translate.z += r*glm::cos(theta);
+  t._translate = camera.target;
+  t._translate.x += r*glm::sin(theta)*glm::cos(phi);
+  t._translate.y += r*glm::sin(theta)*glm::sin(phi);
+  t._translate.z += r*glm::cos(theta);
 
-  t._translate.x += 0.001f;
-  t._translate.z = 10.0f;
+  //t._translate.x += 0.001f;
+  //t._translate.z = 10.0f;
+
   _delta_cursor = {0,0};
   _movement_amount = {0,0,0};
 }

@@ -59,7 +59,6 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
   // Setup Shaders
 
   // Height calculation shader
-
   auto height_v = std::make_shared<gl::Shader>("height.vert");
   auto height_f = std::make_shared<gl::Shader>("height.frag");
   height_v->load();
