@@ -26,6 +26,9 @@ static MeshData solid(glm::vec3 vec, glm::vec4 color){
   data.interleaved.push_back(color.b);
   data.interleaved.push_back(color.a);
 
+  data.elements.push_back(0);
+  data.elements.push_back(1);
+
   return data;
 }
 

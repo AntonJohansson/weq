@@ -46,6 +46,9 @@ DebugDraw::~DebugDraw(){
 }
 
 void DebugDraw::configure(ex::EventManager& events){
+  // Events
+  events.subscribe<event::DebugDraw>(*this);
+
   auto passthrough_v = std::make_shared<gl::Shader>("vertex", gl::ShaderType::VERTEX, vertex_source);
   auto passthrough_f = std::make_shared<gl::Shader>("fragment", gl::ShaderType::FRAGMENT, fragment_source);
   passthrough_v->load();
@@ -60,12 +63,14 @@ void DebugDraw::update(ex::EntityManager& entities,
             ex::EventManager& events,
             ex::TimeDelta dt){
   for(auto& event : _buffered_events){
-    auto mesh = std::make_shared<Mesh>(primitive::vector::solid(event.vec, {1, 0, 0, 0}), gl::DrawMode::LINES);
+    auto mesh = std::make_shared<Mesh>(primitive::vector::solid(event.vec, event.color), gl::DrawMode::LINES);
     _meshes.push_back(mesh);
     auto e = entities.create();
     e.assign<component::Transform>()->_translate = event.pos;
     e.assign<component::Renderable>(mesh)->scene = _shader;
   }
+
+  _buffered_events.clear();
 }
 
 void DebugDraw::receive(const event::DebugDraw& event){
