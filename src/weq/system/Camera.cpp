@@ -75,10 +75,9 @@ void Camera::update(ex::EntityManager& entities,
 
     // Update look direction for both camera modes.
     if(c.look_mode == LookMode::TARGET){
-      update_target(c, t);
-      c.view = glm::lookAt(t._translate, c.target, c.up);
-      c.target.x += 0.001f;
-      //look_at(c, t);
+      //update_target(c, t);
+      //c.view = glm::lookAt(t._translate, c.target, c.up);
+      look_at(c, t);
     }else if(c.look_mode == LookMode::DIRECTION){
       update_direction(c, t);
       c.view = glm::lookAt(t._translate, t._translate + t._direction, c.up);
@@ -104,13 +103,12 @@ void Camera::update_target(component::Camera& camera, component::Transform& t){
   // Vad händer när target - translate = - up?
 
   static float r = 10.0f, theta = 45.0f, phi = 45.0f;
-  theta -= 0.0001f;
-  //r     += _movement_amount.z;
-  //// phi increases counter clockwise according to ISO standard.
-  //// +x -> rotate left.
-  //phi   -= _delta_cursor.x;
-  //// theta increases clockwise around the +x axis, +y -> rotate down.
-  //theta -= _delta_cursor.y;
+  r     += _movement_amount.z;
+  // phi increases counter clockwise according to ISO standard.
+  // +x -> rotate left.
+  phi   -= _delta_cursor.x;
+  // theta increases clockwise around the +x axis, +y -> rotate down.
+  theta -= _delta_cursor.y;
 
   // clamp minimum sphere radius
   if(r < 0.01f) r = 0.01f;
@@ -146,23 +144,28 @@ void Camera::update_direction(component::Camera& camera, component::Transform& t
 }
 
 void Camera::look_at(component::Camera& camera, component::Transform& t){
-  glm::vec3 start = {0, 0, -1};
-  glm::vec3 end = -(camera.target - t._translate);
+  // This works like update_target... CHAOS I know :(
+  glm::vec3 vec = t._translate - camera.target;
 
-  auto rot1 = rotate_between(start, end);
+  float phi   = -_delta_cursor.x;
+  float theta = -_delta_cursor.y;
 
-  glm::vec3 right = glm::normalize(glm::cross(end, {0,0,1}));
-  camera.up = glm::cross(right, end);
-  glm::vec3 new_up = rot1 * glm::vec3({0,0,1});
+  auto right = glm::normalize(glm::cross(vec, {0,0,1}));
+  auto up = glm::cross(right, vec);
 
-  auto rot2 = rotate_between(new_up, camera.up);
+  // Yaw
+  auto rot_1 = glm::rotate(phi, up);
+  // Pitch
+  auto rot_2 = glm::rotate(theta, right);
 
-  //camera.orientation = rot2 * rot1;
-  camera.orientation = rot1;
-  camera.view = glm::translate(glm::mat4(1.0f), -t._translate) * glm::inverse(glm::mat4_cast(camera.orientation));
-  spdlog::get("console")->info("pos:\n{}\n", glm::to_string(t._translate));
-  spdlog::get("console")->info("Quaterion View:\n{}\n", glm::to_string(camera.view));
-  spdlog::get("console")->info("LookAt View:\n{}\n\n", glm::to_string(glm::lookAt(t._translate, camera.target, camera.up)));
+  auto rot = rot_2 * rot_1;
+
+  t._translate = glm::vec3(rot * glm::vec4(vec, 0)) + camera.target;
+  camera.up = up;
+  camera.view = glm::lookAt(t._translate, camera.target, {0,0,1});
+
+  _delta_cursor = {0,0};
+  _movement_amount = {0,0,0};
 }
 
 void Camera::receive(const event::ActiveWindow& event){
