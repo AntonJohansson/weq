@@ -7,6 +7,7 @@
 #include <weq/component/Camera.hpp>
 #include <weq/primitive/Plane.hpp>
 #include <weq/event/Internal.hpp>
+#include <weq/event/DebugDraw.hpp>
 
 #include <weq/EmbeddedData.hpp>
 
@@ -46,9 +47,9 @@ public:
 
   void configure() override{
     // Add on top (doesnt work)
-    _events.emit<event::DebugDraw>({VECTOR, {1,0,0}, {0,0,0}});
-    _events.emit<event::DebugDraw>({VECTOR, {0,1,0}, {0,0,0}});
-    _events.emit<event::DebugDraw>({VECTOR, {0,0,1}, {0,0,0}});
+    _events.emit(event::DebugDraw(event::DrawType::VECTOR, {1,0,0}, {0,0,0}, {1, 0, 0, 1})); // X
+    _events.emit(event::DebugDraw(event::DrawType::VECTOR, {0,1,0}, {0,0,0}, {0, 1, 0, 1})); // Y
+    _events.emit(event::DebugDraw(event::DrawType::VECTOR, {0,0,1}, {0,0,0}, {0, 0, 1, 1})); // Z
     configure_states();
     add_camera();
     add_wave();
@@ -72,7 +73,7 @@ public:
   void add_camera(){
     auto c = _entities.create();
     c.assign<component::Camera>(LookMode::TARGET);
-    c.assign<component::Transform>();
+    c.assign<component::Transform>()->_translate = {1,1,10};
     c.assign<component::ActiveCamera>();
   }
 
@@ -131,8 +132,8 @@ public:
 
 
     wave.assign<component::Transform>()->_translate = {-size/2, -size/2, 0};
-    auto r = wave.assign<component::Renderable>(wave_mesh);
-    r->scene = scene_p;
+    //auto r = wave.assign<component::Renderable>(wave_mesh);
+    //r->scene = scene_p;
   }
 
   //TODO improve UI
