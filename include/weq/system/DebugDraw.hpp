@@ -36,7 +36,8 @@ public:
   void receive(const event::DebugDraw& event);
 private:
   std::vector<event::DebugDraw> _buffered_events;
-  std::vector<std::shared_ptr<Mesh>> _meshes; // I REALLY NEED A RESOURCE MANAGER
+  std::vector<ex::Entity> _persistent_entities;
+  std::vector<ex::Entity> _frame_entities;
   std::shared_ptr<gl::ShaderProgram> _shader;
 };
 

@@ -3,7 +3,7 @@
 #include <weq/component/Transform.hpp>
 #include <weq/event/Window.hpp>
 #include <weq/event/Input.hpp>
-
+#include <weq/event/DebugDraw.hpp>
 #include <spdlog/spdlog.h>
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -149,9 +149,17 @@ void Camera::look_at(component::Camera& camera, component::Transform& t){
 
   float phi   = -_delta_cursor.x;
   float theta = -_delta_cursor.y;
+  static float tot_phi = 45.0f;
+  static float tot_theta = 45.0f;
+  static float radius = 10.0f;
+
+  tot_phi += phi;
+  tot_theta += theta;
+
+  // Problem då vec || {0,0,1} fixa genom att byta {0,0,1} till nåt annat ortagonalt.
 
   auto right = glm::normalize(glm::cross(vec, {0,0,1}));
-  auto up = glm::cross(right, vec);
+  auto up = glm::normalize(glm::cross(right, vec));
 
   // Yaw
   auto rot_1 = glm::rotate(phi, up);
@@ -160,10 +168,15 @@ void Camera::look_at(component::Camera& camera, component::Transform& t){
 
   auto rot = rot_2 * rot_1;
 
-  t._translate = glm::vec3(rot * glm::vec4(vec, 0)) + camera.target;
-  camera.up = up;
-  camera.view = glm::lookAt(t._translate, camera.target, {0,0,1});
+  auto new_vec = glm::vec3(rot * glm::vec4(vec, 0));
+  t._translate = new_vec + camera.target;
 
+  auto new_right = glm::normalize(glm::cross(new_vec, {0,0,1}));
+  auto new_up = glm::normalize(glm::cross(new_right, new_vec));
+  camera.up = new_up;
+  camera.view = glm::lookAt(t._translate, camera.target, camera.up);
+
+  // Reset mouse vars. :)
   _delta_cursor = {0,0};
   _movement_amount = {0,0,0};
 }
