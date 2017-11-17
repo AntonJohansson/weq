@@ -62,12 +62,22 @@ void DebugDraw::configure(ex::EventManager& events){
 void DebugDraw::update(ex::EntityManager& entities,
             ex::EventManager& events,
             ex::TimeDelta dt){
+  // Clear frame entities
+  for(auto& e : _frame_entities){
+    e.destroy();
+  }
+
+  // Create new entities
   for(auto& event : _buffered_events){
     auto mesh = std::make_shared<Mesh>(primitive::vector::solid(event.vec, event.color), gl::DrawMode::LINES);
-    _meshes.push_back(mesh);
     auto e = entities.create();
     e.assign<component::Transform>()->_translate = event.pos;
     e.assign<component::Renderable>(mesh)->scene = _shader;
+
+    switch(event.mode){
+	case event::DebugMode::PERSISTENT: _persistent_entities.push_back(e); break;
+	case event::DebugMode::FRAME:      _frame_entities.push_back(e); break;
+    };
   }
 
   _buffered_events.clear();

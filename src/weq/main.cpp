@@ -47,9 +47,9 @@ public:
 
   void configure() override{
     // Add on top (doesnt work)
-    _events.emit(event::DebugDraw(event::DrawType::VECTOR, {1,0,0}, {0,0,0}, {1, 0, 0, 1})); // X
-    _events.emit(event::DebugDraw(event::DrawType::VECTOR, {0,1,0}, {0,0,0}, {0, 1, 0, 1})); // Y
-    _events.emit(event::DebugDraw(event::DrawType::VECTOR, {0,0,1}, {0,0,0}, {0, 0, 1, 1})); // Z
+    _events.emit(event::DebugDraw(event::DrawType::VECTOR, event::DebugMode::PERSISTENT, {1,0,0}, {0,0,0}, {1, 0, 0, 1})); // X
+    _events.emit(event::DebugDraw(event::DrawType::VECTOR, event::DebugMode::PERSISTENT, {0,1,0}, {0,0,0}, {0, 1, 0, 1})); // Y
+    _events.emit(event::DebugDraw(event::DrawType::VECTOR, event::DebugMode::PERSISTENT, {0,0,1}, {0,0,0}, {0, 0, 1, 1})); // Z
     configure_states();
     add_camera();
     add_wave();
