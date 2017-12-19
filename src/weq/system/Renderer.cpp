@@ -15,6 +15,7 @@
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw_gl3.h>
 #include <spdlog/spdlog.h>
 
 namespace weq::system{
@@ -39,6 +40,7 @@ Renderer::~Renderer(){
 }
 
 void Renderer::configure(ex::EventManager& events){
+  spdlog::get("console")->info("renderer");
   // Events
   events.subscribe<event::ActiveInput>(*this);
   events.subscribe<event::ActiveWindow>(*this);

@@ -20,10 +20,12 @@ public:
               ex::EventManager& events,
               ex::TimeDelta dt) override;
 
-  void add_ui();
+  void add_ui(ex::EntityManager& entities);
 
   void receive(const event::ActiveInput& event);
 private:
+  bool _ui_created = false;
+  ex::Entity _ui;
 };
 
 }

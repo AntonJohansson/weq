@@ -20,6 +20,7 @@ UserInterface::UserInterface(){}
 UserInterface::~UserInterface(){}
 
 void UserInterface::configure(ex::EventManager& events){
+  spdlog::get("console")->info("UI");
   events.subscribe<event::ActiveInput>(*this);
   events.subscribe<event::ActiveWindow>(*this);
 }

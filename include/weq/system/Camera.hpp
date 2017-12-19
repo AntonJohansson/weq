@@ -34,7 +34,7 @@ public:
 
   void update_target(component::Camera& camera, component::Transform& t);
   void update_direction(component::Camera& camera, component::Transform& t);
-  void look_at(component::Camera& camera, component::Transform& t);
+  void look_at(component::Camera& camera, component::Transform& t, ex::EventManager& events);
 
   void receive(const event::ActiveWindow& event);
   void receive(const event::ActiveInput& event);

@@ -6,6 +6,7 @@
 #include <weq/event/Window.hpp>
 #include <weq/Window.hpp>
 
+#include <spdlog/spdlog.h>
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
 
@@ -70,6 +71,7 @@ namespace{
 }
 
 void Input::configure(ex::EventManager& events){
+  spdlog::get("console")->info("input");
   (void)events;
 
   // Events

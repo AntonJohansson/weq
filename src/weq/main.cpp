@@ -33,15 +33,24 @@ public:
   Simulation(int argc, char** argv)
     : Application(argc, argv){
 
-    _systems.add<weq::system::Input>();
-    _systems.add<weq::system::UserInterface>();
+    //_systems.add<weq::system::Input>();
+    //_systems.add<weq::system::UserInterface>();
+    //_systems.add<weq::system::WaveGPUSimulation>();
+    //_systems.add<weq::system::Camera>();
+    //_systems.add<weq::system::DebugDraw>();
+    //_systems.add<weq::system::Renderer>();
 
-    //_systems.add<weq::system::WaveSimulation>();
-    _systems.add<weq::system::WaveGPUSimulation>();
-
-    _systems.add<weq::system::Camera>();
-    _systems.add<weq::system::DebugDraw>();
+    // Order is backwards on mac for some reason.
+    // Should systems be order independant?
+    // entityx thinks so.
     _systems.add<weq::system::Renderer>();
+    _systems.add<weq::system::DebugDraw>();
+    _systems.add<weq::system::Camera>();
+    _systems.add<weq::system::WaveGPUSimulation>();
+    _systems.add<weq::system::UserInterface>();
+    _systems.add<weq::system::Input>();
+
+
     _systems.configure();
   }
 
@@ -140,7 +149,7 @@ public:
   void add_ui(){
     auto ui = _entities.create();
     ui.assign<component::ImGui>([](ex::EventManager& e){
-        ImGui::ShowTestWindow();
+        //ImGui::ShowTestWindow();
         ImGui::Begin("Menu");
         ImGui::SetWindowCollapsed("Menu", false, ImGuiSetCond_FirstUseEver);
         ImGui::SetWindowPos("Menu", ImVec2(10,10), ImGuiSetCond_FirstUseEver);

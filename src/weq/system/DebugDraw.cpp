@@ -6,6 +6,7 @@
 #include <weq/gl/ShaderProgram.hpp>
 #include <weq/gl/Shader.hpp>
 #include <weq/primitive/Vector.hpp>
+#include <spdlog/spdlog.h>
 
 namespace weq::system{
 
@@ -46,6 +47,7 @@ DebugDraw::~DebugDraw(){
 }
 
 void DebugDraw::configure(ex::EventManager& events){
+  spdlog::get("console")->info("debugdraw");
   // Events
   events.subscribe<event::DebugDraw>(*this);
 
@@ -63,9 +65,10 @@ void DebugDraw::update(ex::EntityManager& entities,
             ex::EventManager& events,
             ex::TimeDelta dt){
   // Clear frame entities
-  for(auto& e : _frame_entities){
+  for(auto e : _frame_entities){
     e.destroy();
   }
+  _frame_entities.clear();
 
   // Create new entities
   for(auto& event : _buffered_events){
@@ -75,8 +78,8 @@ void DebugDraw::update(ex::EntityManager& entities,
     e.assign<component::Renderable>(mesh)->scene = _shader;
 
     switch(event.mode){
-	case event::DebugMode::PERSISTENT: _persistent_entities.push_back(e); break;
-	case event::DebugMode::FRAME:      _frame_entities.push_back(e); break;
+    case event::DebugMode::PERSISTENT: _persistent_entities.push_back(e); break;
+    case event::DebugMode::FRAME:      _frame_entities.push_back(e); break;
     };
   }
 

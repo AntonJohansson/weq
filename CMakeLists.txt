@@ -9,8 +9,18 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 
 if(WIN32)
-  link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/x32/lib)
-  set(library_path ${CMAKE_CURRENT_SOURCE_DIR}/external/x32/lib)
+  set(EXTERNAL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/external/x32)
+  set(library_path ${EXTERNAL_PATH}/lib)
+  link_directories(${EXTERNAL_PATH}/lib)
+elseif(APPLE)
+  set(EXTERNAL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/external/osx)
+  set(library_path ${EXTERNAL_PATH}/lib)
+  link_directories(${EXTERNAL_PATH}/lib)
+  find_library(cocoa Cocoa REQUIRED)
+  find_library(iokit IOKit REQUIRED)
+  find_library(corevideo CoreVideo REQUIRED)
+  set(EXTRA_LIBS ${cocoa} ${iokit} ${corevideo})
+
 endif()
 
 #find_library(glfw HINTS ${library_path} NAMES glfw3 REQUIRED)
@@ -57,7 +67,7 @@ endif()
 
 set_target_properties(weq PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(weq PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external/x32/include> # SHOULD ONLY BE ADDED ON WINDOWS
+  $<BUILD_INTERFACE:${EXTERNAL_PATH}/include> # SHOULD ONLY BE ADDED ON WINDOWS
   $<BUILD_INTERFACE:/usr/local/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE: include>)
@@ -67,4 +77,5 @@ target_compile_definitions(weq PRIVATE FREEIMAGE_LIB)
 target_link_libraries(weq
   ${glfw} ${freeimage} ${entityx}
   ${OPENGL_gl_LIBRARY}
+  ${EXTRA_LIBS}
   )

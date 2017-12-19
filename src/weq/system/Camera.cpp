@@ -53,6 +53,7 @@ Camera::~Camera(){
 }
 
 void Camera::configure(ex::EventManager& events){
+  spdlog::get("console")->info("camera");
   //events.subscribe<event::WindowUpdate>(*this);
   events.subscribe<event::ActiveWindow>(*this);
   events.subscribe<event::ActiveInput>(*this);
@@ -64,9 +65,9 @@ void Camera::update(ex::EntityManager& entities,
 
   // TODO don't use glm lookat -> manual rot with quaternions.
 
-  auto update_perspective = [dt, this](ex::Entity e,
-                                         component::Camera& c,
-                                         component::Transform& t){
+  auto update_perspective = [dt, this, &events](ex::Entity e,
+                                               component::Camera& c,
+                                               component::Transform& t){
     // Check aspect ratio
     if(c.inherit_aspect){
       c.aspect_ratio = _aspect_ratio;
@@ -77,7 +78,7 @@ void Camera::update(ex::EntityManager& entities,
     if(c.look_mode == LookMode::TARGET){
       //update_target(c, t);
       //c.view = glm::lookAt(t._translate, c.target, c.up);
-      look_at(c, t);
+      look_at(c, t, events);
     }else if(c.look_mode == LookMode::DIRECTION){
       update_direction(c, t);
       c.view = glm::lookAt(t._translate, t._translate + t._direction, c.up);
@@ -143,7 +144,7 @@ void Camera::update_direction(component::Camera& camera, component::Transform& t
   _movement_amount = {0,0,0};
 }
 
-void Camera::look_at(component::Camera& camera, component::Transform& t){
+void Camera::look_at(component::Camera& camera, component::Transform& t, ex::EventManager& events){
   // This works like update_target... CHAOS I know :(
   glm::vec3 vec = t._translate - camera.target;
 
@@ -156,10 +157,17 @@ void Camera::look_at(component::Camera& camera, component::Transform& t){
   tot_phi += phi;
   tot_theta += theta;
 
-  // Problem då vec || {0,0,1} fixa genom att byta {0,0,1} till nåt annat ortagonalt.
-
-  auto right = glm::normalize(glm::cross(vec, {0,0,1}));
+  auto right = glm::normalize(glm::cross(glm::normalize(vec), {0,0,1}));
   auto up = glm::normalize(glm::cross(right, vec));
+
+  // Problem då vec || {0,0,1} fixa genom att byta {0,0,1} till nåt annat ortagonalt.
+  glm::vec3 v = {0,0,1};
+  events.emit(event::DebugDraw(event::DrawType::VECTOR, event::DebugMode::FRAME, right, {0,0,0}, {1, 1, 0, 1}));
+  events.emit(event::DebugDraw(event::DrawType::VECTOR, event::DebugMode::FRAME, vec, {0,0,0}, {1, 1, 1, 1}));
+  if(glm::length(right) == 0){
+    right = glm::normalize(glm::cross(vec, {1,0,0}));
+    up = glm::normalize(glm::cross(right, vec));
+  }
 
   // Yaw
   auto rot_1 = glm::rotate(phi, up);

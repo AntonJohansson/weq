@@ -1,6 +1,7 @@
 #include <weq/system/WaveGPUSimulation.hpp>
 #include <weq/component/Renderable.hpp>
 #include <weq/component/Wave.hpp>
+#include <weq/component/ImGui.hpp>
 #include <weq/event/Input.hpp>
 #include <weq/Texture.hpp>
 #include <weq/gl/ShaderProgram.hpp>
@@ -147,7 +148,7 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
   (void)events;
   (void)dt;
 
-  add_ui();
+  add_ui(entities);
 
   entities.each<WaveGPU, Renderable>([dt](ex::Entity e, WaveGPU& wave, Renderable& r){
       (void)e;
@@ -258,45 +259,52 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
     });
 }
 
-void WaveGPUSimulation::add_ui(){
-  ImGui::Begin("Menu");
+void WaveGPUSimulation::add_ui(ex::EntityManager& entities){
 
-  if(ImGui::CollapsingHeader("simulation")){
-    ImGui::Separator();
-    if(ImGui::InputFloat("Wave velocity (c)", &c)){
-      set_c = true;
-    }
+  if(!_ui_created){
+    _ui_created = true;
+    _ui = entities.create();
+    _ui.assign<component::ImGui>([&](ex::EventManager& e){
+        ImGui::Begin("Menu");
 
-    if(ImGui::Button("Clear waves")){
-      clear = true;
-    }
+        if(ImGui::CollapsingHeader("simulation")){
+          ImGui::Separator();
+          if(ImGui::InputFloat("Wave velocity (c)", &c)){
+            set_c = true;
+          }
 
-    ImGui::Separator(); // Grid related
+          if(ImGui::Button("Clear waves")){
+            clear = true;
+          }
 
-    // Grid resolution
-    if(ImGui::InputInt("Grid resolution", &resolution)){
-      recompute_mesh = true;
-    }
+          ImGui::Separator(); // Grid related
 
-    // Boundary behaviour
-    ImGui::Combo("Boundary behaviour", &boundary_item, "Reflect\0Radiate\0\0");
+          // Grid resolution
+          if(ImGui::InputInt("Grid resolution", &resolution)){
+            recompute_mesh = true;
+          }
 
-    // Wall type
-    ImGui::Combo("Wall type", &wall_item, "None\0Single Slit\0Double Slit\0Custom\0\0");
+          // Boundary behaviour
+          ImGui::Combo("Boundary behaviour", &boundary_item, "Reflect\0Radiate\0\0");
 
-    // Refractive index
-    if(ImGui::Button("Change refractive index")){
-      refractive_visible ^= 1;
-    }
+          // Wall type
+          ImGui::Combo("Wall type", &wall_item, "None\0Single Slit\0Double Slit\0Custom\0\0");
 
-    if(refractive_visible){
-      ImGui::Begin("Refractive Index");
-      ImGui::Text("Paint obstructions on the white grid.");
-      ImGui::End();
-    }
+          // Refractive index
+          if(ImGui::Button("Change refractive index")){
+            refractive_visible ^= 1;
+          }
+
+          if(refractive_visible){
+            ImGui::Begin("Refractive Index");
+            ImGui::Text("Paint obstructions on the white grid.");
+            ImGui::End();
+          }
+        }
+
+        ImGui::End();
+      });
   }
-
-  ImGui::End();
 }
 
 void WaveGPUSimulation::receive(const event::ActiveInput& event){
