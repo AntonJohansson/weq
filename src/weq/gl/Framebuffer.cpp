@@ -22,10 +22,10 @@ Framebuffer::Framebuffer(unsigned int w, unsigned int h, GLenum internal, GLenum
 
     // Renderbuffer Depth
     // TODO support resizing rbos
-    //glGenRenderbuffers(1, &_rbo_depth);
-    //glBindRenderbuffer(GL_RENDERBUFFER, _rbo_depth);
-    //glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, w, h);
-    //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _rbo_depth);
+    glGenRenderbuffers(1, &_rbo_depth);
+    glBindRenderbuffer(GL_RENDERBUFFER, _rbo_depth);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, w, h);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _rbo_depth);
 
     if(!check_complete()){
       spdlog::get("console")->error("Failed to create a complete frambuffer {}!", _id);

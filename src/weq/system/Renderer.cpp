@@ -116,10 +116,13 @@ void Renderer::update(ex::EntityManager& entities,
   // Bind scene fbo.
   scene_fbo->bind();
 
-  glClearColor(0, 0, 0, 1);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glEnable(GL_DEPTH_TEST);
   glDepthMask(GL_TRUE);
+  //glDepthFunc(GL_LEQUAL);
+  //glDepthRange(0.0f, 1.0f);
+  glClearColor(0, 0, 0, 1);
+  glClearDepth(1.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   // Move draw code out of entities loop, works fine since there's only a
   // single entity.

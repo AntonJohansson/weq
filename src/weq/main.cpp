@@ -100,7 +100,8 @@ public:
     scene_p->link();
 
 
-    auto wave_mesh = std::make_shared<Mesh>(gl::DrawMode::LINES);
+    //auto wave_mesh = std::make_shared<Mesh>(gl::DrawMode::LINES);
+    auto wave_mesh = std::make_shared<Mesh>(gl::DrawMode::TRIANGLES);
 
     //wave_mesh->generate_vao(scene_p);
     // Mesh for wave plane

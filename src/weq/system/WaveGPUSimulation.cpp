@@ -175,12 +175,16 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
                       transform = t;
                     });
 
+    // Convert viewport coord to a ray in world coords
+    // http://antongerdelan.net/opengl/raycasting.html
     glm::vec4 ray_clip = {mouse.x, mouse.y, -1.0f, 1.0f};
     glm::vec4 ray_eye = glm::inverse(camera.projection) * ray_clip;
     ray_eye = {ray_eye.x, ray_eye.y, -1.0, 0.0};
 
     glm::vec3 ray_world = glm::vec3(glm::inverse(camera.view) * ray_eye);
     ray_world = glm::normalize(ray_world);
+
+    // Ray plane intersection
 
     glm::vec3 plane_normal = {0, 0, 1};
 
@@ -190,6 +194,7 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       float t = - (glm::dot(transform._position, plane_normal) + d) / dot;
       glm::vec3 intersect = transform._position + t * ray_world;
 
+      // if inside mesh boundaries
       if(glm::abs(intersect.x) <= mesh_size/2.0f &&
          glm::abs(intersect.y) <= mesh_size/2.0f){
         spawn_drop = true;
