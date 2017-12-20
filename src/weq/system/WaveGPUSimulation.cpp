@@ -161,15 +161,28 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
   if(spawn_ray){
     // Get the currently active camera
     component::Transform transform;
-    entities.each<component::ActiveCamera,
+    component::Camera camera;
+    entities.each<component::Camera,
+                  component::ActiveCamera,
                   component::Transform>(
-                    [&transform](ex::Entity e,
+                    [&camera, &transform](ex::Entity e,
+                                 component::Camera c,
                                  component::ActiveCamera& a,
                                  component::Transform& t){
+                      camera = c;
                       transform = t;
                     });
 
-    events.emit(event::DebugRay(transform._direction, transform._position, {1,0,0,1}));
+    glm::vec4 ray_clip = {mouse.x, mouse.y, -1.0f, 1.0f};
+    glm::vec4 ray_eye = glm::inverse(camera.projection) * ray_clip;
+    ray_eye = {ray_eye.x, ray_eye.y, -1.0, 0.0};
+
+    glm::vec3 ray_world = glm::vec3(glm::inverse(camera.view) * ray_eye);
+    ray_world = glm::normalize(ray_world);
+
+    spdlog::get("console")->info("{}, {}, {}", ray_world.x, ray_world.y, ray_world.z);
+
+    events.emit(event::DebugRay(ray_world, transform._position, {1,0,0,1}));
 
     spawn_ray = false;
   }
