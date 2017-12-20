@@ -4,28 +4,33 @@
 
 namespace event{
 
-enum class DebugMode{
-  PERSISTENT,
-  FRAME,
-};
-
-enum class DrawType{
-  VECTOR
-};
-
-struct DebugDraw{
-  DrawType type;
-  DebugMode mode;
-  glm::vec3 vec;
-  glm::vec3 pos;
+struct DebugDrawBase{
+  glm::vec3 position;
   glm::vec4 color;
+  float duration;
+  bool has_duration;
 
-  DebugDraw(DrawType t, DebugMode m, glm::vec3 v, glm::vec3 p, glm::vec4 c)
-    : type(t),
-      mode(m),
-      vec(v),
-      pos(p),
-      color(c){}
+  DebugDrawBase(glm::vec3 p, glm::vec4 c, float d = -1.0f)
+    : position(p),
+      color(c),
+      duration(d),
+      has_duration(d >= 0.0f) {}
+};
+
+struct DebugVector : DebugDrawBase{
+  glm::vec3 vector;
+
+  DebugVector(glm::vec3 v, glm::vec3 p, glm::vec4 c, float t = -1.0f)
+    : DebugDrawBase(p, c, t),
+      vector(v) {}
+};
+
+struct DebugRay : DebugDrawBase{
+  glm::vec3 direction;
+
+  DebugRay(glm::vec3 d, glm::vec3 p, glm::vec4 c, float t = -1.0f)
+    : DebugDrawBase(p, c, t),
+      direction(d) {}
 };
 
 }

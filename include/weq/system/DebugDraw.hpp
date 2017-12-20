@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include <entityx/entityx.h>
 #include <glm/glm.hpp> //TODO temp
 #include <vector>
@@ -10,7 +11,10 @@ namespace ex = entityx;
 class Mesh;
 
 namespace event{
-struct DebugDraw;
+struct DebugDrawBase;
+struct DebugVector;
+struct DebugRay;
+class Mesh;
 }
 
 namespace gl{
@@ -33,11 +37,12 @@ public:
               ex::EventManager& events,
               ex::TimeDelta dt) override;
 
-  void receive(const event::DebugDraw& event);
+  void receive(const event::DebugVector& event);
+  void receive(const event::DebugRay& event);
 private:
-  std::vector<event::DebugDraw> _buffered_events;
+  std::vector<std::pair<event::DebugDrawBase, std::shared_ptr<Mesh>>> _buffered_events;
+  std::vector<std::pair<ex::Entity, float>> _timed_entities;
   std::vector<ex::Entity> _persistent_entities;
-  std::vector<ex::Entity> _frame_entities;
   std::shared_ptr<gl::ShaderProgram> _shader;
 };
 

@@ -50,15 +50,16 @@ public:
     _systems.add<weq::system::UserInterface>();
     _systems.add<weq::system::Input>();
 
-
     _systems.configure();
   }
 
   void configure() override{
-    // Add on top (doesnt work)
-    _events.emit(event::DebugDraw(event::DrawType::VECTOR, event::DebugMode::PERSISTENT, {1,0,0}, {0,0,0}, {1, 0, 0, 1})); // X
-    _events.emit(event::DebugDraw(event::DrawType::VECTOR, event::DebugMode::PERSISTENT, {0,1,0}, {0,0,0}, {0, 1, 0, 1})); // Y
-    _events.emit(event::DebugDraw(event::DrawType::VECTOR, event::DebugMode::PERSISTENT, {0,0,1}, {0,0,0}, {0, 0, 1, 1})); // Z
+    // Draw axes
+    //_events.emit(event::DebugVector({1,0,0}, {0,0,0}, {1, 0, 0, 1})); // X
+    //_events.emit(event::DebugVector({0,1,0}, {0,0,0}, {0, 1, 0, 1})); // Y
+    //_events.emit(event::DebugVector({0,0,1}, {0,0,0}, {0, 0, 1, 1})); // Z
+
+    // Configure stuff
     configure_states();
     add_camera();
     add_wave();
@@ -141,8 +142,8 @@ public:
 
 
     wave.assign<component::Transform>()->_position = {-size/2, -size/2, 0};
-    //auto r = wave.assign<component::Renderable>(wave_mesh);
-    //r->scene = scene_p;
+    auto r = wave.assign<component::Renderable>(wave_mesh);
+    r->scene = scene_p;
   }
 
   //TODO improve UI

@@ -18,6 +18,7 @@ enum class InputAction{
   RENDER_WIREFRAME,
   RENDER_SOLID,
   TOGGLE_REFLECT,
+  SPAWN_RAY,
   UNKNOWN,
 };
 

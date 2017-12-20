@@ -2,7 +2,11 @@
 #include <weq/component/Renderable.hpp>
 #include <weq/component/Wave.hpp>
 #include <weq/component/ImGui.hpp>
+#include <weq/component/Camera.hpp>
+#include <weq/component/Transform.hpp>
 #include <weq/event/Input.hpp>
+#include <weq/event/DebugDraw.hpp>
+//#include <weq/event/Camera.hpp>
 #include <weq/Texture.hpp>
 #include <weq/gl/ShaderProgram.hpp>
 #include <weq/gl/Shader.hpp>
@@ -24,6 +28,7 @@ namespace{
   bool set_c = false;
   bool recompute_mesh = true; // Generate a mesh with default resolution and mesh_size.
   bool refractive_visible = false;
+
   int wall_item = 0; // 0 - none, 1 - single, 2, - double, 3 - custom
   int boundary_item = 0; // 0 - reflect, 1 - radiate
 
@@ -52,6 +57,8 @@ namespace{
   std::shared_ptr<gl::ShaderProgram> vel_shader;
   std::shared_ptr<gl::ShaderProgram> height_shader;
   bool spawn_drop = false;
+  bool spawn_ray = false;
+  glm::vec2 mouse;
 }
 
 void WaveGPUSimulation::configure(ex::EventManager& events){
@@ -148,7 +155,24 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
   (void)events;
   (void)dt;
 
+  // Add UI if it doesn't exist (!)
   add_ui(entities);
+
+  if(spawn_ray){
+    // Get the currently active camera
+    component::Transform transform;
+    entities.each<component::ActiveCamera,
+                  component::Transform>(
+                    [&transform](ex::Entity e,
+                                 component::ActiveCamera& a,
+                                 component::Transform& t){
+                      transform = t;
+                    });
+
+    events.emit(event::DebugRay(transform._direction, transform._position, {1,0,0,1}));
+
+    spawn_ray = false;
+  }
 
   entities.each<WaveGPU, Renderable>([dt](ex::Entity e, WaveGPU& wave, Renderable& r){
       (void)e;
@@ -260,7 +284,6 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
 }
 
 void WaveGPUSimulation::add_ui(ex::EntityManager& entities){
-
   if(!_ui_created){
     _ui_created = true;
     _ui = entities.create();
@@ -308,10 +331,21 @@ void WaveGPUSimulation::add_ui(ex::EntityManager& entities){
 }
 
 void WaveGPUSimulation::receive(const event::ActiveInput& event){
-  (void)event;
   if(event.has(InputAction::SPAWN_WAVELET)){
     spawn_drop = true;
   }
+  if(event.has(InputAction::SPAWN_RAY)){
+    spawn_ray = true;
+  }
+  if(event.has(InputRange::CURSOR_X) && event.has(InputRange::CURSOR_Y)){
+    mouse.x = event.ranges.at(InputRange::CURSOR_X);
+    mouse.y = event.ranges.at(InputRange::CURSOR_Y);
+  }
 }
+
+// There is another way to do this
+//void WaveGPUSimulation::receive(const event::ActiveCamera& event){
+//  if()
+//}
 
 }

@@ -97,21 +97,11 @@ void Input::configure(ex::EventManager& events){
   // Inputsmaps
   InputMap<int, InputAction> action_map = {
     {raw::Key::E, InputAction::SPAWN_PLANE_WAVE},
+    {raw::Key::W, InputAction::SPAWN_RAY},
     {raw::Key::Q, InputAction::SPAWN_WAVELET},
     {raw::Key::C, InputAction::CLEAR},
-    {raw::Key::_2,InputAction::DOUBLE_SLIT},
-    {raw::Key::I, InputAction::INCREASE_D},
-    {raw::Key::K, InputAction::DECREASE_D},
-    {raw::Key::U, InputAction::INCREASE_B},
-    {raw::Key::J, InputAction::DECREASE_B},
-    {raw::Key::Y, InputAction::INCREASE_C},
-    {raw::Key::H, InputAction::DECREASE_C},
-    {raw::Key::O, InputAction::INCREASE_T},
-    {raw::Key::L, InputAction::DECREASE_T},
     {raw::Key::R, InputAction::RENDER_WIREFRAME},
     {raw::Key::F, InputAction::RENDER_SOLID},
-    {raw::Key::V, InputAction::UPDATE_COLOR},
-    {raw::Key::B, InputAction::TOGGLE_REFLECT}
   };
 
   InputMap<int, InputState> state_map = {

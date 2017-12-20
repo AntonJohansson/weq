@@ -147,7 +147,8 @@ void Camera::update_arcball(component::Camera& camera, component::Transform& t){
   view = glm::translate(view, glm::vec3(0,0,t.radius));
 
   // 5) the cameras position is then given as the 4th column in the matrix,
-  t._position = glm::vec3(view[3]);
+  t._position  = glm::vec3(view[3]);
+  t._direction = -glm::vec3(view[2]);
 
   // 6) inverse of this matrix gives the view matrix.
   camera.view = glm::inverse(view);

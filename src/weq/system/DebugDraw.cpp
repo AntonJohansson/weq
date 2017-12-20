@@ -6,7 +6,12 @@
 #include <weq/gl/ShaderProgram.hpp>
 #include <weq/gl/Shader.hpp>
 #include <weq/primitive/Vector.hpp>
+#include <weq/primitive/Ray.hpp>
+
 #include <spdlog/spdlog.h>
+
+#include <algorithm>
+
 
 namespace weq::system{
 
@@ -49,7 +54,8 @@ DebugDraw::~DebugDraw(){
 void DebugDraw::configure(ex::EventManager& events){
   spdlog::get("console")->info("debugdraw");
   // Events
-  events.subscribe<event::DebugDraw>(*this);
+  events.subscribe<event::DebugVector>(*this);
+  events.subscribe<event::DebugRay>(*this);
 
   auto passthrough_v = std::make_shared<gl::Shader>("vertex", gl::ShaderType::VERTEX, vertex_source);
   auto passthrough_f = std::make_shared<gl::Shader>("fragment", gl::ShaderType::FRAGMENT, fragment_source);
@@ -64,30 +70,44 @@ void DebugDraw::configure(ex::EventManager& events){
 void DebugDraw::update(ex::EntityManager& entities,
             ex::EventManager& events,
             ex::TimeDelta dt){
-  // Clear frame entities
-  for(auto e : _frame_entities){
-    e.destroy();
+  // Update entity durations
+  for(auto itr = _timed_entities.begin(); itr != _timed_entities.end();){
+    itr->second -= dt;
+    if(itr->second < 0.0f){
+      itr->first.destroy();
+      _timed_entities.erase(itr);
+    }else{
+      ++itr;
+    }
   }
-  _frame_entities.clear();
 
   // Create new entities
-  for(auto& event : _buffered_events){
-    auto mesh = std::make_shared<Mesh>(primitive::vector::solid(event.vec, event.color), gl::DrawMode::LINES);
+  for(auto& pair : _buffered_events){
+    auto& event = pair.first;
+    auto& mesh = pair.second;
+
     auto e = entities.create();
-    e.assign<component::Transform>()->_position = event.pos;
+    e.assign<component::Transform>()->_position = event.position;
     e.assign<component::Renderable>(mesh)->scene = _shader;
 
-    switch(event.mode){
-    case event::DebugMode::PERSISTENT: _persistent_entities.push_back(e); break;
-    case event::DebugMode::FRAME:      _frame_entities.push_back(e); break;
-    };
+    if(event.has_duration){
+      _timed_entities.push_back({e, event.duration});
+    }else{
+      _persistent_entities.push_back(e);
+    }
   }
 
   _buffered_events.clear();
 }
 
-void DebugDraw::receive(const event::DebugDraw& event){
-  _buffered_events.push_back(event);
+void DebugDraw::receive(const event::DebugVector& event){
+  auto mesh = std::make_shared<Mesh>(primitive::vector::solid(event.vector, event.color), gl::DrawMode::LINES);
+  _buffered_events.push_back({event, mesh});
+}
+
+void DebugDraw::receive(const event::DebugRay& event){
+  auto mesh = std::make_shared<Mesh>(primitive::ray::solid(event.direction, event.color), gl::DrawMode::LINES);
+  _buffered_events.push_back({event, mesh});
 }
 
 }

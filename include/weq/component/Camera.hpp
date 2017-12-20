@@ -36,6 +36,7 @@ struct Camera{
       aspect_ratio(a_ratio),
       target(target),
       up({0, 0, 1}),
+      direction({0,0,0}),
       update_projection(true),
       inherit_aspect(false){
     if(aspect_ratio == 0.0f){
@@ -54,6 +55,7 @@ struct Camera{
   // -- View frustrum
   glm::vec3 target;
   glm::vec3 up;
+  glm::vec3 direction;
   glm::quat orientation;
 
   // -- Transformations
