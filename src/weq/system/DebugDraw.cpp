@@ -74,7 +74,7 @@ void DebugDraw::update(ex::EntityManager& entities,
   for(auto& event : _buffered_events){
     auto mesh = std::make_shared<Mesh>(primitive::vector::solid(event.vec, event.color), gl::DrawMode::LINES);
     auto e = entities.create();
-    e.assign<component::Transform>()->_translate = event.pos;
+    e.assign<component::Transform>()->_position = event.pos;
     e.assign<component::Renderable>(mesh)->scene = _shader;
 
     switch(event.mode){

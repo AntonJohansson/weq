@@ -82,7 +82,7 @@ public:
   void add_camera(){
     auto c = _entities.create();
     c.assign<component::Camera>(LookMode::TARGET);
-    c.assign<component::Transform>()->_translate = {1,1,10};
+    c.assign<component::Transform>()->spherical(10, 0, 0);
     c.assign<component::ActiveCamera>();
   }
 
@@ -140,7 +140,7 @@ public:
         });
 
 
-    wave.assign<component::Transform>()->_translate = {-size/2, -size/2, 0};
+    wave.assign<component::Transform>()->_position = {-size/2, -size/2, 0};
     //auto r = wave.assign<component::Renderable>(wave_mesh);
     //r->scene = scene_p;
   }

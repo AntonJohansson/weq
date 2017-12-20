@@ -14,8 +14,12 @@ struct Transform{
   //      and position.
   Transform()
     : _direction(0.0f, 0.0f, -1.0f),
-      _translate(0.0f, 0.0f, 0.0f),
-      _scale(1.0f, 1.0f, 1.0f){}
+      _position(0.0f, 0.0f, 0.0f),
+      _scale(1.0f, 1.0f, 1.0f),
+      radius(0.0f),
+      theta(0.0f),
+      phi(0.0f)
+  {}
 
   // Updates the quaternion by adding a relative rotation given in
   // Euler angles. Note: this also updates the direction vector.
@@ -39,15 +43,24 @@ struct Transform{
     glm::mat4 model(1.0);
     model = glm::scale(model, _scale);
     model = glm::mat4_cast(_rotation)*model;
-    model = glm::translate(model, _translate);
+    model = glm::translate(model, _position);
 
     return model;
   }
 
+  void spherical(float r, float t, float p){
+    radius = r;
+    theta = t;
+    phi = p;
+  }
+
   glm::vec3 _direction;
-  glm::vec3 _translate;
+  glm::vec3 _position; // x, y, z
   glm::vec3 _scale;
   glm::quat _rotation;
+  float radius;
+  float theta;
+  float phi;
 };
 
 } // namespace component

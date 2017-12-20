@@ -4,11 +4,16 @@
 #include <weq/event/Window.hpp>
 #include <weq/event/Input.hpp>
 #include <weq/event/DebugDraw.hpp>
+
 #include <spdlog/spdlog.h>
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtc/constants.hpp>
 #include <glm/ext.hpp>
+
+#include <algorithm>
+#include <cmath>
 //#include <glm/gtx/quaternion.hpp>
 
 /* TODO (bug)
@@ -19,6 +24,16 @@
 // TODO inverted x-movement
 
 namespace{
+  void draw_mat(glm::mat4 m){
+    spdlog::get("console")->info(
+      "\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n",
+      m[0][0], m[1][0], m[2][0], m[3][0],
+      m[0][1], m[1][1], m[2][1], m[3][1],
+      m[0][2], m[1][2], m[2][2], m[3][2],
+      m[0][3], m[1][3], m[2][3], m[3][3]
+      );
+  }
+
   glm::vec3 orthogonal(glm::vec3 v){
     static glm::vec3 x_axis = {1,0,0};
     static glm::vec3 y_axis = {0,1,0};
@@ -76,55 +91,22 @@ void Camera::update(ex::EntityManager& entities,
 
     // Update look direction for both camera modes.
     if(c.look_mode == LookMode::TARGET){
-      //update_target(c, t);
-      //c.view = glm::lookAt(t._translate, c.target, c.up);
-      look_at(c, t, events);
+      update_arcball(c, t);
     }else if(c.look_mode == LookMode::DIRECTION){
       update_direction(c, t);
-      c.view = glm::lookAt(t._translate, t._translate + t._direction, c.up);
+      c.view = glm::lookAt(t._position, t._position + t._direction, c.up);
     }
 
     //TODO Move this? model needs to be built before render anc camera pass
     //c.normal_matrix = glm::transpose(glm::inverse(c.view*t.transform));
 
     if(c.update_projection){
-      c.projection = glm::perspective(glm::radians(c.fov), c.aspect_ratio, c._near, c._far);
+      c.projection = glm::perspective(glm::radians(c.fov), c.aspect_ratio, c.near, c.far);
       c.update_projection = false;
     }
   };
 
   entities.each<component::Camera, component::Transform>(update_perspective);
-}
-
-void Camera::update_target(component::Camera& camera, component::Transform& t){
-  // TODO This positioning is not being done with quaternions.
-  // get the vector from the target to the camera and rotate that one.
-  // Utilize "transform" more.
-
-  // Vad händer när target - translate = - up?
-
-  static float r = 10.0f, theta = 45.0f, phi = 45.0f;
-  r     += _movement_amount.z;
-  // phi increases counter clockwise according to ISO standard.
-  // +x -> rotate left.
-  phi   -= _delta_cursor.x;
-  // theta increases clockwise around the +x axis, +y -> rotate down.
-  theta -= _delta_cursor.y;
-
-  // clamp minimum sphere radius
-  if(r < 0.01f) r = 0.01f;
-
-  // Update translate vector
-  t._translate = camera.target;
-  t._translate.x += r*glm::sin(theta)*glm::cos(phi);
-  t._translate.y += r*glm::sin(theta)*glm::sin(phi);
-  t._translate.z += r*glm::cos(theta);
-
-  //t._translate.x += 0.001f;
-  //t._translate.z = 10.0f;
-
-  _delta_cursor = {0,0};
-  _movement_amount = {0,0,0};
 }
 
 void Camera::update_direction(component::Camera& camera, component::Transform& t){
@@ -137,54 +119,40 @@ void Camera::update_direction(component::Camera& camera, component::Transform& t
   //t.transform = glm::rotate(t.transform, glm::radians(10.0f*_dy), right);
   //t.transform = glm::translate(t.transform, _translate);
 
-  t._translate += (right*_movement_amount.x +
+  t._position += (right*_movement_amount.x +
                    local_up*_movement_amount.y +
                    t._direction*_movement_amount.z);
   _delta_cursor = {0,0};
   _movement_amount = {0,0,0};
 }
 
-void Camera::look_at(component::Camera& camera, component::Transform& t, ex::EventManager& events){
-  // This works like update_target... CHAOS I know :(
-  glm::vec3 vec = t._translate - camera.target;
+void Camera::update_arcball(component::Camera& camera, component::Transform& t){
+  // radius
+  t.radius = glm::max(t.radius + _movement_amount.z, 0.0f);
+  // theta
+  t.theta = glm::clamp<float>(t.theta - _delta_cursor.y, 0.0f, glm::pi<float>());
+  // phi
+  t.phi = std::fmodf(t.phi - _delta_cursor.x, 360.0f);
 
-  float phi   = -_delta_cursor.x;
-  float theta = -_delta_cursor.y;
-  static float tot_phi = 45.0f;
-  static float tot_theta = 45.0f;
-  static float radius = 10.0f;
+  // In order to get from camera to world space:
+  // 1) translate radius in +z-axis,
+  // 2) rotate theta about +x-axis,
+  // 3) rotate phi about +z-axis,
+  // 4) translate to camera target,
 
-  tot_phi += phi;
-  tot_theta += theta;
+  auto view = glm::mat4();
+  view = glm::translate(view, camera.target);
+  view = glm::rotate(view, t.phi + glm::half_pi<float>(), glm::vec3(0,0,1));
+  view = glm::rotate(view, t.theta, glm::vec3(1,0,0));
+  view = glm::translate(view, glm::vec3(0,0,t.radius));
 
-  auto right = glm::normalize(glm::cross(glm::normalize(vec), {0,0,1}));
-  auto up = glm::normalize(glm::cross(right, vec));
+  // 5) the cameras position is then given as the 4th column in the matrix,
+  t._position = glm::vec3(view[3]);
 
-  // Problem då vec || {0,0,1} fixa genom att byta {0,0,1} till nåt annat ortagonalt.
-  glm::vec3 v = {0,0,1};
-  events.emit(event::DebugDraw(event::DrawType::VECTOR, event::DebugMode::FRAME, right, {0,0,0}, {1, 1, 0, 1}));
-  events.emit(event::DebugDraw(event::DrawType::VECTOR, event::DebugMode::FRAME, vec, {0,0,0}, {1, 1, 1, 1}));
-  if(glm::length(right) == 0){
-    right = glm::normalize(glm::cross(vec, {1,0,0}));
-    up = glm::normalize(glm::cross(right, vec));
-  }
+  // 6) inverse of this matrix gives the view matrix.
+  camera.view = glm::inverse(view);
 
-  // Yaw
-  auto rot_1 = glm::rotate(phi, up);
-  // Pitch
-  auto rot_2 = glm::rotate(theta, right);
-
-  auto rot = rot_2 * rot_1;
-
-  auto new_vec = glm::vec3(rot * glm::vec4(vec, 0));
-  t._translate = new_vec + camera.target;
-
-  auto new_right = glm::normalize(glm::cross(new_vec, {0,0,1}));
-  auto new_up = glm::normalize(glm::cross(new_right, new_vec));
-  camera.up = new_up;
-  camera.view = glm::lookAt(t._translate, camera.target, camera.up);
-
-  // Reset mouse vars. :)
+  // Reset mouse variables.
   _delta_cursor = {0,0};
   _movement_amount = {0,0,0};
 }

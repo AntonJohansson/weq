@@ -30,8 +30,8 @@ struct Camera{
          float a_ratio = 0.0f,
          glm::vec3 target = {0, 0, 0})
     : look_mode(look_mode),
-      _near(n),
-      _far(f),
+      near(n),
+      far(f),
       fov(fov),
       aspect_ratio(a_ratio),
       target(target),
@@ -46,8 +46,8 @@ struct Camera{
   LookMode look_mode;
 
   // -- Perspective
-  float _near;
-  float _far;
+  float near;
+  float far;
   float fov;
   float aspect_ratio;
 
