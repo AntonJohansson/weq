@@ -36,6 +36,8 @@ namespace{
   float mesh_size = 5.0f;
   float c = 0.2f;
 
+  glm::vec3 spawn_drop_pos;
+
   void apply_shader(std::shared_ptr<Mesh> mesh, gl::Framebuffer& fbo, std::shared_ptr<gl::ShaderProgram> shader){
     fbo.bind();
 
@@ -180,9 +182,20 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
     glm::vec3 ray_world = glm::vec3(glm::inverse(camera.view) * ray_eye);
     ray_world = glm::normalize(ray_world);
 
-    spdlog::get("console")->info("{}, {}, {}", ray_world.x, ray_world.y, ray_world.z);
+    glm::vec3 plane_normal = {0, 0, 1};
 
-    events.emit(event::DebugRay(ray_world, transform._position, {1,0,0,1}));
+    float dot = glm::dot(ray_world, plane_normal);
+    if(dot != 0){
+      float d = 0.0f;
+      float t = - (glm::dot(transform._position, plane_normal) + d) / dot;
+      glm::vec3 intersect = transform._position + t * ray_world;
+
+      if(glm::abs(intersect.x) <= mesh_size/2.0f &&
+         glm::abs(intersect.y) <= mesh_size/2.0f){
+        spawn_drop = true;
+        spawn_drop_pos = intersect;
+      }
+    }
 
     spawn_ray = false;
   }
@@ -240,6 +253,7 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       if(spawn_drop){
         drop_shader->use();
         drop_shader->set("height_field", 0);
+        drop_shader->set("pos", glm::vec2(spawn_drop_pos)/mesh_size);
         wave.height_fbo.texture()->bind(0);
         apply_shader(screen_mesh, wave.height_fbo, drop_shader);
 

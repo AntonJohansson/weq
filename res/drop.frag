@@ -5,6 +5,7 @@ in vec2 v_texcoord;
 out vec4 frag_color;
 
 uniform sampler2D height_field;
+uniform vec2 pos;
 
 float gaussian(float A, vec2 p, vec2 p0, vec2 sigma){
   return exp(-0.5*(pow((p.x - p0.x)/sigma.x, 2) +
@@ -12,7 +13,7 @@ float gaussian(float A, vec2 p, vec2 p0, vec2 sigma){
 }
 
 void main(){
-  float drop = gaussian(0.0001, v_texcoord, vec2(0.5, 0.5), vec2(0.01, 0.01));
+  float drop = gaussian(0.0001, -pos + v_texcoord, vec2(0.5, 0.5), vec2(0.01, 0.01));
   float height = texture(height_field, v_texcoord).r;
   frag_color = vec4(height + drop, 0, 0, 0); // Addition should be done with OpenGL blend
 }
