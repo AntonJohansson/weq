@@ -13,6 +13,7 @@ namespace gl{
 // TODO Make more customizable.
 // TODO support multisampling.
 // TODO support resizing.
+// TODO all FBOs have depth components by default, might not be desirable. :)
 class Framebuffer{
 public:
   // Creates a framebuffer with the specified width and height.

@@ -52,6 +52,11 @@ float Framebuffer::depth(float x, float y){
 
 void Framebuffer::resize(unsigned int w, unsigned int h){
   _texture->resize(w, h);
+
+  // Resize depth buffer
+  glBindRenderbuffer(GL_RENDERBUFFER, _rbo_depth);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, w, h);
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _rbo_depth);
 }
 
 void Framebuffer::bind(){

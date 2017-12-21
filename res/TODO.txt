@@ -1,14 +1,9 @@
 TODO
 
+- FBOS
+  - All FBOS are created with a depth component. More customizability please.
 - Debug draw
   - Make more efficient (default meshes that you can scale)
-- North facing camera issue
-    https://gamedev.stackexchange.com/questions/73588/how-do-i-fix-my-planet-facing-camera
-  - Camera target rotation is not using "transform" component.
-    Rotation is being done by hand and not by quaternions.
-  - Don't use lookat, use quaterions.
-    https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluLookAt.xml
-- Unproject mouse
 - Texture for materials (refractive index)
 - Edge shader (radiate properly)
 - Wall texture
