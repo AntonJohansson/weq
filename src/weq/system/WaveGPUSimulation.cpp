@@ -63,6 +63,7 @@ namespace{
   std::shared_ptr<Texture> grid_texture;
   bool spawn_drop = false;
   bool spawn_ray = false;
+
   glm::vec2 mouse;
 }
 
@@ -154,7 +155,7 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
   screen_mesh->generate_vao(edge_shader);
 
   // Grid texture
-  grid_texture = std::make_shared<Texture>("GridTexture", GL_TEXTURE_2D, 1000, 1000);
+  grid_texture = std::make_shared<Texture>("GridTexture", GL_TEXTURE_2D, 100, 100, GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
   grid_texture->set_parameters({
       {GL_TEXTURE_BASE_LEVEL, 0},
       {GL_TEXTURE_MAX_LEVEL, 0},
@@ -216,15 +217,46 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
          glm::abs(intersect.y) <= mesh_size/2.0f){
         spawn_drop = true;
         spawn_drop_pos = intersect;
-        glm::vec3 new_pos = (1000.0f/5.0f)*(spawn_drop_pos + glm::vec3(2.5f, 2.5f, 0.0f));
-        static unsigned char bits[3] = {255, 255, 255};
-        grid_texture->set_data(new_pos.x, new_pos.y, 1, 1, (void*)bits);
+
+        // radius stuff
+        const int size = 20;
+        float radius = size/2.0f;
+        glm::vec3 new_pos = (100.0f/5.0f)*(spawn_drop_pos + glm::vec3(2.5f, 2.5f, 0.0f)) - glm::vec3(size/2, size/2, 0);
+        GLubyte bits[size*size*3] = {0};
+        grid_texture->get_data(bits, size*size*3, new_pos.x, new_pos.y, size, size);
+
+        auto set_color = [&bits, &size](int x, int y, int r, int g, int b){
+          bits[3*(x*size + y) + 0] = r;
+          bits[3*(x*size + y) + 1] = g;
+          bits[3*(x*size + y) + 2] = b;
+        };
+
+        for(int x = 0; x < size; x++){
+          for(int y = 0; y < size; y++){
+            float dx = glm::abs(x - size/2.0f);
+            float dy = glm::abs(y - size/2.0f);
+            if(dx*dx + dy*dy <= radius){
+              set_color(x, y, 255, 0, 0);
+            }
+          }
+        }
+
+        //set_color(0,0,0,0,0);
+        //set_color(1,1,0,0,0);
+        //set_color(2,2,0,0,0);
+        //set_color(3,3,0,0,0);
+        //set_color(4,4,0,0,0);
+
+        //grid_texture->set_data((void*)bits);
+        //grid_texture->set_data(0, 0, 5, 5, (void*)bits);
+        grid_texture->set_data(new_pos.x, new_pos.y, size, size, (void*)bits);
       }
     }
 
     spawn_ray = false;
   }
 
+  // Components
   entities.each<WaveGPU, Renderable>([dt](ex::Entity e, WaveGPU& wave, Renderable& r){
       (void)e;
 
@@ -247,7 +279,6 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       GLint old_viewport[4];
       glGetIntegerv(GL_VIEWPORT, old_viewport);
       glViewport(0, 0, wave.width, wave.height);
-
 
       // Handle interactivity
       if(set_c){wave.set_c(c); set_c = false;}

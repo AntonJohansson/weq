@@ -1,5 +1,7 @@
 TODO
 
+- Some weird stuff occurs when creating a texture with byte data and the size is 10*10,
+  does not occur for 16*16 or 20*20 +
 - FBOS
   - All FBOS are created with a depth component. More customizability please.
 - Debug draw
