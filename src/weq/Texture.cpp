@@ -66,6 +66,10 @@ void Texture::set_data(int x, int y, int width, int height, void* bits){
   glTexSubImage2D(_target, 0, x, y, width, height, _format_external, _format_type, bits);
 }
 
+void Texture::get_data(void* bits, int size, int x, int y, int width, int height){
+  glGetTextureSubImage(_texture, 0, x, y, 0, width, height, 1, _format_external, _format_type, size, bits);
+}
+
 void Texture::load(){
   _is_loaded = true;
 
