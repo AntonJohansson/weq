@@ -2,6 +2,8 @@
 
 #ifdef _WIN32
 #include <Windows.h> // lol wtf... required by spdlog
+#undef near
+#undef far
 #endif
 
 #include <weq/resource/ResourceManager.hpp>

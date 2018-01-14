@@ -33,22 +33,22 @@ public:
   Simulation(int argc, char** argv)
     : Application(argc, argv){
 
-    //_systems.add<weq::system::Input>();
-    //_systems.add<weq::system::UserInterface>();
-    //_systems.add<weq::system::WaveGPUSimulation>();
-    //_systems.add<weq::system::Camera>();
-    //_systems.add<weq::system::DebugDraw>();
-    //_systems.add<weq::system::Renderer>();
+    _systems.add<weq::system::Input>();
+    _systems.add<weq::system::UserInterface>();
+    _systems.add<weq::system::WaveGPUSimulation>();
+    _systems.add<weq::system::Camera>();
+    _systems.add<weq::system::DebugDraw>();
+    _systems.add<weq::system::Renderer>();
 
     // Order is backwards on mac for some reason.
     // Should systems be order independant?
     // entityx thinks so.
-    _systems.add<weq::system::Renderer>();
-    _systems.add<weq::system::DebugDraw>();
-    _systems.add<weq::system::Camera>();
-    _systems.add<weq::system::WaveGPUSimulation>();
-    _systems.add<weq::system::UserInterface>();
-    _systems.add<weq::system::Input>();
+    //_systems.add<weq::system::Renderer>();
+    //_systems.add<weq::system::DebugDraw>();
+    //_systems.add<weq::system::Camera>();
+    //_systems.add<weq::system::WaveGPUSimulation>();
+    //_systems.add<weq::system::UserInterface>();
+    //_systems.add<weq::system::Input>();
 
     _systems.configure();
   }

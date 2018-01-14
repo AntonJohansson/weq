@@ -3,6 +3,11 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#ifdef _WIN32
+#undef near
+#undef far
+#endif
+
 // Describes camera behaviour.
 // TARGET    - Forces the camera to look at a set position every update.
 //             Useful for orbital cameras.

@@ -366,7 +366,7 @@ void WaveGPUSimulation::receive(const event::ActiveInput& event){
   if(event.has(InputAction::SPAWN_WAVELET)){
     spawn_drop = true;
   }
-  if(event.has(InputAction::SPAWN_RAY)){
+  if(event.has(InputState::SPAWN_RAY)){
     spawn_ray = true;
   }
   if(event.has(InputRange::CURSOR_X) && event.has(InputRange::CURSOR_Y)){

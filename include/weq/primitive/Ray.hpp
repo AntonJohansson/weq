@@ -7,9 +7,9 @@ namespace primitive::ray{
 
 static MeshData solid(glm::vec3 direction, glm::vec4 color){
   MeshData data(gl::format::VC);
-  float far = 10.0f;
+  float far_plane = 10.0f;
 
-  glm::vec3 far_vector = far*direction;
+  glm::vec3 far_vector = far_plane*direction;
 
   data.interleaved.push_back(0);
   data.interleaved.push_back(0);

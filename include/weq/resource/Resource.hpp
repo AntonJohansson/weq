@@ -23,7 +23,7 @@ public:
 
 protected:
   #ifdef _WIN32
-	static constexpr auto _resource_path = "C:\\Users\\Anton\ Johansson\\Desktop\\weq\\res\\";
+	static constexpr auto _resource_path = "C:\\Users\\Anton\ Johansson\\git\\weq\\res\\";
   #else
   static constexpr auto _resource_path = "/Users/antonjohansson/git/weq/res/";
   #endif

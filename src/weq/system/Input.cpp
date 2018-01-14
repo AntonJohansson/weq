@@ -97,7 +97,6 @@ void Input::configure(ex::EventManager& events){
   // Inputsmaps
   InputMap<int, InputAction> action_map = {
     {raw::Key::E, InputAction::SPAWN_PLANE_WAVE},
-    {raw::Key::W, InputAction::SPAWN_RAY},
     {raw::Key::Q, InputAction::SPAWN_WAVELET},
     {raw::Key::C, InputAction::CLEAR},
     {raw::Key::R, InputAction::RENDER_WIREFRAME},
@@ -109,6 +108,7 @@ void Input::configure(ex::EventManager& events){
     {raw::Key::A, InputState::MOVE_LEFT},
     {raw::Key::S, InputState::MOVE_BACK},
     {raw::Key::D, InputState::MOVE_RIGHT},
+    {raw::Mouse::BUTTON_RIGHT, InputState::SPAWN_RAY},
     {raw::Key::LEFT_SHIFT, InputState::MOVE_UP},
     {raw::Key::LEFT_CONTROL, InputState::MOVE_DOWN},
     {raw::Mouse::BUTTON_LEFT, InputState::CURSOR_DOWN}

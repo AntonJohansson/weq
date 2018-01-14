@@ -14,6 +14,12 @@
 
 #include <algorithm>
 #include <cmath>
+
+#ifdef _WIN32
+#undef near
+#undef far
+#endif
+
 //#include <glm/gtx/quaternion.hpp>
 
 /* TODO (bug)

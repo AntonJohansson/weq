@@ -7,4 +7,7 @@ TODO
 - Texture for materials (refractive index)
 - Edge shader (radiate properly)
 - Wall texture
+- Bunch of #undef near, far. Not sure where to place it :/
+- Dynamically find resource path using exe location
+- Read input from files
 

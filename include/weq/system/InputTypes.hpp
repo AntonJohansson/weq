@@ -18,7 +18,6 @@ enum class InputAction{
   RENDER_WIREFRAME,
   RENDER_SOLID,
   TOGGLE_REFLECT,
-  SPAWN_RAY,
   UNKNOWN,
 };
 
@@ -30,6 +29,7 @@ enum class InputState{
   MOVE_LEFT,
   MOVE_RIGHT,
   CURSOR_DOWN,
+  SPAWN_RAY,
   UNKNOWN,
 };
 
