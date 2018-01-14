@@ -60,6 +60,12 @@ void Texture::set_data(void* bits){
   glTexImage2D(_target, 0, _format_internal, _width, _height, 0, _format_external, _format_type, _bits);
 }
 
+void Texture::set_data(int x, int y, int width, int height, void* bits){
+  bind();
+  // assert that 0 < x + w < width, 0 < y + h < height
+  glTexSubImage2D(_target, 0, x, y, width, height, _format_external, _format_type, bits);
+}
+
 void Texture::load(){
   _is_loaded = true;
 

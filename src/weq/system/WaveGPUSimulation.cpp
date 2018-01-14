@@ -35,6 +35,8 @@ namespace{
   int resolution = 1000;
   float mesh_size = 5.0f;
   float c = 0.2f;
+  float droplet_amplitude = 0.1;
+  float droplet_sigma = 0.01;
 
   glm::vec3 spawn_drop_pos;
 
@@ -58,6 +60,7 @@ namespace{
   std::shared_ptr<gl::ShaderProgram> clear_shader;
   std::shared_ptr<gl::ShaderProgram> vel_shader;
   std::shared_ptr<gl::ShaderProgram> height_shader;
+  std::shared_ptr<Texture> grid_texture;
   bool spawn_drop = false;
   bool spawn_ray = false;
   glm::vec2 mouse;
@@ -149,6 +152,20 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
   screen_mesh->generate_vao(drop_shader);
   screen_mesh->generate_vao(clear_shader);
   screen_mesh->generate_vao(edge_shader);
+
+  // Grid texture
+  grid_texture = std::make_shared<Texture>("GridTexture", GL_TEXTURE_2D, 1000, 1000);
+  grid_texture->set_parameters({
+      {GL_TEXTURE_BASE_LEVEL, 0},
+      {GL_TEXTURE_MAX_LEVEL, 0},
+
+      {GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
+      {GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE},
+
+      {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
+      {GL_TEXTURE_MAG_FILTER, GL_LINEAR},
+    });
+  grid_texture->load();
 }
 
 void WaveGPUSimulation::update(ex::EntityManager& entities,
@@ -199,6 +216,9 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
          glm::abs(intersect.y) <= mesh_size/2.0f){
         spawn_drop = true;
         spawn_drop_pos = intersect;
+        glm::vec3 new_pos = (1000.0f/5.0f)*(spawn_drop_pos + glm::vec3(2.5f, 2.5f, 0.0f));
+        static unsigned char bits[3] = {255, 255, 255};
+        grid_texture->set_data(new_pos.x, new_pos.y, 1, 1, (void*)bits);
       }
     }
 
@@ -259,6 +279,8 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
         drop_shader->use();
         drop_shader->set("height_field", 0);
         drop_shader->set("pos", glm::vec2(spawn_drop_pos)/mesh_size);
+        drop_shader->set("amplitude", droplet_amplitude);
+        drop_shader->set("sigma", droplet_sigma);
         wave.height_fbo.texture()->bind(0);
         apply_shader(screen_mesh, wave.height_fbo, drop_shader);
 
@@ -311,6 +333,8 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
 
         ImGui::Text("Output from height shader:");
         ImGui::Image((void*)wave.height_fbo.texture()->handle(), ImVec2(200, 200));
+        ImGui::Text("Wall");
+        ImGui::Image((void*)grid_texture->handle(), ImVec2(200, 200));
       ImGui::End();
     });
 }
@@ -330,6 +354,14 @@ void WaveGPUSimulation::add_ui(ex::EntityManager& entities){
 
           if(ImGui::Button("Clear waves")){
             clear = true;
+          }
+
+          ImGui::Separator(); // Droplet related
+
+          if(ImGui::InputFloat("Droplet amplitude", &droplet_amplitude)){
+          }
+
+          if(ImGui::InputFloat("Droplet width", &droplet_sigma)){
           }
 
           ImGui::Separator(); // Grid related

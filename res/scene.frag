@@ -13,7 +13,7 @@ out vec4 frag_color;
 void main(){
   float h = v_height;
 
-
+  // Change color depending on height
   if(h > 0){
     frag_color = vec4(h, 0, 0.25, 1);
   }else if (h == 0){

@@ -39,6 +39,9 @@ public:
   // Set the texture data manually, retains size and format.
   void set_data(void* bits);
 
+  // Update pixel data
+  void set_data(int x, int y, int width, int height, void* bits);
+
   // Handles loading the texture from file or memory to a
   // format useable by OpenGL.
   void load() override;
