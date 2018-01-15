@@ -1,5 +1,9 @@
 TODO
 
+- fix it so that the painted dot handles borders and edges correctly!
+  - removed wave effects and colors effects to study this more closely.
+- Should I handle texture bounds in get_data and set_data or error?
+- Move raycasting code to somewhere else :) (currently in waveGPU...)
 - Some weird stuff occurs when creating a texture with byte data and the size is 10*10,
   does not occur for 16*16 or 20*20 +
 - FBOS

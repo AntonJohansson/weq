@@ -19,6 +19,7 @@
 #include <imgui/imgui.h>
 
 #include <future>
+#include <algorithm>
 
 using component::Renderable;
 using component::WaveGPU;
@@ -155,7 +156,7 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
   screen_mesh->generate_vao(edge_shader);
 
   // Grid texture
-  grid_texture = std::make_shared<Texture>("GridTexture", GL_TEXTURE_2D, 100, 100, GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+  grid_texture = std::make_shared<Texture>("GridTexture", GL_TEXTURE_2D, 1000, 1000, GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
   grid_texture->set_parameters({
       {GL_TEXTURE_BASE_LEVEL, 0},
       {GL_TEXTURE_MAX_LEVEL, 0},
@@ -219,37 +220,49 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
         spawn_drop_pos = intersect;
 
         // radius stuff
-        const int size = 20;
+        const unsigned int size = 40;
         float radius = size/2.0f;
-        glm::vec3 new_pos = (100.0f/5.0f)*(spawn_drop_pos + glm::vec3(2.5f, 2.5f, 0.0f)) - glm::vec3(size/2, size/2, 0);
+
+        glm::vec3 center = (1000.0f/5.0f)*(spawn_drop_pos + glm::vec3(2.5f, 2.5f, 0.0f));
+        glm::vec3 bottom_left = center - glm::vec3(size/2, size/2, 0);
+
+        // Bound the rectangle
+        int width = size;
+        int height = size;
+        if(bottom_left.x < 0){
+          width = size + bottom_left.x;
+          bottom_left.x = 0;
+        }
+        if(bottom_left.y < 0){
+          height = size + bottom_left.y;
+          bottom_left.y = 0;
+        }
+        if(bottom_left.x + size > grid_texture->width()){
+          width = grid_texture->width() - bottom_left.x;
+        }
+        if(bottom_left.y + size > grid_texture->height()){
+          height = grid_texture->height() - bottom_left.y;
+        }
+
+        //GLubyte* bits = new GLubyte[width*height*3];
         GLubyte bits[size*size*3] = {0};
-        grid_texture->get_data(bits, size*size*3, new_pos.x, new_pos.y, size, size);
+        grid_texture->get_data(bits, size*size*3, bottom_left.x, bottom_left.y, width, height);
+        spdlog::get("console")->info("{},{}\t {},{}", bottom_left.x, bottom_left.y, width, height);
 
-        auto set_color = [&bits, &size](int x, int y, int r, int g, int b){
-          bits[3*(x*size + y) + 0] = r;
-          bits[3*(x*size + y) + 1] = g;
-          bits[3*(x*size + y) + 2] = b;
-        };
-
-        for(int x = 0; x < size; x++){
-          for(int y = 0; y < size; y++){
-            float dx = glm::abs(x - size/2.0f);
-            float dy = glm::abs(y - size/2.0f);
+        for(int x = 0; x < width; x++){
+          for(int y = 0; y < height; y++){
+            float dx = glm::abs(bottom_left.x + x - center.x);
+            float dy = glm::abs(bottom_left.y + y - center.y);
             if(dx*dx + dy*dy <= radius){
-              set_color(x, y, 255, 0, 0);
+              bits[3*(x*width + y) + 0] = 255;
+              bits[3*(x*width + y) + 1] = 0;
+              bits[3*(x*width + y) + 2] = 0;
             }
           }
         }
 
-        //set_color(0,0,0,0,0);
-        //set_color(1,1,0,0,0);
-        //set_color(2,2,0,0,0);
-        //set_color(3,3,0,0,0);
-        //set_color(4,4,0,0,0);
-
-        //grid_texture->set_data((void*)bits);
-        //grid_texture->set_data(0, 0, 5, 5, (void*)bits);
-        grid_texture->set_data(new_pos.x, new_pos.y, size, size, (void*)bits);
+        grid_texture->set_data(bottom_left.x, bottom_left.y, width, height, (void*)bits);
+		delete bits;
       }
     }
 
@@ -356,6 +369,7 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
 
       r.textures.clear();
       r.textures.push_back(wave.height_fbo.texture());
+      r.textures.push_back(grid_texture);
 
       // Visualize the output from each shader.
       ImGui::Begin("Debug");
