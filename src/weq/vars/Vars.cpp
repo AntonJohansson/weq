@@ -21,8 +21,8 @@ struct Audio {
 	Var(float, mix_voice, 1.0)
 	Var(float, mix_movies, 1.0)
   Var(bool, profiling, true)
-  Var(std::string, title, "nope");
-  Var(int, number, 15);
+  Var(std::string, title, "nope")
+  Var(int, number, 15)
 };
 
 Audio audio;

@@ -31,7 +31,7 @@ void Shader::load(){
 
   if(_shader_source.empty()){
     // Load from file
-    _shader_source = read_from_file(_resource_path + _id);
+    _shader_source = read_from_file(_resource_path + std::string("\\shaders\\") + _id);
   }
 
   const GLchar* source = _shader_source.c_str();

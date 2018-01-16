@@ -60,6 +60,9 @@ public:
     // Init vars
 
     weq::vars::initialize("..\\res\\System.vars");
+    //weq::hotloader::add_directory("..\\res");
+    weq::hotloader::add("..\\res\\System.vars", [](auto){});
+    weq::hotloader::add("..\\res\\shaders", [](auto){});
   }
 
   void configure() override{
@@ -182,6 +185,7 @@ public:
   }
 
   void update(double dt) override{
+    weq::hotloader::update();
     _systems.update_all(dt);
   }
 };

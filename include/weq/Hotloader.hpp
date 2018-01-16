@@ -1,11 +1,13 @@
 #pragma once
 
 #include <string>
+#include <functional>
 
 namespace weq::hotloader{
 
-void add_directory(const std::string& path);
-void add_file(const std::string& path);
+using UpdateFunc = std::function<void(std::string)>;
+
+void add(const std::string& path, UpdateFunc func);
 void update();
 
 }
