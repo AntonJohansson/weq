@@ -36,6 +36,7 @@ add_executable(weq
   src/weq/main.cpp
   src/weq/Cubemap.cpp
   src/weq/Application.cpp
+  src/weq/Hotloader.cpp
 
   src/weq/gl/Framebuffer.cpp
   src/weq/gl/Shader.cpp

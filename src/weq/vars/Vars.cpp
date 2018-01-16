@@ -5,64 +5,24 @@
 #include <fstream>
 #include <string_view>
 #include <algorithm>
-#include <unordered_map>
-
-#include <iostream>
-#include <tuple>
-#include <sstream>
-//#include <charconv> not supported yet
 
 
 
 
 
-
-enum class VarEnum{
-  I32,
-  FLOAT,
-  BOOL,
-  STRING,
-};
-
-void register_var(const char*, void*, size_t, size_t hash_code);
-
-template<typename T>
-struct VarType{
-  VarType(T t, size_t s, const char* n)
-    : var(t),
-      size(s),
-      name(n),
-      hash_code(typeid(T).hash_code()){
-    register_var(name, &var, size, hash_code);
-  }
-
-  T var;
-  size_t size;
-  const char* name;
-  size_t hash_code;
-};
-
-#define VAR(TYPE, NAME, VALUE) \
-  VarType<TYPE> NAME = {VALUE, sizeof(TYPE), #NAME};
-
-std::unordered_map<std::string, std::tuple<void*, size_t, size_t>> var_map;
-
-void register_var(const char* name, void* pointer, size_t size, size_t  hash_code){
-	var_map.insert({ name, std::make_tuple(pointer, size, hash_code) });
-};
 
 
 struct Audio {
-	VAR(float, mix_all, 1.0)
-	VAR(float, mix_ambiences, 1.0)
-	VAR(float, mix_footsteps, 1.0)
-	VAR(float, mix_props, 1.0)
-	VAR(float, mix_ui, 1.0)
-	VAR(float, mix_voice, 1.0)
-	VAR(float, mix_movies, 1.0)
-  VAR(bool, profiling, true)
-  VAR(std::string, title, "nope");
-  VAR(int, number, 15);
+	Var(float, mix_all, 1.0)
+	Var(float, mix_ambiences, 1.0)
+	Var(float, mix_footsteps, 1.0)
+	Var(float, mix_props, 1.0)
+	Var(float, mix_ui, 1.0)
+	Var(float, mix_voice, 1.0)
+	Var(float, mix_movies, 1.0)
+  Var(bool, profiling, true)
+  Var(std::string, title, "nope");
+  Var(int, number, 15);
 };
 
 Audio audio;
@@ -71,6 +31,12 @@ Audio audio;
 
 
 namespace weq::vars{
+using VarMap = std::unordered_map<std::string, std::tuple<void*, size_t, size_t>>;
+
+VarMap& get_var_map(){
+  static VarMap var_map;
+  return var_map;
+}
 
 template<typename T>
 bool is_hash_code(size_t hash_code){
@@ -79,10 +45,6 @@ bool is_hash_code(size_t hash_code){
 
 bool starts_with(const std::string_view& view, const std::string& value){
   return view.substr(0, value.size()).compare(value) == 0;
-}
-
-bool contains(const std::string_view& line_view, const std::string& value){
-  return line_view.find(value) != std::string_view::npos;
 }
 
 void process(std::string_view line_view, const std::string& filepath, unsigned int line_number){
@@ -126,8 +88,8 @@ void process(std::string_view line_view, const std::string& filepath, unsigned i
     }
 
     // Interpret value
-    auto it = var_map.find(var);
-    if(it != var_map.end()){
+    auto it = get_var_map().find(var);
+    if(it != get_var_map().end()){
       auto [ptr, size, hash_code] = it->second;
 
       if(is_hash_code<int>(hash_code)){
@@ -147,9 +109,8 @@ void process(std::string_view line_view, const std::string& filepath, unsigned i
   }
 }
 
-void initialize_vars(const std::string& filepath){
+void initialize(const std::string& filepath){
   std::ifstream file_stream(filepath);
-
 
   if(file_stream.is_open()){
     std::string line_data;
@@ -163,5 +124,9 @@ void initialize_vars(const std::string& filepath){
     spdlog::get("console")->error("Could not load file {}!", filepath);
   }
 }
+
+void attach(const char* name, void* pointer, size_t size, size_t hash_code){
+	get_var_map().insert({ name, std::make_tuple(pointer, size, hash_code) });
+};
 
 }
