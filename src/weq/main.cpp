@@ -19,6 +19,8 @@
 #include <weq/system/Renderer.hpp>
 #include <weq/system/DebugDraw.hpp>
 
+#include <weq/vars/Vars.hpp>
+
 // TODO ActiveWindow skickas ut i början av run(), move.
 // TODO window is currently created in application.cpp, move this!
 /* TODO
@@ -53,6 +55,10 @@ public:
 #endif
 
     _systems.configure();
+
+    // Init vars
+
+    weq::vars::initialize_vars("..\\res\\System.vars");
   }
 
   void configure() override{
