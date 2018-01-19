@@ -20,7 +20,7 @@ public:
               ex::EventManager& events,
               ex::TimeDelta dt) override;
 
-  void add_ui(ex::EntityManager& entities);
+  void add_ui(ex::EntityManager& entities, ex::EventManager& events);
 
   void receive(const event::ActiveInput& event);
 private:

@@ -7,6 +7,7 @@
 #include <weq/gl/Shader.hpp>
 #include <weq/primitive/Vector.hpp>
 #include <weq/primitive/Ray.hpp>
+#include <weq/primitive/Circle.hpp>
 
 #include <spdlog/spdlog.h>
 
@@ -56,6 +57,7 @@ void DebugDraw::configure(ex::EventManager& events){
   // Events
   events.subscribe<event::DebugVector>(*this);
   events.subscribe<event::DebugRay>(*this);
+  events.subscribe<event::DebugCircle>(*this);
 
   auto passthrough_v = std::make_shared<gl::Shader>("vertex", gl::ShaderType::VERTEX, vertex_source);
   auto passthrough_f = std::make_shared<gl::Shader>("fragment", gl::ShaderType::FRAGMENT, fragment_source);
@@ -109,5 +111,11 @@ void DebugDraw::receive(const event::DebugRay& event){
   auto mesh = std::make_shared<Mesh>(primitive::ray::solid(event.direction, event.color), gl::DrawMode::LINES);
   _buffered_events.push_back({event, mesh});
 }
+
+void DebugDraw::receive(const event::DebugCircle& event){
+  auto mesh = std::make_shared<Mesh>(primitive::circle::outline(event.radius, event.color), gl::DrawMode::LINES);
+  _buffered_events.push_back({event, mesh});
+}
+
 
 }

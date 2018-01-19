@@ -14,6 +14,7 @@ namespace event{
 struct DebugDrawBase;
 struct DebugVector;
 struct DebugRay;
+struct DebugCircle;
 class Mesh;
 }
 
@@ -39,6 +40,7 @@ public:
 
   void receive(const event::DebugVector& event);
   void receive(const event::DebugRay& event);
+  void receive(const event::DebugCircle& event);
 private:
   std::vector<std::pair<event::DebugDrawBase, std::shared_ptr<Mesh>>> _buffered_events;
   std::vector<std::pair<ex::Entity, float>> _timed_entities;

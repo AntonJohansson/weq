@@ -33,4 +33,12 @@ struct DebugRay : DebugDrawBase{
       direction(d) {}
 };
 
+struct DebugCircle : DebugDrawBase{
+  float radius;
+
+  DebugCircle(float r, glm::vec3 p, glm::vec4 c, float t = -1.0f)
+    : DebugDrawBase(p, c, t),
+      radius(r) {}
+};
+
 }

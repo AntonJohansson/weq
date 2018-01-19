@@ -166,19 +166,13 @@ public:
         //ImGui::ShowTestWindow();
         ImGui::Begin("Debug", NULL, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::SetWindowCollapsed("Debug", true, ImGuiSetCond_FirstUseEver);
-        ImGui::SetWindowPos("Debug", ImVec2(10,), ImGuiSetCond_FirstUseEver);
+        //ImGui::SetWindowPos("Debug", ImVec2(10,), ImGuiSetCond_FirstUseEver);
         ImGui::Text("Avg. frametime %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::End();
         ImGui::Begin("Menu", NULL, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::SetWindowCollapsed("Menu", false, ImGuiSetCond_FirstUseEver);
         ImGui::SetWindowPos("Menu", ImVec2(10,10), ImGuiSetCond_FirstUseEver);
 
-        if(ImGui::CollapsingHeader("settings")){
-        }
-
-        if(ImGui::Button("Exit")){
-          e.emit(event::Quit());
-        }
 
         ImGui::End();
       });

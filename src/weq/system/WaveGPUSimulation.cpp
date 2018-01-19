@@ -20,8 +20,11 @@
 
 #include <future>
 #include <algorithm>
+#include <cmath>
 
 #include <weq/vars/Vars.hpp>
+#include <weq/event/Internal.hpp>
+#include <weq/event/DebugDraw.hpp>
 
 using component::Renderable;
 using component::WaveGPU;
@@ -35,6 +38,9 @@ namespace{
   int wall_item = 0; // 0 - none, 1 - single, 2, - double, 3 - custom
   int boundary_item = 0; // 0 - reflect, 1 - radiate
 
+  // Change refractive index
+  int brush_size_percent = 16;
+
   //int resolution = 1000;
   int resolution = 100;
 
@@ -44,6 +50,31 @@ namespace{
   float droplet_sigma = 0.01;
 
   glm::vec3 spawn_drop_pos;
+
+  std::tuple<glm::vec3, bool> ray_pick(glm::vec2 clip_coords, component::Camera camera, component::Transform transform){
+    // Convert viewport coord to a ray in world coords
+    // http://antongerdelan.net/opengl/raycasting.html
+    glm::vec4 ray_clip = {clip_coords.x, clip_coords.y, -1.0f, 1.0f};
+    glm::vec4 ray_eye = glm::inverse(camera.projection) * ray_clip;
+    ray_eye = {ray_eye.x, ray_eye.y, -1.0, 0.0};
+
+    glm::vec3 ray_world = glm::vec3(glm::inverse(camera.view) * ray_eye);
+    ray_world = glm::normalize(ray_world);
+
+    // Ray plane intersection
+    glm::vec3 plane_normal = {0, 0, 1};
+
+    float dot = glm::dot(ray_world, plane_normal);
+    if(dot != 0){
+      float d = 0.0f;
+      float t = - (glm::dot(transform._position, plane_normal) + d) / dot;
+      glm::vec3 intersect = transform._position + t * ray_world;
+
+      return {intersect, true};
+    }
+
+    return {{0,0,0}, false};
+  }
 
   void apply_shader(std::shared_ptr<Mesh> mesh, gl::Framebuffer& fbo, std::shared_ptr<gl::ShaderProgram> shader){
     fbo.bind();
@@ -57,9 +88,6 @@ namespace{
 }
 
 namespace weq::system{
-
-// Tweak files variables
-Var(int, paint_size, 40);
 
 namespace{
   std::shared_ptr<Mesh> screen_mesh;
@@ -175,102 +203,103 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
       {GL_TEXTURE_MAG_FILTER, GL_LINEAR},
     });
   grid_texture->load();
+  int w = grid_texture->width();
+  int h = grid_texture->height();
+  GLubyte* bits = new GLubyte[w*h*3];
+  for(int x = 0; x < w; x++){
+    for(int y = 0; y < h; y++){
+      if((x%2 == 0 && y%2 != 0) ||
+         (x%2 != 0 && y%2 == 0)){
+        bits[3*(x + y*w) + 0] = 255;
+        bits[3*(x + y*w) + 1] = 255;
+        bits[3*(x + y*w) + 2] = 255;
+      }else{
+        bits[3*(x + y*w) + 0] = 0;
+        bits[3*(x + y*w) + 1] = 0;
+        bits[3*(x + y*w) + 2] = 0;
+      }
+    }
+  }
+  grid_texture->set_subdata(0,0,w,h,bits);
+  delete[] bits;
 }
 
 void WaveGPUSimulation::update(ex::EntityManager& entities,
                             ex::EventManager& events,
                             ex::TimeDelta dt){
-  (void)events;
   (void)dt;
 
   // Add UI if it doesn't exist (!)
-  add_ui(entities);
+  add_ui(entities, events);
 
   if(spawn_ray){
-    // Get the currently active camera
     component::Transform transform;
     component::Camera camera;
     entities.each<component::Camera,
                   component::ActiveCamera,
                   component::Transform>(
                     [&camera, &transform](ex::Entity e,
-                                 component::Camera c,
-                                 component::ActiveCamera& a,
-                                 component::Transform& t){
+                                          component::Camera c,
+                                          component::ActiveCamera& a,
+                                          component::Transform& t){
                       camera = c;
                       transform = t;
                     });
 
-    // Convert viewport coord to a ray in world coords
-    // http://antongerdelan.net/opengl/raycasting.html
-    glm::vec4 ray_clip = {mouse.x, mouse.y, -1.0f, 1.0f};
-    glm::vec4 ray_eye = glm::inverse(camera.projection) * ray_clip;
-    ray_eye = {ray_eye.x, ray_eye.y, -1.0, 0.0};
+    auto[intersect, success] = ray_pick({mouse.x, mouse.y}, camera, transform);
 
-    glm::vec3 ray_world = glm::vec3(glm::inverse(camera.view) * ray_eye);
-    ray_world = glm::normalize(ray_world);
+    // if inside mesh boundaries
+    if(success &&
+       glm::abs(intersect.x) <= mesh_size/2.0f &&
+       glm::abs(intersect.y) <= mesh_size/2.0f){
 
-    // Ray plane intersection
+      spawn_drop = true;
+      spawn_drop_pos = intersect;
 
-    glm::vec3 plane_normal = {0, 0, 1};
+      // radius stuff
+      int brush_size = std::round(((float)brush_size_percent/100.0f)*resolution);
+      float radius2 = std::pow(brush_size/2.0f, 2);
 
-    float dot = glm::dot(ray_world, plane_normal);
-    if(dot != 0){
-      float d = 0.0f;
-      float t = - (glm::dot(transform._position, plane_normal) + d) / dot;
-      glm::vec3 intersect = transform._position + t * ray_world;
+      glm::vec3 center = (resolution/mesh_size)*(spawn_drop_pos + glm::vec3(mesh_size/2.0f, mesh_size/2.0f, 0.0f));
+      glm::vec3 bottom_left = center - glm::vec3(brush_size/2, brush_size/2, 0);
 
-      // if inside mesh boundaries
-      if(glm::abs(intersect.x) <= mesh_size/2.0f &&
-         glm::abs(intersect.y) <= mesh_size/2.0f){
-        spawn_drop = true;
-        spawn_drop_pos = intersect;
+      //events.emit(event::DebugCircle((brush_size/2.0f)*5.0f/resolution, center, {1, 0, 0, 1}));
 
-        // radius stuff
-        float radius = paint_size.var/2.0f;
+      // Bound the rectangle
+      int min_sub_size = 16;
+      int sub_size = std::max(brush_size, min_sub_size);
 
-        glm::vec3 center = (resolution/5.0f)*(spawn_drop_pos + glm::vec3(2.5f, 2.5f, 0.0f));
-        glm::vec3 bottom_left = center - glm::vec3(paint_size.var/2, paint_size.var/2, 0);
+      // Bound to texture
+      if(bottom_left.x < 0){
+        bottom_left.x = 0;
+      }
+      if(bottom_left.y < 0){
+        bottom_left.y = 0;
+      }
+      if(bottom_left.x + sub_size > grid_texture->width()){
+        bottom_left.x = grid_texture->width() - sub_size;
+      }
+      if(bottom_left.y + sub_size > grid_texture->height()){
+        bottom_left.y = grid_texture->height() - sub_size;
+      }
 
-        // Bound the rectangle
-        int min_sub_size = 16;
-        int width = paint_size.var;
-        int height = paint_size.var;
+      GLubyte* bits = new GLubyte[sub_size*sub_size*3];
+      grid_texture->get_subdata(bits, sub_size*sub_size*3, bottom_left.x, bottom_left.y, sub_size, sub_size);
 
-        // Bound to texture
-        if(bottom_left.x < 0){
-          bottom_left.x = 0;
-        }
-        if(bottom_left.y < 0){
-          bottom_left.y = 0;
-        }
-        if(bottom_left.x + paint_size.var > grid_texture->width()){
-          bottom_left.x = grid_texture->width() - paint_size.var;
-        }
-        if(bottom_left.y + paint_size.var > grid_texture->height()){
-          bottom_left.y = grid_texture->height() - paint_size.var;
-        }
-
-        //GLubyte* bits = new GLubyte[width*height*3];
-        GLubyte* bits = new GLubyte[paint_size.var*paint_size.var*3];
-        grid_texture->get_subdata(bits, paint_size.var*paint_size.var*3, bottom_left.x, bottom_left.y, width, height);
-        spdlog::get("console")->info("{},{}\t {},{}", bottom_left.x, bottom_left.y, width, height);
-
-        for(int x = 0; x < width; x++){
-          for(int y = 0; y < height; y++){
-            float dx = glm::abs(x - (center.x - bottom_left.x));
-            float dy = glm::abs(y - (center.y - bottom_left.y));
-            if(dx*dx + dy*dy <= radius*radius){
-              bits[3*(x + y*width) + 0] = 255;
-              bits[3*(x + y*width) + 1] = 0;
-              bits[3*(x + y*width) + 2] = 0;
-            }
+      for(int x = 0; x < sub_size; x++){
+        for(int y = 0; y < sub_size; y++){
+          float dx = glm::abs(x - (center.x - bottom_left.x));
+          float dy = glm::abs(y - (center.y - bottom_left.y));
+          if(dx*dx + dy*dy <= radius2){
+            bits[3*(x + y*sub_size) + 0] = 255;
+            bits[3*(x + y*sub_size) + 1] = 0;
+            bits[3*(x + y*sub_size) + 2] = 0;
           }
         }
-
-        grid_texture->set_subdata(bottom_left.x, bottom_left.y, width, height, (void*)bits);
-        delete[] bits;
       }
+
+      grid_texture->set_subdata(bottom_left.x, bottom_left.y, sub_size, sub_size, (void*)bits);
+      delete[] bits;
     }
 
     spawn_ray = false;
@@ -415,55 +444,53 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
     });
 }
 
-void WaveGPUSimulation::add_ui(ex::EntityManager& entities){
+void WaveGPUSimulation::add_ui(ex::EntityManager& entities, ex::EventManager& events){
   if(!_ui_created){
     _ui_created = true;
     _ui = entities.create();
     _ui.assign<component::ImGui>([&](ex::EventManager& e){
         ImGui::Begin("Menu");
 
-        if(ImGui::CollapsingHeader("simulation")){
-          ImGui::Separator();
-          if(ImGui::InputFloat("Wave velocity (c)", &c)){
-            set_c = true;
-          }
-
-          if(ImGui::Button("Clear waves")){
-            clear = true;
-          }
-
-          ImGui::Separator(); // Droplet related
-
-          if(ImGui::InputFloat("Droplet amplitude", &droplet_amplitude)){
-          }
-
-          if(ImGui::InputFloat("Droplet width", &droplet_sigma)){
-          }
-
-          ImGui::Separator(); // Grid related
-
-          // Grid resolution
-          if(ImGui::InputInt("Grid resolution", &resolution)){
-            resolution_changed = true;
-          }
-
-          // Boundary behaviour
-          ImGui::Combo("Boundary behaviour", &boundary_item, "Reflect\0Radiate\0\0");
-
-          // Wall type
-          ImGui::Combo("Wall type", &wall_item, "None\0Single Slit\0Double Slit\0Custom\0\0");
-
-          // Refractive index
-          if(ImGui::Button("Change refractive index")){
-            refractive_visible ^= 1;
-          }
-
-          if(refractive_visible){
-            ImGui::Begin("Refractive Index");
-            ImGui::Text("Paint obstructions on the white grid.");
-            ImGui::End();
-          }
+        ImGui::Separator();
+        if(ImGui::InputFloat("Wave velocity (c)", &c)){
+          set_c = true;
         }
+
+        if(ImGui::Button("Clear waves")){
+          clear = true;
+        }
+
+        ImGui::Separator(); // Droplet related
+
+        if(ImGui::InputFloat("Droplet amplitude", &droplet_amplitude)){
+        }
+
+        if(ImGui::InputFloat("Droplet width", &droplet_sigma)){
+        }
+
+        ImGui::Separator(); // Grid related
+
+        // Grid resolution
+        if(ImGui::InputInt("Grid resolution", &resolution) && resolution < 2000){
+          resolution_changed = true;
+        }
+
+        // Boundary behaviour
+        ImGui::Combo("Boundary behaviour", &boundary_item, "Reflect\0Radiate\0\0");
+
+        // Wall type
+        ImGui::Combo("Wall type", &wall_item, "None\0Single Slit\0Double Slit\0Custom\0\0");
+
+        // Refractive index
+        if(ImGui::CollapsingHeader("Refractive index")){
+          ImGui::SliderInt("Paint brush radius (%)", &brush_size_percent, 1, 100);
+        }
+
+        // Handle exiting correctly :/
+        if(ImGui::Button("Exit")){
+          e.emit(event::Quit());
+        }
+
 
         ImGui::End();
       });
