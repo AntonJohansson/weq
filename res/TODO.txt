@@ -1,5 +1,9 @@
 TODO
 
+- Currently keeping a pointer to the shader program in the shader class, in order to re-link the program
+  on hot reload.
+
+- namespaces are inconsistent. (eg. Shader doesnt use weq::)
 - fix it so that the painted dot handles borders and edges correctly!
   - removed wave effects and colors effects to study this more closely.
 - Should I handle texture bounds in get_data and set_data or error?

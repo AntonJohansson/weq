@@ -62,7 +62,7 @@ public:
     weq::vars::initialize("..\\res\\System.vars");
     //weq::hotloader::add_directory("..\\res");
     weq::hotloader::add("..\\res\\System.vars", [](auto){});
-    weq::hotloader::add("..\\res\\shaders", [](auto){});
+    //weq::hotloader::add("..\\res\\shaders", [](auto){});
   }
 
   void configure() override{

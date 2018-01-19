@@ -8,6 +8,9 @@
 
 namespace gl{
 
+// Forward declare of shader program, needed for hot-reloading
+class ShaderProgram;
+
 // Enum encapsulating the OpenGL shader types.
 enum class ShaderType : GLenum{
   VERTEX   = GL_VERTEX_SHADER,
@@ -40,13 +43,16 @@ public:
 
   // Compiles the shader source code. Assumes glShaderSource(...) has been
   // called, i.e. shader has been load()-ed.
-  void compile();
+  bool compile();
 
   // Returns the OpenGL shader handle.
   GLuint id() const {return _shader;}
 
   // Returns the current shader type.
-  const ShaderType& type(){return _type;}
+  const ShaderType& type(){return _shader_type;}
+
+  // Currently keeping a pointer to the shader program in order to re-link program on reload
+  void set_shader_program(ShaderProgram* _sp){_shader_program = _sp;}
 
 private:
   // Helper function to retrive the shader type from file extension.
@@ -56,8 +62,11 @@ private:
   std::string read_from_file(const std::string& file);
 
   std::string _shader_source;
-  ShaderType _type;
+  ShaderType _shader_type;
   GLuint _shader;
+
+  // Currently keeping a pointer to the shader program in order to re-link program on reload
+  ShaderProgram* _shader_program;
 };
 
 } // namespace gl

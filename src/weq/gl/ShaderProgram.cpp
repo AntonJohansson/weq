@@ -51,6 +51,8 @@ void ShaderProgram::link(){
 void ShaderProgram::load(){
   for(auto& shader : _shaders){
     glAttachShader(_program, shader.second->id());
+    // TEMPORARY
+    shader.second->set_shader_program(this);
   }
 
   glBindFragDataLocation(_program, 0, "frag_color");

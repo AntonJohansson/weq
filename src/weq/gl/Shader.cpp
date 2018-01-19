@@ -6,19 +6,32 @@
 #include <sstream>
 #include <stdexcept>
 
+#include <weq/Hotloader.hpp>
+#include <weq/gl/ShaderProgram.hpp>
+
 namespace gl{
 
 Shader::Shader(const std::string& id)
   : Resource(id, ResourceType::FILE){
-  _type = type_from_filename(_id);
-  _shader = glCreateShader(GLenum(_type));
+  _shader_type = type_from_filename(_id);
+  _shader = glCreateShader(GLenum(_shader_type));
+
+  // Support hotloading
+  weq::hotloader::add(_resource_path + std::string("shaders\\") + _id, [this](auto){
+      reload();
+
+      // relink program if this is a reload.
+      if(_is_loaded && _shader_program != nullptr){
+        _shader_program->link();
+      }
+    });
 }
 
 Shader::Shader(const std::string& id, ShaderType type, const std::string& source)
   : Resource(id, ResourceType::MEMORY),
     _shader_source(source),
-    _type(type){
-  _shader = glCreateShader(GLenum(_type));
+    _shader_type(type){
+  _shader = glCreateShader(GLenum(_shader_type));
 }
 
 Shader::~Shader(){
@@ -27,23 +40,27 @@ Shader::~Shader(){
 
 void Shader::load(){
   if(_is_loaded){
+    return;
   }
 
-  if(_shader_source.empty()){
+  if(_type == ResourceType::FILE){
     // Load from file
-    _shader_source = read_from_file(_resource_path + std::string("\\shaders\\") + _id);
+    _shader_source = read_from_file(_resource_path + std::string("shaders\\") + _id);
   }
 
   const GLchar* source = _shader_source.c_str();
-  glShaderSource(_shader, 1, &source, NULL);
+  glShaderSource(_shader, 1, &source, NULL); // NULL = string length, NULL = > null terminated :)
 
-  compile();
+  if(compile()){
+    _is_loaded = true;
+  }
 }
 
 void Shader::unload(){
+  _is_loaded = false;
 }
 
-void Shader::compile(){
+bool Shader::compile(){
   glCompileShader(_shader);
 
   // check compile status
@@ -56,6 +73,8 @@ void Shader::compile(){
 
     spdlog::get("console")->error("Failed to compile shader {}!\nCompile logs:\n{}", _id, buffer);
   }
+
+  return status;
 }
 
 /*

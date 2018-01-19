@@ -6,7 +6,7 @@
 #undef far
 #endif
 
-#include <weq/resource/ResourceManager.hpp>
+#include <weq/memory/ResourceManager.hpp>
 #include <weq/state/StateManager.hpp>
 
 #include <entityx/entityx.h>
