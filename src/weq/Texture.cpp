@@ -65,7 +65,7 @@ void Texture::set_subdata(int x, int y, int width, int height, void* bits){
   // assert that 0 < x + w < width, 0 < y + h < height
   //if(x + width > _width)width = _width - x;
   //if(y + height > _height)height = _height - y;
-  //spdlog::get("console")->info("{} + {} > {}",x, width, _width);
+  //spdlog::get("console")->info("{} + {} > {}",x, width, _
 
   glTexSubImage2D(_target, 0, x, y, width, height, _format_external, _format_type, bits);
 }
@@ -73,6 +73,7 @@ void Texture::set_subdata(int x, int y, int width, int height, void* bits){
 void Texture::get_subdata(void* bits, int size, int x, int y, int width, int height){
   //if(x + width > _width)width = _width - x;
   //if(y + height > _height)height = _height - y;
+
   glGetTextureSubImage(_texture, 0, x, y, 0, width, height, 1, _format_external, _format_type, size, bits);
 }
 

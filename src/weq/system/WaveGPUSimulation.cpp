@@ -191,7 +191,7 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
   screen_mesh->generate_vao(edge_shader);
 
   // Grid texture
-  grid_texture = std::make_shared<Texture>("GridTexture", GL_TEXTURE_2D, resolution, resolution, GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+  grid_texture = std::make_shared<Texture>("GridTexture", GL_TEXTURE_2D, resolution, resolution, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
   grid_texture->set_parameters({
       {GL_TEXTURE_BASE_LEVEL, 0},
       {GL_TEXTURE_MAX_LEVEL, 0},
@@ -203,25 +203,6 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
       {GL_TEXTURE_MAG_FILTER, GL_LINEAR},
     });
   grid_texture->load();
-  int w = grid_texture->width();
-  int h = grid_texture->height();
-  GLubyte* bits = new GLubyte[w*h*3];
-  for(int x = 0; x < w; x++){
-    for(int y = 0; y < h; y++){
-      if((x%2 == 0 && y%2 != 0) ||
-         (x%2 != 0 && y%2 == 0)){
-        bits[3*(x + y*w) + 0] = 255;
-        bits[3*(x + y*w) + 1] = 255;
-        bits[3*(x + y*w) + 2] = 255;
-      }else{
-        bits[3*(x + y*w) + 0] = 0;
-        bits[3*(x + y*w) + 1] = 0;
-        bits[3*(x + y*w) + 2] = 0;
-      }
-    }
-  }
-  grid_texture->set_subdata(0,0,w,h,bits);
-  delete[] bits;
 }
 
 void WaveGPUSimulation::update(ex::EntityManager& entities,
@@ -269,31 +250,33 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       int min_sub_size = 16;
       int sub_size = std::max(brush_size, min_sub_size);
 
-      // Bound to texture
+      //Bound to texture
       if(bottom_left.x < 0){
-        bottom_left.x = 0;
+       bottom_left.x = 0;
       }
       if(bottom_left.y < 0){
-        bottom_left.y = 0;
+       bottom_left.y = 0;
       }
       if(bottom_left.x + sub_size > grid_texture->width()){
-        bottom_left.x = grid_texture->width() - sub_size;
+       bottom_left.x = grid_texture->width() - sub_size;
       }
       if(bottom_left.y + sub_size > grid_texture->height()){
-        bottom_left.y = grid_texture->height() - sub_size;
+       bottom_left.y = grid_texture->height() - sub_size;
       }
 
-      GLubyte* bits = new GLubyte[sub_size*sub_size*3];
-      grid_texture->get_subdata(bits, sub_size*sub_size*3, bottom_left.x, bottom_left.y, sub_size, sub_size);
+      unsigned int buffer_size = (sub_size)*(sub_size)*4;
+      GLubyte* bits = new GLubyte[buffer_size];
+      grid_texture->get_subdata((void*)bits, buffer_size, bottom_left.x, bottom_left.y, sub_size, sub_size);
 
       for(int x = 0; x < sub_size; x++){
         for(int y = 0; y < sub_size; y++){
           float dx = glm::abs(x - (center.x - bottom_left.x));
           float dy = glm::abs(y - (center.y - bottom_left.y));
           if(dx*dx + dy*dy <= radius2){
-            bits[3*(x + y*sub_size) + 0] = 255;
-            bits[3*(x + y*sub_size) + 1] = 0;
-            bits[3*(x + y*sub_size) + 2] = 0;
+            bits[4*(x + y*sub_size) + 0] = 255;
+            bits[4*(x + y*sub_size) + 1] = 0;
+            bits[4*(x + y*sub_size) + 2] = 0;
+            bits[4*(x + y*sub_size) + 3] = 255;
           }
         }
       }
@@ -304,6 +287,7 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
 
     spawn_ray = false;
   }
+
 
   // Components
   entities.each<WaveGPU, Renderable>([dt](ex::Entity e, WaveGPU& wave, Renderable& r){
@@ -339,21 +323,8 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
         // Clear paint texture
         int w = grid_texture->width();
         int h = grid_texture->height();
-        GLubyte* bits = new GLubyte[w*h*3];
-        for(int x = 0; x < w; x++){
-          for(int y = 0; y < h; y++){
-            if((x%2 == 0 && y%2 != 0) ||
-               (x%2 != 0 && y%2 == 0)){
-              bits[3*(x + y*w) + 0] = 255;
-              bits[3*(x + y*w) + 1] = 255;
-              bits[3*(x + y*w) + 2] = 255;
-            }else{
-              bits[3*(x + y*w) + 0] = 0;
-              bits[3*(x + y*w) + 1] = 0;
-              bits[3*(x + y*w) + 2] = 0;
-            }
-          }
-        }
+        GLubyte* bits = new GLubyte[w*h*4];
+        for(int i = 0; i < w*h*4; i++)bits[i] = 0;
         grid_texture->set_subdata(0,0,w,h,bits);
         delete[] bits;
         // Apply clear shader on height_fbo and vel_fbo
