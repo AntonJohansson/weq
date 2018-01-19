@@ -109,7 +109,7 @@ void process(std::string_view line_view, const std::string& filepath, unsigned i
   }
 }
 
-void initialize(const std::string& filepath){
+void read_file(const std::string& filepath){
   std::ifstream file_stream(filepath);
 
   if(file_stream.is_open()){

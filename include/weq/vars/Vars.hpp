@@ -8,7 +8,7 @@ namespace weq::vars{
 
 extern std::unordered_map<std::string, std::tuple<void*, size_t, size_t>> var_map;
 
-void initialize(const std::string& file);
+void read_file(const std::string& file);
 void attach(const char* name, void* ptr, size_t size, size_t hash_code);
 
 template<typename T>

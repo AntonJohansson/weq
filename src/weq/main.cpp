@@ -59,9 +59,9 @@ public:
 
     // Init vars
 
-    weq::vars::initialize("..\\res\\System.vars");
+    weq::vars::read_file("..\\res\\System.vars");
     //weq::hotloader::add_directory("..\\res");
-    weq::hotloader::add("..\\res\\System.vars", [](auto){});
+    weq::hotloader::add("..\\res\\System.vars", [](auto path){weq::vars::read_file(path);});
     //weq::hotloader::add("..\\res\\shaders", [](auto){});
   }
 
@@ -164,16 +164,16 @@ public:
     auto ui = _entities.create();
     ui.assign<component::ImGui>([](ex::EventManager& e){
         //ImGui::ShowTestWindow();
-        ImGui::Begin("Menu");
+        ImGui::Begin("Debug", NULL, ImGuiWindowFlags_AlwaysAutoResize);
+        ImGui::SetWindowCollapsed("Debug", true, ImGuiSetCond_FirstUseEver);
+        ImGui::SetWindowPos("Debug", ImVec2(10,), ImGuiSetCond_FirstUseEver);
+        ImGui::Text("Avg. frametime %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::End();
+        ImGui::Begin("Menu", NULL, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::SetWindowCollapsed("Menu", false, ImGuiSetCond_FirstUseEver);
         ImGui::SetWindowPos("Menu", ImVec2(10,10), ImGuiSetCond_FirstUseEver);
-        ImGui::SetWindowSize("Menu", ImVec2(200,500), ImGuiSetCond_FirstUseEver);
 
         if(ImGui::CollapsingHeader("settings")){
-        }
-
-        if(ImGui::CollapsingHeader("debug")){
-          ImGui::Text("Avg. frametime %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         }
 
         if(ImGui::Button("Exit")){

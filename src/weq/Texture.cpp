@@ -60,7 +60,7 @@ void Texture::set_data(void* bits){
   glTexImage2D(_target, 0, _format_internal, _width, _height, 0, _format_external, _format_type, _bits);
 }
 
-void Texture::set_data(int x, int y, int width, int height, void* bits){
+void Texture::set_subdata(int x, int y, int width, int height, void* bits){
   bind();
   // assert that 0 < x + w < width, 0 < y + h < height
   //if(x + width > _width)width = _width - x;
@@ -70,7 +70,7 @@ void Texture::set_data(int x, int y, int width, int height, void* bits){
   glTexSubImage2D(_target, 0, x, y, width, height, _format_external, _format_type, bits);
 }
 
-void Texture::get_data(void* bits, int size, int x, int y, int width, int height){
+void Texture::get_subdata(void* bits, int size, int x, int y, int width, int height){
   //if(x + width > _width)width = _width - x;
   //if(y + height > _height)height = _height - y;
   glGetTextureSubImage(_texture, 0, x, y, 0, width, height, 1, _format_external, _format_type, size, bits);

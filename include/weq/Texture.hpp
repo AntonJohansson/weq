@@ -40,10 +40,10 @@ public:
   void set_data(void* bits);
 
   // Update pixel data
-  void set_data(int x, int y, int width, int height, void* bits);
+  void set_subdata(int x, int y, int width, int height, void* bits);
 
   // Returns pixel data for the given region.
-  void get_data(void* bits, int size, int x, int y, int width, int height);
+  void get_subdata(void* bits, int size, int x, int y, int width, int height);
 
   // Handles loading the texture from file or memory to a
   // format useable by OpenGL.

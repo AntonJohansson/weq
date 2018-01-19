@@ -21,19 +21,23 @@
 #include <future>
 #include <algorithm>
 
+#include <weq/vars/Vars.hpp>
+
 using component::Renderable;
 using component::WaveGPU;
 
 namespace{
   bool clear = false;
   bool set_c = false;
-  bool recompute_mesh = true; // Generate a mesh with default resolution and mesh_size.
+  bool resolution_changed = true; // Generate a mesh with default resolution and mesh_size.
   bool refractive_visible = false;
 
   int wall_item = 0; // 0 - none, 1 - single, 2, - double, 3 - custom
   int boundary_item = 0; // 0 - reflect, 1 - radiate
 
-  int resolution = 1000;
+  //int resolution = 1000;
+  int resolution = 100;
+
   float mesh_size = 5.0f;
   float c = 0.2f;
   float droplet_amplitude = 0.1;
@@ -53,6 +57,9 @@ namespace{
 }
 
 namespace weq::system{
+
+// Tweak files variables
+Var(int, paint_size, 40);
 
 namespace{
   std::shared_ptr<Mesh> screen_mesh;
@@ -156,7 +163,7 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
   screen_mesh->generate_vao(edge_shader);
 
   // Grid texture
-  grid_texture = std::make_shared<Texture>("GridTexture", GL_TEXTURE_2D, 1000, 1000, GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+  grid_texture = std::make_shared<Texture>("GridTexture", GL_TEXTURE_2D, resolution, resolution, GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
   grid_texture->set_parameters({
       {GL_TEXTURE_BASE_LEVEL, 0},
       {GL_TEXTURE_MAX_LEVEL, 0},
@@ -220,49 +227,49 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
         spawn_drop_pos = intersect;
 
         // radius stuff
-        const unsigned int size = 40;
-        float radius = size/2.0f;
+        float radius = paint_size.var/2.0f;
 
-        glm::vec3 center = (1000.0f/5.0f)*(spawn_drop_pos + glm::vec3(2.5f, 2.5f, 0.0f));
-        glm::vec3 bottom_left = center - glm::vec3(size/2, size/2, 0);
+        glm::vec3 center = (resolution/5.0f)*(spawn_drop_pos + glm::vec3(2.5f, 2.5f, 0.0f));
+        glm::vec3 bottom_left = center - glm::vec3(paint_size.var/2, paint_size.var/2, 0);
 
         // Bound the rectangle
-        int width = size;
-        int height = size;
+        int min_sub_size = 16;
+        int width = paint_size.var;
+        int height = paint_size.var;
+
+        // Bound to texture
         if(bottom_left.x < 0){
-          width = size + bottom_left.x;
           bottom_left.x = 0;
         }
         if(bottom_left.y < 0){
-          height = size + bottom_left.y;
           bottom_left.y = 0;
         }
-        if(bottom_left.x + size > grid_texture->width()){
-          width = grid_texture->width() - bottom_left.x;
+        if(bottom_left.x + paint_size.var > grid_texture->width()){
+          bottom_left.x = grid_texture->width() - paint_size.var;
         }
-        if(bottom_left.y + size > grid_texture->height()){
-          height = grid_texture->height() - bottom_left.y;
+        if(bottom_left.y + paint_size.var > grid_texture->height()){
+          bottom_left.y = grid_texture->height() - paint_size.var;
         }
 
         //GLubyte* bits = new GLubyte[width*height*3];
-        GLubyte bits[size*size*3] = {0};
-        grid_texture->get_data(bits, size*size*3, bottom_left.x, bottom_left.y, width, height);
+        GLubyte* bits = new GLubyte[paint_size.var*paint_size.var*3];
+        grid_texture->get_subdata(bits, paint_size.var*paint_size.var*3, bottom_left.x, bottom_left.y, width, height);
         spdlog::get("console")->info("{},{}\t {},{}", bottom_left.x, bottom_left.y, width, height);
 
         for(int x = 0; x < width; x++){
           for(int y = 0; y < height; y++){
-            float dx = glm::abs(bottom_left.x + x - center.x);
-            float dy = glm::abs(bottom_left.y + y - center.y);
-            if(dx*dx + dy*dy <= radius){
-              bits[3*(x*width + y) + 0] = 255;
-              bits[3*(x*width + y) + 1] = 0;
-              bits[3*(x*width + y) + 2] = 0;
+            float dx = glm::abs(x - (center.x - bottom_left.x));
+            float dy = glm::abs(y - (center.y - bottom_left.y));
+            if(dx*dx + dy*dy <= radius*radius){
+              bits[3*(x + y*width) + 0] = 255;
+              bits[3*(x + y*width) + 1] = 0;
+              bits[3*(x + y*width) + 2] = 0;
             }
           }
         }
 
-        grid_texture->set_data(bottom_left.x, bottom_left.y, width, height, (void*)bits);
-		delete bits;
+        grid_texture->set_subdata(bottom_left.x, bottom_left.y, width, height, (void*)bits);
+        delete[] bits;
       }
     }
 
@@ -274,13 +281,17 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       (void)e;
 
       // Recompute grid mesh from new resolution
-      if(recompute_mesh){
+      if(resolution_changed){
+        // Update grid paint textures size
+        grid_texture->resize(resolution, resolution);
+
+        // Update grid mesh
         wave.width = resolution;
         wave.height = resolution;
         wave.height_fbo.resize(resolution, resolution);
         wave.vel_fbo.resize(resolution, resolution);
 
-        recompute_mesh = false;
+        resolution_changed = false;
 
         // OpenGL is per thread, so this will be anoying to split out.
         r.mesh->set_data(primitive::plane::solid(resolution, resolution,
@@ -296,6 +307,26 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       // Handle interactivity
       if(set_c){wave.set_c(c); set_c = false;}
       if(clear){
+        // Clear paint texture
+        int w = grid_texture->width();
+        int h = grid_texture->height();
+        GLubyte* bits = new GLubyte[w*h*3];
+        for(int x = 0; x < w; x++){
+          for(int y = 0; y < h; y++){
+            if((x%2 == 0 && y%2 != 0) ||
+               (x%2 != 0 && y%2 == 0)){
+              bits[3*(x + y*w) + 0] = 255;
+              bits[3*(x + y*w) + 1] = 255;
+              bits[3*(x + y*w) + 2] = 255;
+            }else{
+              bits[3*(x + y*w) + 0] = 0;
+              bits[3*(x + y*w) + 1] = 0;
+              bits[3*(x + y*w) + 2] = 0;
+            }
+          }
+        }
+        grid_texture->set_subdata(0,0,w,h,bits);
+        delete[] bits;
         // Apply clear shader on height_fbo and vel_fbo
         clear_shader->use();
         wave.vel_fbo.texture()->bind();
@@ -413,7 +444,7 @@ void WaveGPUSimulation::add_ui(ex::EntityManager& entities){
 
           // Grid resolution
           if(ImGui::InputInt("Grid resolution", &resolution)){
-            recompute_mesh = true;
+            resolution_changed = true;
           }
 
           // Boundary behaviour

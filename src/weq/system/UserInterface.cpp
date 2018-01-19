@@ -30,14 +30,14 @@ void UserInterface::update(ex::EntityManager& entities,
                            ex::TimeDelta dt){
   ImGui_ImplGlfwGL3_NewFrame();
 
-  ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, ImVec4(20/255.f, 20/255.f, 20/255.f, 1.0f));
-  ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(40/255.f, 40/255.f, 40/255.f, 1.0f));
-  ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(135/255.f, 135/255.f, 135/255.f, 1.0f));
-  ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(20/255.f, 20/255.f, 20/255.f, 1.0f));
-  ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(40/255.f, 40/255.f, 40/255.f, 1.0f));
-  ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(135/255.f, 135/255.f, 135/255.f, 1.0f));
+  //ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, ImVec4(20/255.f, 20/255.f, 20/255.f, 1.0f));
+  //ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(40/255.f, 40/255.f, 40/255.f, 1.0f));
+  //ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(135/255.f, 135/255.f, 135/255.f, 1.0f));
+  //ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(20/255.f, 20/255.f, 20/255.f, 1.0f));
+  //ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(40/255.f, 40/255.f, 40/255.f, 1.0f));
+  //ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(135/255.f, 135/255.f, 135/255.f, 1.0f));
 
-  ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+  //ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 
   entities.each<component::ImGui>([dt, &events](ex::Entity e, component::ImGui& i){
       if(i._register_ui)i._register_ui(events);
@@ -50,8 +50,8 @@ void UserInterface::update(ex::EntityManager& entities,
   menu_size = ImGui::GetWindowSize();
   ImGui::End();
 
-  ImGui::PopStyleVar();
-  ImGui::PopStyleColor(6);
+  //ImGui::PopStyleVar();
+  //ImGui::PopStyleColor(6);
 
   // Render is being called by the render system to ensure correct draw order.
   //ImGui::Render();
