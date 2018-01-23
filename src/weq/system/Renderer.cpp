@@ -141,8 +141,6 @@ void Renderer::update(ex::EntityManager& entities,
         r.scene->use();
         r.scene->set("mvp", mvp);
         r.scene->set("normal_matrix", active_camera.normal_matrix);
-        r.scene->set("height_field", 0);
-        r.scene->set("ri_field", 1);
 
         for(int i = 0; i < r.textures.size(); i++){
           auto ptr = r.textures[i];

@@ -77,7 +77,7 @@ void DebugDraw::update(ex::EntityManager& entities,
     itr->second -= dt;
     if(itr->second < 0.0f){
       itr->first.destroy();
-      _timed_entities.erase(itr);
+      itr = _timed_entities.erase(itr);
     }else{
       ++itr;
     }
@@ -113,7 +113,7 @@ void DebugDraw::receive(const event::DebugRay& event){
 }
 
 void DebugDraw::receive(const event::DebugCircle& event){
-  auto mesh = std::make_shared<Mesh>(primitive::circle::outline(event.radius, event.color), gl::DrawMode::LINES);
+  auto mesh = std::make_shared<Mesh>(primitive::circle::dotted(event.radius, event.color), gl::DrawMode::LINES);
   _buffered_events.push_back({event, mesh});
 }
 

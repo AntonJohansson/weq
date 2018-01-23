@@ -7,7 +7,7 @@
 
 namespace primitive::circle{
 
-static MeshData outline(float radius, glm::vec4 color){
+static MeshData dotted(float radius, glm::vec4 color){
   MeshData data(gl::format::VC);
   float divisions = 100.0f;
   float two_pi = 2.0f*glm::pi<float>();

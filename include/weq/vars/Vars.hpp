@@ -21,6 +21,13 @@ struct VarType{
     attach(name, &var, size, hash_code);
   }
 
+  //T operator+(const T& rhs);
+  //T operator+(T rhs);
+  //T operator-(const T& rhs);
+  //T operator-(T rhs);
+
+
+
   T var;
   size_t size;
   const char* name;

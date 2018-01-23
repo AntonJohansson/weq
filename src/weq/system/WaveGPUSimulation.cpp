@@ -30,16 +30,21 @@ using component::Renderable;
 using component::WaveGPU;
 
 namespace{
-  bool clear = false;
+  bool clear_wave = false;
+  bool clear_ri = false;
   bool set_c = false;
   bool resolution_changed = true; // Generate a mesh with default resolution and mesh_size.
-  bool refractive_visible = false;
+  bool should_paint_grid = false;
+  bool should_raycast = false;
+  bool should_draw_brush_size = false;
+  bool change_grid = false;
 
   int wall_item = 0; // 0 - none, 1 - single, 2, - double, 3 - custom
   int boundary_item = 0; // 0 - reflect, 1 - radiate
 
   // Change refractive index
   int brush_size_percent = 16;
+  float brush_refractive_index = 1.0f;
 
   //int resolution = 1000;
   int resolution = 100;
@@ -96,6 +101,8 @@ namespace{
   std::shared_ptr<gl::ShaderProgram> clear_shader;
   std::shared_ptr<gl::ShaderProgram> vel_shader;
   std::shared_ptr<gl::ShaderProgram> height_shader;
+  std::shared_ptr<gl::ShaderProgram> scene_grid_shader;
+  std::shared_ptr<gl::ShaderProgram> scene_wave_shader;
   std::shared_ptr<Texture> grid_texture;
   bool spawn_drop = false;
   bool spawn_ray = false;
@@ -107,6 +114,28 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
   events.subscribe<event::ActiveInput>(*this);
 
   // Setup Shaders
+
+  // Scene grid shader
+  auto scene_grid_v = std::make_shared<gl::Shader>("scene_grid.vert");
+  auto scene_grid_f = std::make_shared<gl::Shader>("scene_grid.frag");
+  scene_grid_v->load();
+  scene_grid_f->load();
+  scene_grid_shader = std::make_shared<gl::ShaderProgram>("scene_grid.prog",
+                                                     scene_grid_v,
+                                                     scene_grid_f);
+  scene_grid_shader->load();
+  scene_grid_shader->link();
+
+  // Scene wave shader
+  auto scene_wave_v = std::make_shared<gl::Shader>("scene_wave.vert");
+  auto scene_wave_f = std::make_shared<gl::Shader>("scene_wave.frag");
+  scene_wave_v->load();
+  scene_wave_f->load();
+  scene_wave_shader = std::make_shared<gl::ShaderProgram>("scene_wave.prog",
+                                                          scene_wave_v,
+                                                          scene_wave_f);
+  scene_wave_shader->load();
+  scene_wave_shader->link();
 
   // Height calculation shader
   auto height_v = std::make_shared<gl::Shader>("height.vert");
@@ -191,7 +220,7 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
   screen_mesh->generate_vao(edge_shader);
 
   // Grid texture
-  grid_texture = std::make_shared<Texture>("GridTexture", GL_TEXTURE_2D, resolution, resolution, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+  grid_texture = std::make_shared<Texture>("GridTexture", GL_TEXTURE_2D, resolution, resolution, GL_R32F, GL_RED, GL_FLOAT, nullptr);
   grid_texture->set_parameters({
       {GL_TEXTURE_BASE_LEVEL, 0},
       {GL_TEXTURE_MAX_LEVEL, 0},
@@ -203,6 +232,9 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
       {GL_TEXTURE_MAG_FILTER, GL_LINEAR},
     });
   grid_texture->load();
+
+  // Clear the grid paint texture on startup
+  clear_ri = true;
 }
 
 void WaveGPUSimulation::update(ex::EntityManager& entities,
@@ -213,7 +245,7 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
   // Add UI if it doesn't exist (!)
   add_ui(entities, events);
 
-  if(spawn_ray){
+  if(should_raycast){
     component::Transform transform;
     component::Camera camera;
     entities.each<component::Camera,
@@ -229,22 +261,33 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
 
     auto[intersect, success] = ray_pick({mouse.x, mouse.y}, camera, transform);
 
+    if(success && should_draw_brush_size){
+      int brush_size = std::round(((float)brush_size_percent/100.0f)*resolution);
+      glm::vec3 center = (resolution/mesh_size)*(intersect + glm::vec3(mesh_size/2.0f, mesh_size/2.0f, 0.0f));
+      events.emit(event::DebugCircle((brush_size/2.0f)*(mesh_size/resolution), intersect + glm::vec3{0,0,0.1f}, {1,0,0,1}, 0.0f));
+    }
+
+    if(success &&
+       spawn_drop &&
+       glm::abs(intersect.x) <= mesh_size/2.0f &&
+       glm::abs(intersect.y) <= mesh_size/2.0f){
+      spawn_drop_pos = intersect;
+      should_raycast = false;
+    }
+
     // if inside mesh boundaries
     if(success &&
+       should_paint_grid &&
        glm::abs(intersect.x) <= mesh_size/2.0f &&
        glm::abs(intersect.y) <= mesh_size/2.0f){
 
-      spawn_drop = true;
-      spawn_drop_pos = intersect;
-
       // radius stuff
       int brush_size = std::round(((float)brush_size_percent/100.0f)*resolution);
+      glm::vec3 center = (resolution/mesh_size)*(intersect + glm::vec3(mesh_size/2.0f, mesh_size/2.0f, 0.0f));
       float radius2 = std::pow(brush_size/2.0f, 2);
 
-      glm::vec3 center = (resolution/mesh_size)*(spawn_drop_pos + glm::vec3(mesh_size/2.0f, mesh_size/2.0f, 0.0f));
       glm::vec3 bottom_left = center - glm::vec3(brush_size/2, brush_size/2, 0);
 
-      //events.emit(event::DebugCircle((brush_size/2.0f)*5.0f/resolution, center, {1, 0, 0, 1}));
 
       // Bound the rectangle
       int min_sub_size = 16;
@@ -264,28 +307,34 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
        bottom_left.y = grid_texture->height() - sub_size;
       }
 
-      unsigned int buffer_size = (sub_size)*(sub_size)*4;
-      GLubyte* bits = new GLubyte[buffer_size];
-      grid_texture->get_subdata((void*)bits, buffer_size, bottom_left.x, bottom_left.y, sub_size, sub_size);
+      unsigned int buffer_size = (sub_size)*(sub_size);
+      //GLubyte* bits = new GLubyte[buffer_size];
+      float* bits = new float[buffer_size];
+      grid_texture->get_subdata((void*)bits, buffer_size*sizeof(float), bottom_left.x, bottom_left.y, sub_size, sub_size);
 
+      // Encode the constant r = v*v/(gridsize*gridsize), gridsize = mesh_size/resolution, v = c/n
+      //float v = c/brush_refractive_index;
+      //float gridsize = mesh_size/resolution;
+      //float r = v*v/(gridsize*gridsize);
+      // Encode the refractive index in the texture
       for(int x = 0; x < sub_size; x++){
         for(int y = 0; y < sub_size; y++){
           float dx = glm::abs(x - (center.x - bottom_left.x));
           float dy = glm::abs(y - (center.y - bottom_left.y));
           if(dx*dx + dy*dy <= radius2){
-            bits[4*(x + y*sub_size) + 0] = 255;
-            bits[4*(x + y*sub_size) + 1] = 0;
-            bits[4*(x + y*sub_size) + 2] = 0;
-            bits[4*(x + y*sub_size) + 3] = 255;
+            //bits[4*(x + y*sub_size) + 0] = std::round((255.0f/2.0f)*brush_refractive_index);
+            //bits[4*(x + y*sub_size) + 1] = 0;
+            //bits[4*(x + y*sub_size) + 2] = 0;
+            //bits[4*(x + y*sub_size) + 3] = 255;
+            bits[(x + y*sub_size)] = brush_refractive_index;
           }
         }
       }
 
       grid_texture->set_subdata(bottom_left.x, bottom_left.y, sub_size, sub_size, (void*)bits);
       delete[] bits;
+      should_paint_grid = false;
     }
-
-    spawn_ray = false;
   }
 
 
@@ -301,9 +350,13 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
         // Update grid mesh
         wave.width = resolution;
         wave.height = resolution;
+        wave.gridsize = mesh_size/resolution;
+        wave.set_c(wave.c);
         wave.height_fbo.resize(resolution, resolution);
         wave.vel_fbo.resize(resolution, resolution);
 
+        clear_wave = true;
+        clear_ri = true;
         resolution_changed = false;
 
         // OpenGL is per thread, so this will be anoying to split out.
@@ -319,14 +372,9 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
 
       // Handle interactivity
       if(set_c){wave.set_c(c); set_c = false;}
-      if(clear){
-        // Clear paint texture
-        int w = grid_texture->width();
-        int h = grid_texture->height();
-        GLubyte* bits = new GLubyte[w*h*4];
-        for(int i = 0; i < w*h*4; i++)bits[i] = 0;
-        grid_texture->set_subdata(0,0,w,h,bits);
-        delete[] bits;
+
+      // Clear waves on surface
+      if(clear_wave){
         // Apply clear shader on height_fbo and vel_fbo
         clear_shader->use();
         wave.vel_fbo.texture()->bind();
@@ -335,14 +383,28 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
         wave.height_fbo.texture()->bind();
         apply_shader(screen_mesh, wave.height_fbo, clear_shader);
 
-        clear = false;
+        clear_wave = false;
+      }
+
+      // Clear refractive index paint
+      if(clear_ri){
+        // Clear paint texture
+        int w = grid_texture->width();
+        int h = grid_texture->height();
+        float* bits = new float[w*h];
+        for(int i = 0; i < w*h; i++)bits[i] = 1.0f;
+        grid_texture->set_subdata(0,0,w,h,bits);
+        delete[] bits;
+
+        clear_ri = false;
       }
 
       // Apply edge shader if boundary mode is set to radiate.
       if(boundary_item == 1){ // Radiate
         edge_shader->use();
         edge_shader->set("height_field", 0);
-        edge_shader->set("gridsize", glm::vec2(1.0/wave.width, 1.0/wave.height));
+        // since the width of a texture is always 1
+        edge_shader->set("pixelsize", glm::vec2(1.0/wave.width, 1.0/wave.height));
         edge_shader->set("c", wave.c);
         edge_shader->set("dt", dt);
         wave.height_fbo.texture()->bind(0);
@@ -373,12 +435,15 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       vel_shader->use();
       vel_shader->set("height_field", 0);
       vel_shader->set("vel_field", 1);
+      vel_shader->set("ri_field", 2);
       vel_shader->set("dt", dt);
-      vel_shader->set("gridsize", glm::vec2(1.0/wave.width, 1.0/wave.height));
-      vel_shader->set("r", wave.r);
+      vel_shader->set("pixelsize", glm::vec2(1.0/wave.width, 1.0/wave.height));
+      vel_shader->set("gridsize", glm::vec2(wave.gridsize, wave.gridsize));
+      vel_shader->set("c", wave.c);
 
       wave.height_fbo.texture()->bind(0);
       wave.vel_fbo.texture()->bind(1);
+      grid_texture->bind(2);
 
       apply_shader(screen_mesh, wave.vel_fbo, vel_shader);
 
@@ -399,8 +464,25 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
                  old_viewport[3]);
 
       r.textures.clear();
-      r.textures.push_back(wave.height_fbo.texture());
-      r.textures.push_back(grid_texture);
+
+
+      // Set the correct scene shader
+      if(change_grid){
+        // r = v*v/(gridsize*gridsize), v = c/n
+        // r = c^2/(gridsize^2*n*2)
+        // n^2 = c^2/(r*gridsize^2)
+        //float k = wave.c*wave.c/(wave.gridsize*wave.gridsize);
+        r.scene = scene_grid_shader;
+        r.scene->use();
+        r.scene->set("r_field", 0);
+        //r.scene->set("k", k);
+        r.textures.push_back(grid_texture);
+      }else{
+        r.scene = scene_wave_shader;
+        r.scene->use();
+        r.scene->set("height_field", 0);
+        r.textures.push_back(wave.height_fbo.texture());
+      }
 
       // Visualize the output from each shader.
       ImGui::Begin("Debug");
@@ -424,11 +506,14 @@ void WaveGPUSimulation::add_ui(ex::EntityManager& entities, ex::EventManager& ev
 
         ImGui::Separator();
         if(ImGui::InputFloat("Wave velocity (c)", &c)){
+          if(c < 0.0f)c = 0.0f;
+          float max_c = 0.7f*(mesh_size/resolution)/0.016f;
+          if(c > max_c)c = max_c;
           set_c = true;
         }
 
         if(ImGui::Button("Clear waves")){
-          clear = true;
+          clear_wave = true;
         }
 
         ImGui::Separator(); // Droplet related
@@ -442,7 +527,8 @@ void WaveGPUSimulation::add_ui(ex::EntityManager& entities, ex::EventManager& ev
         ImGui::Separator(); // Grid related
 
         // Grid resolution
-        if(ImGui::InputInt("Grid resolution", &resolution) && resolution < 2000){
+        if(ImGui::InputInt("Grid resolution", &resolution)){
+          if(resolution < 16)resolution = 16;
           resolution_changed = true;
         }
 
@@ -454,8 +540,25 @@ void WaveGPUSimulation::add_ui(ex::EntityManager& entities, ex::EventManager& ev
 
         // Refractive index
         if(ImGui::CollapsingHeader("Refractive index")){
+          change_grid = true;
+          should_raycast = true;
+          should_draw_brush_size = true;
+
           ImGui::SliderInt("Paint brush radius (%)", &brush_size_percent, 1, 100);
+          ImGui::SliderFloat("Refractive index (n)", &brush_refractive_index, 1.0f, 5.0f);
+
+          if(ImGui::Button("Clear refractive index")){
+            clear_ri = true;
+          }
+        }else{
+          if(change_grid == true){
+            change_grid = false;
+            should_raycast = false;
+            should_draw_brush_size = false;
+          }
         }
+
+        ImGui::Separator(); // Exit
 
         // Handle exiting correctly :/
         if(ImGui::Button("Exit")){
@@ -469,11 +572,14 @@ void WaveGPUSimulation::add_ui(ex::EntityManager& entities, ex::EventManager& ev
 }
 
 void WaveGPUSimulation::receive(const event::ActiveInput& event){
-  if(event.has(InputAction::SPAWN_WAVELET)){
-    spawn_drop = true;
-  }
   if(event.has(InputState::SPAWN_RAY)){
-    spawn_ray = true;
+    should_raycast = true;
+    if(change_grid){
+      should_paint_grid = true;
+    }else{
+      spawn_drop = true;
+    }
+
   }
   if(event.has(InputRange::CURSOR_X) && event.has(InputRange::CURSOR_Y)){
     mouse.x = event.ranges.at(InputRange::CURSOR_X);

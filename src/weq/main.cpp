@@ -100,16 +100,10 @@ public:
   }
 
   void add_wave(){
-    float resolution = 1000.0f;
+    float resolution = 100.0f;
     float size = 5.0f;
 
     // Scene shader
-    auto scene_v = _resource_manager.get<gl::Shader>("scene.vert");
-    auto scene_f = _resource_manager.get<gl::Shader>("scene.frag");
-    auto scene_p = _resource_manager.get<gl::ShaderProgram>("scene.prog",
-                                                            scene_v,
-                                                            scene_f);
-    scene_p->link();
 
 
     //auto wave_mesh = std::make_shared<Mesh>(gl::DrawMode::LINES);
@@ -130,7 +124,7 @@ public:
     auto wave_gpu = wave.assign<component::WaveGPU>(resolution,
                                                     resolution,
                                                     size/resolution,
-                                                    0.02f);
+                                                    0.2f);
 
     wave_gpu->vel_fbo.texture()->set_parameters({
         {GL_TEXTURE_BASE_LEVEL, 0},
@@ -156,7 +150,7 @@ public:
 
     wave.assign<component::Transform>()->_position = {-size/2, -size/2, 0};
     auto r = wave.assign<component::Renderable>(wave_mesh);
-    r->scene = scene_p;
+    //xr->scene = scene_p;
   }
 
   //TODO improve UI

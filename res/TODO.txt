@@ -1,8 +1,21 @@
 TODO
 
+- change maximum c or change maximum dt?
+  - c < dh/dt <=> dt < dh/c
+  - add a way to set engine dt via events
+  - if multithread, change system dt
+  - could have different dts for single threaded engine :), hmmm
+  - display error message if used dt is smaller than the actual one (including safety factor)
+
+- Move hotload into system?
+
 - Currently keeping a pointer to the shader program in the shader class, in order to re-link the program
   on hot reload.
 
+- WAVEGPU: be consitent between keeping system vs. component variables, currently settings a
+  bunch in main.cpp (component and changing i wavegpu), and later setting stuff i wavegpu.
+
+- operator overloading for VARS.
 - namespaces are inconsistent. (eg. Shader doesnt use weq::)
 - fix it so that the painted dot handles borders and edges correctly!
   - removed wave effects and colors effects to study this more closely.
