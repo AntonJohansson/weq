@@ -157,7 +157,7 @@ public:
   void add_ui(){
     auto ui = _entities.create();
     ui.assign<component::ImGui>([](ex::EventManager& e){
-        //ImGui::ShowTestWindow();
+        ImGui::ShowTestWindow();
         ImGui::Begin("Debug", NULL, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::SetWindowCollapsed("Debug", true, ImGuiSetCond_FirstUseEver);
         //ImGui::SetWindowPos("Debug", ImVec2(10,), ImGuiSetCond_FirstUseEver);

@@ -529,7 +529,7 @@ void WaveGPUSimulation::add_ui(ex::EntityManager& entities, ex::EventManager& ev
         // Grid resolution
         if(ImGui::InputInt("Grid resolution", &resolution)){
           if(resolution < 16)resolution = 16;
-          resolution_changed = true;
+          if(resolution > 2000)resolution = 2000;
         }
 
         // Boundary behaviour
