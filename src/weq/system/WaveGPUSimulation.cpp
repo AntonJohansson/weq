@@ -413,7 +413,7 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
         edge_shader->set("c", wave.c);
         edge_shader->set("dt", dt);
         wave.height_fbo.texture()->bind(0);
-        wave.edge_fbo.texture()->bind(1);
+        wave.edge_fbo.texture()->bind(0);
         apply_shader(screen_mesh, wave.edge_fbo, edge_shader);
         glViewport(0, 0, wave.width, wave.height);
       }
