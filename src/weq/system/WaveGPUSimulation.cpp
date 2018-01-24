@@ -354,6 +354,7 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
         wave.set_c(wave.c);
         wave.height_fbo.resize(resolution, resolution);
         wave.vel_fbo.resize(resolution, resolution);
+        wave.edge_fbo.resize(resolution, 4);
 
         clear_wave = true;
         clear_ri = true;
@@ -375,13 +376,16 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
 
       // Clear waves on surface
       if(clear_wave){
-        // Apply clear shader on height_fbo and vel_fbo
+        // Apply clear shader on height_fbo, vel_fbo, and edge_ebo
         clear_shader->use();
         wave.vel_fbo.texture()->bind();
         apply_shader(screen_mesh, wave.vel_fbo, clear_shader);
 
         wave.height_fbo.texture()->bind();
         apply_shader(screen_mesh, wave.height_fbo, clear_shader);
+
+        wave.edge_fbo.texture()->bind();
+        apply_shader(screen_mesh, wave.edge_fbo, clear_shader);
 
         clear_wave = false;
       }
@@ -401,14 +405,17 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
 
       // Apply edge shader if boundary mode is set to radiate.
       if(boundary_item == 1){ // Radiate
+        glViewport(0, 0, wave.width, 4);
         edge_shader->use();
         edge_shader->set("height_field", 0);
-        // since the width of a texture is always 1
+        edge_shader->set("edge_field", 1);
         edge_shader->set("pixelsize", glm::vec2(1.0/wave.width, 1.0/wave.height));
         edge_shader->set("c", wave.c);
         edge_shader->set("dt", dt);
         wave.height_fbo.texture()->bind(0);
-        apply_shader(screen_mesh, wave.height_fbo, edge_shader);
+        wave.edge_fbo.texture()->bind(1);
+        apply_shader(screen_mesh, wave.edge_fbo, edge_shader);
+        glViewport(0, 0, wave.width, wave.height);
       }
 
       // Drop shader
@@ -436,14 +443,21 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       vel_shader->set("height_field", 0);
       vel_shader->set("vel_field", 1);
       vel_shader->set("ri_field", 2);
+      vel_shader->set("edge_field", 3);
       vel_shader->set("dt", dt);
       vel_shader->set("pixelsize", glm::vec2(1.0/wave.width, 1.0/wave.height));
       vel_shader->set("gridsize", glm::vec2(wave.gridsize, wave.gridsize));
       vel_shader->set("c", wave.c);
 
+
+      //temp
+      vel_shader->set("radiate_edge", boundary_item == 1);
+
+
       wave.height_fbo.texture()->bind(0);
       wave.vel_fbo.texture()->bind(1);
       grid_texture->bind(2);
+      wave.edge_fbo.texture()->bind(3);
 
       apply_shader(screen_mesh, wave.vel_fbo, vel_shader);
 
@@ -488,10 +502,11 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       ImGui::Begin("Debug");
         ImGui::Text("Output from velocity shader:");
         ImGui::Image((void*)wave.vel_fbo.texture()->handle(), ImVec2(200, 200));
-
         ImGui::Text("Output from height shader:");
         ImGui::Image((void*)wave.height_fbo.texture()->handle(), ImVec2(200, 200));
-        ImGui::Text("Wall");
+        ImGui::Text("Edge");
+        ImGui::Image((void*)wave.edge_fbo.texture()->handle(), ImVec2(200, 32));
+        ImGui::Text("Refractive index");
         ImGui::Image((void*)grid_texture->handle(), ImVec2(200, 200));
       ImGui::End();
     });

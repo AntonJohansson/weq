@@ -27,7 +27,8 @@ struct WaveGPU{
       c(wavespeed),
       r(wavespeed*wavespeed/(gridsz*gridsz)),
       vel_fbo(w, h, GL_R32F, GL_RED, GL_FLOAT),
-      height_fbo(w, h, GL_R32F, GL_RED, GL_FLOAT){
+      height_fbo(w, h, GL_R32F, GL_RED, GL_FLOAT),
+      edge_fbo(w, 4, GL_R32F, GL_RED, GL_FLOAT){
   }
 
   void set_c(float wavespeed){
@@ -44,6 +45,7 @@ struct WaveGPU{
 
   gl::Framebuffer vel_fbo;
   gl::Framebuffer height_fbo;
+  gl::Framebuffer edge_fbo;
 };
 
 // Component describing all the relevant data for performing

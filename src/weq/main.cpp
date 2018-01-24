@@ -67,9 +67,9 @@ public:
 
   void configure() override{
     // Draw axes
-    //_events.emit(event::DebugVector({1,0,0}, {0,0,0}, {1, 0, 0, 1})); // X
-    //_events.emit(event::DebugVector({0,1,0}, {0,0,0}, {0, 1, 0, 1})); // Y
-    //_events.emit(event::DebugVector({0,0,1}, {0,0,0}, {0, 0, 1, 1})); // Z
+    _events.emit(event::DebugVector({1,0,0}, {0,0,0}, {1, 0, 0, 1})); // X
+    _events.emit(event::DebugVector({0,1,0}, {0,0,0}, {0, 1, 0, 1})); // Y
+    _events.emit(event::DebugVector({0,0,1}, {0,0,0}, {0, 0, 1, 1})); // Z
 
     // Configure stuff
     configure_states();
@@ -146,6 +146,16 @@ public:
         {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
         {GL_TEXTURE_MAG_FILTER, GL_LINEAR},
         });
+    wave_gpu->edge_fbo.texture()->set_parameters({
+        {GL_TEXTURE_BASE_LEVEL, 0},
+        {GL_TEXTURE_MAX_LEVEL, 0},
+
+        {GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
+        {GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE},
+
+        {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
+        {GL_TEXTURE_MAG_FILTER, GL_LINEAR},
+        });
 
 
     wave.assign<component::Transform>()->_position = {-size/2, -size/2, 0};
@@ -157,7 +167,7 @@ public:
   void add_ui(){
     auto ui = _entities.create();
     ui.assign<component::ImGui>([](ex::EventManager& e){
-        ImGui::ShowTestWindow();
+        //ImGui::ShowTestWindow();
         ImGui::Begin("Debug", NULL, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::SetWindowCollapsed("Debug", true, ImGuiSetCond_FirstUseEver);
         //ImGui::SetWindowPos("Debug", ImVec2(10,), ImGuiSetCond_FirstUseEver);
