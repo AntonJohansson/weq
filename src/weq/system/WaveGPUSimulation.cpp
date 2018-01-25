@@ -409,11 +409,12 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
         edge_shader->use();
         edge_shader->set("height_field", 0);
         edge_shader->set("edge_field", 1);
+        edge_shader->set("gridsize", glm::vec2(wave.gridsize));
         edge_shader->set("pixelsize", glm::vec2(1.0/wave.width, 1.0/wave.height));
         edge_shader->set("c", wave.c);
         edge_shader->set("dt", dt);
         wave.height_fbo.texture()->bind(0);
-        wave.edge_fbo.texture()->bind(0);
+        wave.edge_fbo.texture()->bind(1);
         apply_shader(screen_mesh, wave.edge_fbo, edge_shader);
         glViewport(0, 0, wave.width, wave.height);
       }
