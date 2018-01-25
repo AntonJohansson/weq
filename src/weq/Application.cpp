@@ -3,13 +3,13 @@
 #include <weq/event/Window.hpp>
 #include <weq/Window.hpp>
 
-#include <string>
-#include <chrono>
+#include <weq/RunningAverage.hpp>
 
-using namespace std::chrono_literals;
-using std::chrono::nanoseconds;
-using std::chrono::duration_cast;
-using std::chrono::duration;
+#include <string>
+
+#include <iostream>
+#include <iomanip>
+
 
 // YO SNYGGING
 // YO SNYGGING
@@ -72,16 +72,22 @@ void Application::run(){
 
   using Clock = std::chrono::high_resolution_clock;
 
-  constexpr nanoseconds timestep(16ms);
+  nanoseconds timestep{16ms};
+  nanoseconds lag{0ns};
+  double timestep_value{0.016};
+
+  //constexpr nanoseconds timestep(16ms);
   //constexpr nanoseconds timestep(5ms);
   //constexpr nanoseconds timestep(1ms);
-  constexpr double timestep_value = duration_cast<duration<double>>(timestep).count();
-
-  nanoseconds lag{0ns};
+  //constexpr double timestep_value = duration_cast<duration<double>>(timestep).count();
 
   auto start_time = Clock::now();
   auto new_time = start_time;
   nanoseconds delta_time;
+
+  RunningAverage<double> frame_time;
+  nanoseconds accum{0s};
+  float frames = 0.0f;
 
   while(!_should_quit){
     // Handle window quit events.
@@ -93,14 +99,50 @@ void Application::run(){
     start_time = new_time;
 
     lag += delta_time;
+    accum += delta_time;
+
+    _systems.for_each([&lag, &delta_time](auto system){
+        system->set_lag(system->get_lag() + delta_time);
+      });
+
+    //std::cout << "\r";
+    if(frame_time.count() >= 120)frame_time.clear();
+    if(accum >= 1s){
+      frame_time.add(frames);
+      //std::cout << std::setw(10) << frame_time.average() << "/" << 1.0/timestep_value;
+
+      _systems.for_each([](auto system){
+          //std::cout << std::setw(10) << system->get_frame_counter() << "/" << 1.0/system->get_timestep_value();
+          system->clear_frame_counter();
+        });
+
+      frames = 0.0f;
+      accum = 0s;
+    }
+    //std::cout << std::flush;
 
     while(lag >= timestep){
-      lag -= timestep;
+      frames++;
+      _systems.for_each([&timestep, &timestep_value, &lag, &delta_time, this](auto system){
+          if(system->get_timestep() < timestep){
+            timestep = system->get_timestep();
+            timestep_value = system->get_timestep_value();
+          }
 
-      update(timestep_value);
+          if(system->get_lag() >= system->get_timestep()){
+            system->update(_entities, _events, system->get_timestep_value());
+            system->set_lag(system->get_lag() - system->get_timestep());
+            system->increment_frame_counter();
+          }
+        });
+
+      lag -= timestep;
     }
   }
 
+}
+
+void Application::update_systems(){
 }
 
 void Application::receive(const event::Quit& q){

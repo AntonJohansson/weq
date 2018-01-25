@@ -36,29 +36,24 @@ public:
   Simulation(int argc, char** argv)
     : Application(argc, argv){
 
-#ifdef _WIN32
-    _systems.add<weq::system::Input>();
-    _systems.add<weq::system::UserInterface>();
-    _systems.add<weq::system::WaveGPUSimulation>();
-    _systems.add<weq::system::Camera>();
-    _systems.add<weq::system::DebugDraw>();
-    _systems.add<weq::system::Renderer>();
-#else
-    // Order is backwards on mac for some reason.
-    // Should systems be order independant?
-    // entityx thinks so.
-    //_systems.add<weq::system::Renderer>();
-    //_systems.add<weq::system::DebugDraw>();
-    //_systems.add<weq::system::Camera>();
-    //_systems.add<weq::system::WaveGPUSimulation>();
-    //_systems.add<weq::system::UserInterface>();
-    //_systems.add<weq::system::Input>();
-#endif
-
     _systems.configure();
 
-    // Init vars
+    _input    = _systems.add<weq::system::Input>();
+    _ui       = _systems.add<weq::system::UserInterface>();
+    _wgpu     = _systems.add<weq::system::WaveGPUSimulation>();
+    _camera   = _systems.add<weq::system::Camera>();
+    _ddraw    = _systems.add<weq::system::DebugDraw>();
+    _renderer = _systems.add<weq::system::Renderer>();
 
+    //_systems.configure(); // order not guarranteed between systems
+    _input->configure(_events);
+    _ui->configure(_events);
+    _wgpu->configure(_events);
+    _camera->configure(_events);
+    _ddraw->configure(_events);
+    _renderer->configure(_events);
+
+    // Init vars
     weq::vars::read_file("..\\res\\System.vars");
     //weq::hotloader::add_directory("..\\res");
     weq::hotloader::add("..\\res\\System.vars", [](auto path){weq::vars::read_file(path);});
@@ -67,9 +62,6 @@ public:
 
   void configure() override{
     // Draw axes
-    _events.emit(event::DebugVector({1,0,0}, {0,0,0}, {1, 0, 0, 1})); // X
-    _events.emit(event::DebugVector({0,1,0}, {0,0,0}, {0, 1, 0, 1})); // Y
-    _events.emit(event::DebugVector({0,0,1}, {0,0,0}, {0, 0, 1, 1})); // Z
 
     // Configure stuff
     configure_states();
@@ -186,6 +178,14 @@ public:
     weq::hotloader::update();
     _systems.update_all(dt);
   }
+
+private:
+  std::shared_ptr<weq::system::Input>             _input;
+  std::shared_ptr<weq::system::UserInterface>     _ui;
+  std::shared_ptr<weq::system::WaveGPUSimulation> _wgpu;
+  std::shared_ptr<weq::system::Camera>            _camera;
+  std::shared_ptr<weq::system::DebugDraw>         _ddraw;
+  std::shared_ptr<weq::system::Renderer>          _renderer;
 };
 
 int main(int argc, char** argv){

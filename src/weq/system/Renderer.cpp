@@ -41,7 +41,6 @@ Renderer::~Renderer(){
 
 void Renderer::configure(ex::EventManager& events){
   spdlog::get("console")->info("renderer");
-  spdlog::get("console")->info("{}", glGetError() != GL_NO_ERROR);
   // Events
   events.subscribe<event::ActiveInput>(*this);
   events.subscribe<event::ActiveWindow>(*this);
@@ -94,8 +93,6 @@ void Renderer::configure(ex::EventManager& events){
       {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
       {GL_TEXTURE_MAG_FILTER, GL_LINEAR},
       });
-
-  spdlog::get("console")->info("{}", glGetError() != GL_NO_ERROR);
 }
 
 void Renderer::update(ex::EntityManager& entities,

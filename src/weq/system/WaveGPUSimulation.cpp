@@ -47,7 +47,6 @@ namespace{
   int brush_size_percent = 16;
   float brush_refractive_index = 1.0f;
 
-  //int resolution = 1000;
   int resolution = 100;
 
   float mesh_size = 5.0f;
@@ -119,6 +118,7 @@ namespace{
 }
 
 void WaveGPUSimulation::configure(ex::EventManager& events){
+  //events.emit(event::SystemDt());
   events.subscribe<event::ActiveInput>(*this);
 
   // Setup Shaders
@@ -533,7 +533,7 @@ void WaveGPUSimulation::add_ui(ex::EntityManager& entities, ex::EventManager& ev
 
         ImGui::Separator();
         if(ImGui::InputFloat("Wave velocity (c)", &c)){
-          bound_c(0.016);
+          bound_c(0.016); // HUH
           set_c = true;
         }
 
@@ -586,6 +586,9 @@ void WaveGPUSimulation::add_ui(ex::EntityManager& entities, ex::EventManager& ev
 
         if(ImGui::CollapsingHeader("Settings")){
           ImGui::Combo("How to handle high velocities", &dt_item, "Variable dt, allow any c\0Fix dt, maximum c depending on gridsize\0\0");
+          events.emit(event::DebugVector({1,0,0}, {0,0,0}, {1, 0, 0, 1}, 0.0f)); // X
+          events.emit(event::DebugVector({0,1,0}, {0,0,0}, {0, 1, 0, 1}, 0.0f)); // Y
+          events.emit(event::DebugVector({0,0,1}, {0,0,0}, {0, 0, 1, 1}, 0.0f)); // Z
         }
 
         ImGui::Separator(); // Exit

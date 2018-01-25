@@ -12,6 +12,14 @@
 #include <entityx/entityx.h>
 #include <spdlog/spdlog.h>
 
+#include <chrono>
+using namespace std::chrono_literals;
+using std::chrono::nanoseconds;
+using std::chrono::duration_cast;
+using std::chrono::duration;
+
+
+
 // Defined in <weq/Window.hpp>
 class Window;
 // Defined in <weq/event/Internal.hpp>
@@ -38,6 +46,9 @@ public:
   // Responsible for updating systems, called from main_loop().
   virtual void update(double dt){(void)dt;}
 
+  void update_systems();
+
+
   // Fixed timestep update loop that drives the entire simulation,
   // calls update(double dt) which is responsible for dispatching
   // system update calls.
@@ -47,6 +58,7 @@ public:
   void receive(const event::Quit& q);
 
 protected:
+
   bool _should_quit = false; // TODO should be handled by some statemanager?
   EventManager _events;
   EntityManager _entities{_events};
