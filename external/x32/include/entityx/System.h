@@ -15,14 +15,22 @@
 #include <unordered_map>
 #include <utility>
 #include <cassert>
+
+
 #include "entityx/config.h"
 #include "entityx/Entity.h"
 #include "entityx/Event.h"
 #include "entityx/help/NonCopyable.h"
 
+#include <functional>
+#include <chrono> // needed for multiple dts
+using namespace std::chrono_literals;
+using std::chrono::nanoseconds;
+using std::chrono::duration_cast;
+using std::chrono::duration;
+
 
 namespace entityx {
-
 
 class SystemManager;
 
@@ -59,7 +67,40 @@ class BaseSystem : entityx::help::NonCopyable {
 
   static Family family_counter_;
 
+  // extending for multiple dts
+  const nanoseconds& get_timestep(){
+    return _timestep;
+  }
+
+  double get_timestep_value(){
+    return _timestep_value;
+  }
+
+  const nanoseconds& get_lag(){
+      return _lag;
+  }
+
+  void set_lag(const nanoseconds& lag){
+    _lag = lag;
+  }
+
+  void increment_frame_counter(){_frame_counter++;}
+  void clear_frame_counter(){_frame_counter = 0;}
+  unsigned int get_frame_counter(){return _frame_counter;}
+
  protected:
+  void set_timestep(nanoseconds timestep){
+    _timestep = timestep;
+    _timestep_value = duration_cast<duration<double>>(_timestep).count();
+  }
+
+ private:
+  // Extending to support multiple dts
+  nanoseconds _timestep{16666667ns};
+  nanoseconds _lag{0ns};
+  double _timestep_value{0.01666667};
+  unsigned int _frame_counter{0};
+
 };
 
 
@@ -84,6 +125,7 @@ private:
     static Family family = family_counter_++;
     return family;
   }
+
 };
 
 
@@ -161,6 +203,14 @@ class SystemManager : entityx::help::NonCopyable {
    * specifying priority for update_all().
    */
   void update_all(TimeDelta dt);
+
+
+  // Do something for each system
+  void for_each(std::function<void(std::shared_ptr<BaseSystem>)> func){
+    for(auto& pair : systems_){
+      func(pair.second);
+    }
+  }
 
   /**
    * Configure the system. Call after adding all Systems.
