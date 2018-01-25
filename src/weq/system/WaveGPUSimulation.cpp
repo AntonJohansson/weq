@@ -409,12 +409,15 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
         edge_shader->use();
         edge_shader->set("height_field", 0);
         edge_shader->set("edge_field", 1);
+        edge_shader->set("ri_field", 2);
         edge_shader->set("gridsize", glm::vec2(wave.gridsize));
         edge_shader->set("pixelsize", glm::vec2(1.0/wave.width, 1.0/wave.height));
         edge_shader->set("c", wave.c);
         edge_shader->set("dt", dt);
         wave.height_fbo.texture()->bind(0);
         wave.edge_fbo.texture()->bind(1);
+        grid_texture->bind(2);
+
         apply_shader(screen_mesh, wave.edge_fbo, edge_shader);
         glViewport(0, 0, wave.width, wave.height);
       }
@@ -450,10 +453,8 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       vel_shader->set("gridsize", glm::vec2(wave.gridsize, wave.gridsize));
       vel_shader->set("c", wave.c);
 
-
       //temp
       vel_shader->set("radiate_edge", boundary_item == 1);
-
 
       wave.height_fbo.texture()->bind(0);
       wave.vel_fbo.texture()->bind(1);
@@ -546,6 +547,7 @@ void WaveGPUSimulation::add_ui(ex::EntityManager& entities, ex::EventManager& ev
         if(ImGui::InputInt("Grid resolution", &resolution)){
           if(resolution < 16)resolution = 16;
           if(resolution > 2000)resolution = 2000;
+          resolution_changed = true;
         }
 
         // Boundary behaviour
