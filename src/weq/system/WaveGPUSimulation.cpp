@@ -40,6 +40,7 @@ namespace{
   bool change_grid = false;
 
   int wall_item = 0; // 0 - none, 1 - single, 2, - double, 3 - custom
+  int dt_item = 0; // 0 - variable dt, 1 - fix dt
   int boundary_item = 0; // 0 - reflect, 1 - radiate
 
   // Change refractive index
@@ -53,6 +54,7 @@ namespace{
   float c = 0.2f;
   float droplet_amplitude = 0.1;
   float droplet_sigma = 0.01;
+  float safetfy_factor = 0.7;
 
   glm::vec3 spawn_drop_pos;
 
@@ -79,6 +81,12 @@ namespace{
     }
 
     return {{0,0,0}, false};
+  }
+
+  void bound_c(double dt){
+    float max_c = safetfy_factor*(mesh_size/resolution)/dt;
+    if(c < 0.0f)c = 0.0f;
+    if(c > max_c) c = max_c;
   }
 
   void apply_shader(std::shared_ptr<Mesh> mesh, gl::Framebuffer& fbo, std::shared_ptr<gl::ShaderProgram> shader){
@@ -356,8 +364,10 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
         wave.vel_fbo.resize(resolution, resolution);
         wave.edge_fbo.resize(resolution, 4);
 
+
         clear_wave = true;
         clear_ri = true;
+        set_c = true;
         resolution_changed = false;
 
         // OpenGL is per thread, so this will be anoying to split out.
@@ -372,7 +382,7 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       glViewport(0, 0, wave.width, wave.height);
 
       // Handle interactivity
-      if(set_c){wave.set_c(c); set_c = false;}
+      if(set_c){bound_c(dt); wave.set_c(c); set_c = false;}
 
       // Clear waves on surface
       if(clear_wave){
@@ -490,7 +500,7 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
         //float k = wave.c*wave.c/(wave.gridsize*wave.gridsize);
         r.scene = scene_grid_shader;
         r.scene->use();
-        r.scene->set("r_field", 0);
+        r.scene->set("ri_field", 0);
         //r.scene->set("k", k);
         r.textures.push_back(grid_texture);
       }else{
@@ -523,9 +533,7 @@ void WaveGPUSimulation::add_ui(ex::EntityManager& entities, ex::EventManager& ev
 
         ImGui::Separator();
         if(ImGui::InputFloat("Wave velocity (c)", &c)){
-          if(c < 0.0f)c = 0.0f;
-          float max_c = 0.7f*(mesh_size/resolution)/0.016f;
-          if(c > max_c)c = max_c;
+          bound_c(0.016);
           set_c = true;
         }
 
@@ -574,6 +582,10 @@ void WaveGPUSimulation::add_ui(ex::EntityManager& entities, ex::EventManager& ev
             should_raycast = false;
             should_draw_brush_size = false;
           }
+        }
+
+        if(ImGui::CollapsingHeader("Settings")){
+          ImGui::Combo("How to handle high velocities", &dt_item, "Variable dt, allow any c\0Fix dt, maximum c depending on gridsize\0\0");
         }
 
         ImGui::Separator(); // Exit
