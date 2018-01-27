@@ -8,9 +8,11 @@
 
 namespace ex = entityx;
 
+namespace weq{
 class Mesh;
+}
 
-namespace event{
+namespace weq::event{
 struct DebugDrawBase;
 struct DebugVector;
 struct DebugRay;
@@ -18,7 +20,7 @@ struct DebugCircle;
 class Mesh;
 }
 
-namespace gl{
+namespace weq::gl{
 class ShaderProgram;
 }
 

@@ -7,9 +7,9 @@ namespace ex = entityx;
 
 class Window;
 // Defined in <weq/event/Input.hpp>
-namespace event{struct ActiveInput;}
+namespace weq::event{struct ActiveInput;}
 // Defined in <weq/event/Window.hpp>
-namespace event{struct ActiveWindow;}
+namespace weq::event{struct ActiveWindow;}
 
 namespace weq::system{
 

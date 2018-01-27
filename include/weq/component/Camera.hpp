@@ -19,7 +19,7 @@ enum class LookMode{
   DIRECTION,
 };
 
-namespace component{
+namespace weq::component{
 
 // Component to tag a camera entity as "Active" forcing it to be used
 // by the renderer. There should only be one active camera, if multiple
@@ -81,4 +81,4 @@ struct Camera{
   bool inherit_aspect;
 };
 
-} // namespace component
+} // namespace weq::component

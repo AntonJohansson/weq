@@ -5,14 +5,14 @@
 
 namespace ex = entityx;
 
-namespace component{
+namespace weq::component{
 // Defined in <weq/component/Camera.hpp>
 struct Camera;
 // Defined in <weq/component/Camera.hpp>
 struct Transform;
 }
 
-namespace event{
+namespace weq::event{
 // Defined in <weq/event/Window.hpp>
 struct ActiveWindow;
 // Defined in <weq/event/Input.hpp>

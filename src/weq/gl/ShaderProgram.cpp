@@ -4,18 +4,11 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <spdlog/spdlog.h>
 
-namespace gl{
+namespace weq::gl{
 
-ShaderProgram::ShaderProgram(const std::string& id)
-  : Resource(id, ResourceType::FILE){
-  _program = glCreateProgram();
-}
-
-ShaderProgram::ShaderProgram(const std::string& id,
-                             std::shared_ptr<gl::Shader> v,
+ShaderProgram::ShaderProgram(std::shared_ptr<gl::Shader> v,
                              std::shared_ptr<gl::Shader> f,
-                             std::shared_ptr<gl::Shader> g)
-  : Resource(id, ResourceType::MEMORY){
+                             std::shared_ptr<gl::Shader> g){
   if(v)_shaders[GLenum(v->type())] = v;
   if(f)_shaders[GLenum(f->type())] = f;
   if(g)_shaders[GLenum(g->type())] = g;
@@ -44,14 +37,18 @@ void ShaderProgram::link(){
     GLchar buffer[512];
     glGetProgramInfoLog(_program, 512, NULL, buffer);
 
-    spdlog::get("console")->error("Failed to link program {}!\nLink log:\n{}", _id, buffer);
+    spdlog::get("console")->error("Failed to link program consisting of:");
+    for(auto& pair : _shaders){
+      spdlog::get("console")->error("\t{}", pair.second->path().string());
+    }
+    spdlog::get("console")->error("Link log:\n{}", buffer);
   }
 }
 
 void ShaderProgram::load(){
   for(auto& shader : _shaders){
-    glAttachShader(_program, shader.second->id());
-    // TEMPORARY
+    glAttachShader(_program, shader.second->handle());
+    // TEMPORARY to allow relinking a program after hotloading shader
     shader.second->set_shader_program(this);
   }
 
@@ -60,7 +57,7 @@ void ShaderProgram::load(){
 
 void ShaderProgram::unload(){
   for(auto& shader : _shaders){
-    glDetachShader(_program, shader.second->id());
+    glDetachShader(_program, shader.second->handle());
   }
 }
 
@@ -82,7 +79,7 @@ void ShaderProgram::bind_attribute(const std::string& attribute,
     glVertexAttribPointer(attrib_location, size, type, GL_FALSE, stride, offset_pointer);
     glEnableVertexAttribArray(attrib_location);
   }else{
-    spdlog::get("console")->error("Shader Error: Attribute \"{}\" cannot be found for shader {}.\n\t Either it is being optimzed out, or isn't being declared.", attribute, _id);
+    spdlog::get("console")->error("Shader Error: Attribute \"{}\" cannot be found for shader {}.\n\t Either it is being optimzed out, or isn't being declared.", attribute, _path.string());
   }
 }
 
@@ -124,4 +121,4 @@ void ShaderProgram::set(const std::string& name, int i){
   glUniform1i(uniform, i);
 }
 
-} // namespace gl
+} // namespace weq::gl

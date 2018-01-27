@@ -3,7 +3,7 @@
 #include <weq/MeshData.hpp>
 #include <glm/glm.hpp>
 
-namespace primitive::ray{
+namespace weq::primitive::ray{
 
 static MeshData solid(glm::vec3 direction, glm::vec4 color){
   MeshData data(gl::format::VC);
@@ -35,4 +35,4 @@ static MeshData solid(glm::vec3 direction, glm::vec4 color){
   return data;
 }
 
-} // namespace primitive::ray
+} // namespace weq::primitive::ray

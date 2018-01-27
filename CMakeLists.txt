@@ -32,7 +32,6 @@ find_package(OpenGL REQUIRED)
 
 add_executable(weq
   src/weq/Window.cpp
-  src/weq/Texture.cpp
   src/weq/main.cpp
   src/weq/Cubemap.cpp
   src/weq/Application.cpp
@@ -43,17 +42,20 @@ add_executable(weq
   src/weq/gl/ShaderProgram.cpp
   src/weq/gl/VertexArray.cpp
   src/weq/gl/VertexFormat.cpp
+  src/weq/gl/Texture.cpp
 
   src/weq/system/Camera.cpp
+  src/weq/system/Hotloader.cpp
   src/weq/system/Input.cpp
   src/weq/system/InputAbstractionLayer.cpp
   src/weq/system/UserInterface.cpp
   src/weq/system/Renderer.cpp
   src/weq/system/WaveGPUSimulation.cpp
-  src/weq/system/WaveSimulation.cpp
   src/weq/system/DebugDraw.cpp
 
   src/weq/vars/Vars.cpp
+
+  src/weq/memory/ResourceManager.cpp
 
   src/glad/glad.cpp
   src/imgui/imgui.cpp

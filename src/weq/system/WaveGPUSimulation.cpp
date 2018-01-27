@@ -7,10 +7,12 @@
 #include <weq/event/Input.hpp>
 #include <weq/event/DebugDraw.hpp>
 //#include <weq/event/Camera.hpp>
-#include <weq/Texture.hpp>
+#include <weq/gl/Texture.hpp>
 #include <weq/gl/ShaderProgram.hpp>
 #include <weq/gl/Shader.hpp>
 #include <weq/primitive/Plane.hpp>
+
+#include <weq/event/Hotloader.hpp>
 
 #include <spdlog/spdlog.h>
 #include <glm/gtc/matrix_transform.hpp>
@@ -25,35 +27,38 @@
 #include <weq/vars/Vars.hpp>
 #include <weq/event/Internal.hpp>
 #include <weq/event/DebugDraw.hpp>
+#include <weq/memory/ResourceManager.hpp>
 
-using component::Renderable;
-using component::WaveGPU;
 
+
+namespace weq::system{
+using weq::component::Renderable;
+using weq::component::WaveGPU;
 namespace{
-  bool clear_wave = false;
-  bool clear_ri = false;
-  bool set_c = false;
-  bool resolution_changed = true; // Generate a mesh with default resolution and mesh_size.
-  bool should_paint_grid = false;
-  bool should_raycast = false;
+  bool clear_wave             = false;
+  bool clear_ri               = false;
+  bool set_c                  = false;
+  bool resolution_changed     = true; // Generate a mesh with default resolution and mesh_size.
+  bool should_paint_grid      = false;
+  bool should_raycast         = false;
   bool should_draw_brush_size = false;
-  bool change_grid = false;
+  bool change_grid            = false;
 
-  int wall_item = 0; // 0 - none, 1 - single, 2, - double, 3 - custom
-  int dt_item = 0; // 0 - variable dt, 1 - fix dt
-  int boundary_item = 0; // 0 - reflect, 1 - radiate
+  int wall_item     = 0;        // 0 - none, 1 - single, 2, - double, 3 - custom
+  int dt_item       = 0;        // 0 - variable dt, 1 - fix dt
+  int boundary_item = 0;        // 0 - reflect, 1 - radiate
 
   // Change refractive index
-  int brush_size_percent = 16;
+  int   brush_size_percent     = 16;
   float brush_refractive_index = 1.0f;
 
   int resolution = 100;
 
-  float mesh_size = 5.0f;
-  float c = 0.2f;
+  float mesh_size         = 5.0f;
+  float c                 = 0.2f;
   float droplet_amplitude = 0.1;
-  float droplet_sigma = 0.01;
-  float safetfy_factor = 0.7;
+  float droplet_sigma     = 0.01;
+  float safetfy_factor    = 0.7;
 
   glm::vec3 spawn_drop_pos;
 
@@ -99,8 +104,6 @@ namespace{
   }
 }
 
-namespace weq::system{
-
 namespace{
   std::shared_ptr<Mesh> screen_mesh;
   std::shared_ptr<gl::ShaderProgram> drop_shader;
@@ -110,7 +113,7 @@ namespace{
   std::shared_ptr<gl::ShaderProgram> height_shader;
   std::shared_ptr<gl::ShaderProgram> scene_grid_shader;
   std::shared_ptr<gl::ShaderProgram> scene_wave_shader;
-  std::shared_ptr<Texture> grid_texture;
+  std::shared_ptr<gl::Texture> grid_texture;
   bool spawn_drop = false;
   bool spawn_ray = false;
 
@@ -118,87 +121,18 @@ namespace{
 }
 
 void WaveGPUSimulation::configure(ex::EventManager& events){
-  //events.emit(event::SystemDt());
+  namespace rm = memory::resource_manager;
+
   events.subscribe<event::ActiveInput>(*this);
 
   // Setup Shaders
-
-  // Scene grid shader
-  auto scene_grid_v = std::make_shared<gl::Shader>("scene_grid.vert");
-  auto scene_grid_f = std::make_shared<gl::Shader>("scene_grid.frag");
-  scene_grid_v->load();
-  scene_grid_f->load();
-  scene_grid_shader = std::make_shared<gl::ShaderProgram>("scene_grid.prog",
-                                                     scene_grid_v,
-                                                     scene_grid_f);
-  scene_grid_shader->load();
-  scene_grid_shader->link();
-
-  // Scene wave shader
-  auto scene_wave_v = std::make_shared<gl::Shader>("scene_wave.vert");
-  auto scene_wave_f = std::make_shared<gl::Shader>("scene_wave.frag");
-  scene_wave_v->load();
-  scene_wave_f->load();
-  scene_wave_shader = std::make_shared<gl::ShaderProgram>("scene_wave.prog",
-                                                          scene_wave_v,
-                                                          scene_wave_f);
-  scene_wave_shader->load();
-  scene_wave_shader->link();
-
-  // Height calculation shader
-  auto height_v = std::make_shared<gl::Shader>("height.vert");
-  auto height_f = std::make_shared<gl::Shader>("height.frag");
-  height_v->load();
-  height_f->load();
-  height_shader = std::make_shared<gl::ShaderProgram>("height.prog",
-                                                      height_v,
-                                                      height_f);
-  height_shader->load();
-  height_shader->link();
-
-  // Velocity calculation shader
-  auto vel_v = std::make_shared<gl::Shader>("vel.vert");
-  auto vel_f = std::make_shared<gl::Shader>("vel.frag");
-  vel_v->load();
-  vel_f->load();
-  vel_shader = std::make_shared<gl::ShaderProgram>("vel.prog",
-                                                   vel_v,
-                                                   vel_f);
-  vel_shader->load();
-  vel_shader->link();
-
-  // Drop calculation shader
-  auto drop_v = std::make_shared<gl::Shader>("drop.vert");
-  auto drop_f = std::make_shared<gl::Shader>("drop.frag");
-  drop_v->load();
-  drop_f->load();
-  drop_shader = std::make_shared<gl::ShaderProgram>("drop.prog",
-                                                    drop_v,
-                                                    drop_f);
-  drop_shader->load();
-  drop_shader->link();
-
-  // Clear shader
-  auto clear_v = std::make_shared<gl::Shader>("clear.vert");
-  auto clear_f = std::make_shared<gl::Shader>("clear.frag");
-  clear_v->load();
-  clear_f->load();
-  clear_shader = std::make_shared<gl::ShaderProgram>("clear.prog",
-                                                     clear_v,
-                                                     clear_f);
-  clear_shader->load();
-  clear_shader->link();
-
-  // Edge shader
-  auto edge_v = std::make_shared<gl::Shader>("edge.vert");
-  auto edge_f = std::make_shared<gl::Shader>("edge.frag");
-  edge_v->load();
-  edge_f->load();
-  edge_shader = std::make_shared<gl::ShaderProgram>("edge.prog",
-                                                    edge_v,
-                                                    edge_f);
-  edge_shader->load();
-  edge_shader->link();
+  scene_grid_shader = rm::load_shader_program("scene_grid.prog");
+  scene_wave_shader = rm::load_shader_program("scene_wave.prog");
+  height_shader     = rm::load_shader_program("height.prog");
+  vel_shader        = rm::load_shader_program("vel.prog");
+  drop_shader       = rm::load_shader_program("drop.prog");
+  clear_shader      = rm::load_shader_program("clear.prog");
+  edge_shader       = rm::load_shader_program("edge.prog");
 
   // Setup 2D mesh for rendering textures
   gl::VertexFormat VT2 = {{
@@ -221,6 +155,8 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
 
   screen_mesh = std::make_shared<Mesh>(screen_mesh_data,
                                        gl::DrawMode::TRIANGLES);
+
+  // Generate vertex arrays for the shaders
   screen_mesh->generate_vao(height_shader);
   screen_mesh->generate_vao(vel_shader);
   screen_mesh->generate_vao(drop_shader);
@@ -228,7 +164,7 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
   screen_mesh->generate_vao(edge_shader);
 
   // Grid texture
-  grid_texture = std::make_shared<Texture>("GridTexture", GL_TEXTURE_2D, resolution, resolution, GL_R32F, GL_RED, GL_FLOAT, nullptr);
+  grid_texture = std::make_shared<gl::Texture>(GL_TEXTURE_2D, resolution, resolution, GL_R32F, GL_RED, GL_FLOAT, nullptr);
   grid_texture->set_parameters({
       {GL_TEXTURE_BASE_LEVEL, 0},
       {GL_TEXTURE_MAX_LEVEL, 0},

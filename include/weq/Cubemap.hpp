@@ -1,22 +1,27 @@
 #pragma once
 
-#include <weq/resource/Resource.hpp>
+#include <weq/memory/Resource.hpp>
 
 #include <glad/glad.h>
 
 #include <vector>
 #include <string>
 #include <tuple>
+#include <filesystem>
+
+namespace weq{
+
+namespace fs = std::experimental::filesystem;
 
 // TODO Merge Cubemap and Texture resources?
 
 // Combines six textures to form a cubemap
-class Cubemap : public Resource{
+class Cubemap : public memory::Resource{
 public:
   // Constructs a resource with a given id and generates the OpenGL cubemap texture.
   // Copies texture_ids to local copy _texture_ids.
-  Cubemap(const std::string& id,
-          const std::vector<std::string>& texture_ids);
+  Cubemap(const fs::path& path,
+          const std::vector<fs::path>& texture_ids);
   // Calls unload() to destory all loaded textures.
   // Also destroys _cubemap texture.
   ~Cubemap();
@@ -36,6 +41,8 @@ private:
   std::tuple<unsigned char*, unsigned int, unsigned int>
   load_texture(const std::string& id);
 
-  std::vector<std::string> _texture_ids;
+  std::vector<fs::path> _texture_ids;
   GLuint _cubemap;
 };
+
+} // namespace weq

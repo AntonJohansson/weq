@@ -8,6 +8,8 @@
 
 #include <unordered_map>
 
+namespace weq{
+
 // Class that takes mesh data and generates a VBO and EBO that can be
 // used for rendering.
 class Mesh{
@@ -61,8 +63,8 @@ public:
 
   // Generate VAO passed in program
   const gl::VertexArray& generate_vao(std::shared_ptr<gl::ShaderProgram> program){
-    _vaos[program->id()] = { program, _vbo, _data.format };
-    return _vaos[program->id()];
+    _vaos[program->path().string()] = { program, _vbo, _data.format };
+    return _vaos[program->path().string()];
   }
 
   // Returns the generated EBO.
@@ -73,7 +75,7 @@ public:
   // TODO move? Generating VAOS when they are requested could cause
   // unnecessary overhead in e.g. rendering.
   const gl::VertexArray& vao(std::shared_ptr<gl::ShaderProgram> program) {
-    auto vao = _vaos.find(program->id());
+    auto vao = _vaos.find(program->path().string());
 
     // Generate vao if it does not exist.
     if(vao == _vaos.end()){
@@ -97,3 +99,5 @@ private:
   std::unordered_map<std::string, gl::VertexArray> _vaos;
   float* _mapped_region;
 };
+
+} // namespace weq

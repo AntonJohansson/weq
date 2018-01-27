@@ -2,11 +2,11 @@
 
 #include <weq/gl/ShaderProgram.hpp>
 #include <weq/Mesh.hpp>
-#include <weq/Texture.hpp>
+#include <weq/gl/Texture.hpp>
 
 #include <vector>
 
-namespace component{
+namespace weq::component{
 
 // Component describing all the data necessary for the render to draw a single
 // mesh. Does currently not support materials.
@@ -21,7 +21,7 @@ struct Renderable{
   std::shared_ptr<gl::ShaderProgram> scene;
   // TODO there is a better data type for this.
   // should also keep track of name to bind to in shaders.
-  std::vector<std::shared_ptr<Texture>> textures;
+  std::vector<std::shared_ptr<gl::Texture>> textures;
 };
 
-} // namespace component
+} // namespace weq::component

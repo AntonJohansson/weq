@@ -4,7 +4,7 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-namespace component{
+namespace weq::component{
 
 // Component describing position, rotation, scale and look direction.
 // Combines all these to a model matrix to be used by the renderer.
@@ -63,4 +63,4 @@ struct Transform{
   float phi;
 };
 
-} // namespace component
+} // namespace weq::component

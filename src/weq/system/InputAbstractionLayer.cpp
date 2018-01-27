@@ -15,6 +15,7 @@
 // tror jag sparar input-datan i ett event-objekt
 // => consumes rensar states.
 
+namespace weq::system{
 namespace{
   event::ActiveInput _active_input;
   std::shared_ptr<InputContext> _context;
@@ -94,3 +95,5 @@ void InputAbstractionLayer::clear(){
 void InputAbstractionLayer::receive(const event::ChangeInputContext& event){
   _context = event.context;
 }
+
+} // namespace weq::system

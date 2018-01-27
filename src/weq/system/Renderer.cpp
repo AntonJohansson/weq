@@ -10,7 +10,8 @@
 #include <weq/gl/VertexFormat.hpp>
 #include <weq/gl/Framebuffer.hpp>
 #include <weq/Window.hpp>
-#include <weq/Texture.hpp>
+#include <weq/gl/Texture.hpp>
+#include <weq/memory/ResourceManager.hpp>
 
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp>
@@ -21,7 +22,7 @@
 namespace weq::system{
 
 namespace{
-std::shared_ptr<Texture> texture;
+std::shared_ptr<gl::Texture> texture;
 std::shared_ptr<gl::ShaderProgram> screen_p;
 std::shared_ptr<Mesh> screen_mesh;
 std::shared_ptr<gl::Framebuffer> scene_fbo;
@@ -46,15 +47,7 @@ void Renderer::configure(ex::EventManager& events){
   events.subscribe<event::ActiveWindow>(*this);
 
   // Setup screen shader
-  auto screen_v = std::make_shared<gl::Shader>("screen.vert");
-  screen_v->load();
-  auto screen_f = std::make_shared<gl::Shader>("screen.frag");
-  screen_f->load();
-  screen_p = std::make_shared<gl::ShaderProgram>("screen.prog",
-                                                 screen_v,
-                                                 screen_f);
-  screen_p->load();
-  screen_p->link();
+  screen_p = memory::resource_manager::load_shader_program("screen.prog");
 
   // Setup screen mesh
   gl::VertexFormat VT2 = {{
@@ -81,7 +74,7 @@ void Renderer::configure(ex::EventManager& events){
 
 
   // Setup cubemap
-  texture = std::make_shared<Texture>("cloudtop_bk.tga", GL_TEXTURE_2D);
+  texture = std::make_shared<gl::Texture>("cloudtop_bk.tga", GL_TEXTURE_2D);
   texture->load();
   texture->set_parameters({
       {GL_TEXTURE_BASE_LEVEL, 0},

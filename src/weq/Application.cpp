@@ -101,12 +101,12 @@ void Application::run(){
     lag += delta_time;
     accum += delta_time;
 
+    // Update lag time for all systems
     _systems.for_each([&lag, &delta_time](auto system){
         system->set_lag(system->get_lag() + delta_time);
       });
 
     //std::cout << "\r";
-    if(frame_time.count() >= 120)frame_time.clear();
     if(accum >= 1s){
       frame_time.add(frames);
       //std::cout << std::setw(10) << frame_time.average() << "/" << 1.0/timestep_value;
@@ -150,4 +150,4 @@ void Application::receive(const event::Quit& q){
   _should_quit = true;
 }
 
-}
+} // namespace weq

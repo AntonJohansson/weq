@@ -22,10 +22,11 @@ using std::chrono::duration;
 
 // Defined in <weq/Window.hpp>
 class Window;
-// Defined in <weq/event/Internal.hpp>
-namespace event{struct Quit;}
 
 namespace weq{
+
+// Defined in <weq/event/Internal.hpp>
+namespace event{struct Quit;}
 
 namespace ex = entityx;
 using ex::EventManager;
@@ -64,8 +65,8 @@ protected:
   EntityManager _entities{_events};
   SystemManager _systems{_entities, _events};
 
-  ResourceManager _resource_manager;
-  StateManager _state_manager; // TODO not functioning
+  //ResourceManager _resource_manager;
+  state::StateManager _state_manager; // TODO not functioning
 
   std::shared_ptr<spdlog::logger> _console;
   std::shared_ptr<Window> _window;

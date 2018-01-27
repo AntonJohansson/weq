@@ -5,7 +5,7 @@
 
 #include <vector>
 
-namespace gl{
+namespace weq::gl{
 
 // Enum for wrapping the OpenGL enums pertaining to
 enum class Usage: GLenum {
@@ -177,4 +177,4 @@ using ElementBuffer  = Buffer<GL_ELEMENT_ARRAY_BUFFER, unsigned int>;
 template<typename T>
 using FeedbackBuffer = Buffer<GL_TRANSFORM_FEEDBACK_BUFFER, T>;
 
-} // namespace gl
+} // namespace weq::gl

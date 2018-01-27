@@ -3,7 +3,7 @@
 #include <weq/Window.hpp>
 #include <memory>
 
-namespace event{
+namespace weq::event{
 
 // Event sent out by the WindowSystem (which does not exist. Yet.)
 // contains the data that has been updated such as window size,
@@ -30,4 +30,4 @@ struct ActiveWindow{
   std::shared_ptr<Window> window;
 };
 
-} // namespace event
+} // namespace weq::event

@@ -1,16 +1,16 @@
 #include <weq/gl/Framebuffer.hpp>
-#include <weq/Texture.hpp>
+#include <weq/gl/Texture.hpp>
 
 #include <spdlog/spdlog.h>
 
-namespace gl{
+namespace weq::gl{
 
 Framebuffer::Framebuffer(unsigned int w, unsigned int h, GLenum internal, GLenum external, GLenum type){
      // Generate framebuffer
     glGenFramebuffers(1, &_id);
     bind();
 
-    _texture = std::make_shared<Texture>("fbo", GL_TEXTURE_2D, w, h, internal, external, type);
+    _texture = std::make_shared<Texture>(GL_TEXTURE_2D, w, h, internal, external, type);
     _texture->load();
 
     //glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, _texture, 0);
@@ -67,4 +67,4 @@ void Framebuffer::unbind(){
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-} // namespace gl
+} // namespace weq::gl

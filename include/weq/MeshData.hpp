@@ -3,6 +3,8 @@
 #include <vector>
 #include <weq/gl/VertexFormat.hpp>
 
+namespace weq{
+
 // Represents mesh data in an engine-friendly format
 // as described by gl::VertexFormat.
 struct MeshData{
@@ -21,3 +23,5 @@ struct MeshData{
   bool has_data() const {return !interleaved.empty();}
   bool has_elements() const {return !elements.empty();}
 };
+
+} // namespace weq

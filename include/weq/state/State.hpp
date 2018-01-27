@@ -9,17 +9,21 @@
 
 //class InputContext; TODO forward declare?
 
+namespace weq::state{
+
 class State{
 public:
-  State(const std::string& name, InputContext context)
+  State(const std::string& name, system::InputContext context)
     : _name(name),
       _input_context(context)
   {}
 
   const std::string& name(){return _name;}
-  InputContext& context(){return _input_context;}
+  system::InputContext& context(){return _input_context;}
 
 private:
   std::string _name;
-  InputContext _input_context;
+  system::InputContext _input_context;
 };
+
+} // namespace weq::state

@@ -4,7 +4,7 @@
 
 #include <memory>
 
-namespace gl{
+namespace weq::gl{
 
 // Defined in <weq/gl/Buffer.hpp>
 template<GLenum buffer_target, typename T>
@@ -51,4 +51,4 @@ private:
   size_t _size;
 };
 
-} // namespace gl
+} // namespace weq::gl

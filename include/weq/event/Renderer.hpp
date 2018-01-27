@@ -1,8 +1,8 @@
 #pragma once
 
-namespace event{
+namespace weq::event{
 
 struct ActiveCamera{
 };
 
-}
+} // namespace weq::event

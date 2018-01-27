@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-namespace event{
+namespace weq::event{
 
 struct DebugDrawBase{
   glm::vec3 position;
@@ -41,4 +41,4 @@ struct DebugCircle : DebugDrawBase{
       radius(r) {}
 };
 
-}
+} // namespace weq::event

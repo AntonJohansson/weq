@@ -1,40 +1,88 @@
 #pragma once
 
-#include <weq/resource/Resource.hpp>
+//#include <weq/resource/Resource.hpp>
+//
+//#include <unordered_map>
+//#include <type_traits>
+//#include <memory>
+//#include <string>
+//
+//#include <FreeImage.h>
 
-#include <unordered_map>
-#include <type_traits>
-#include <memory>
+#include <entityx/entityx.h>
+
+#include <filesystem>
 #include <string>
+#include <memory>
 
-#include <FreeImage.h>
+// Forward declarations
+namespace weq::gl{
+class ShaderProgram;
+class Shader;
+class Texture;
+}
 
-class ResourceManager{
-public:
-  ResourceManager(){
-    FreeImage_Initialise();
+namespace weq::memory{
+class Resource;
+}
+
+//class ResourceManager{
+//public:
+//  ResourceManager(){
+//    FreeImage_Initialise();
+//  }
+//
+//  ~ResourceManager(){
+//    FreeImage_DeInitialise();
+//  }
+//
+//  template<typename T, typename... Args>
+//  std::shared_ptr<T> get(std::string id, Args&&... args){
+//    static_assert(std::is_base_of<Resource, T>::value, "T should inherit from resource");
+//
+//    auto& wp = _memory[id];
+//    auto sp = wp.lock();
+//
+//    if(!sp){
+//      wp = sp = std::make_shared<T>(id, std::forward<Args>(args)...);
+//      sp->load();
+//    }
+//
+//    return std::dynamic_pointer_cast<T>(sp);
+//  }
+//
+//private:
+//  std::unordered_map<std::string,
+//                     std::weak_ptr<Resource>> _memory;
+//};
+
+namespace weq::memory::resource_manager{
+
+namespace ex = entityx;
+namespace fs = std::experimental::filesystem;
+
+extern std::unordered_map<std::string, std::weak_ptr<memory::Resource>> _memory;
+
+void initialize(ex::EventManager& events);
+void shutdown();
+
+template<typename T, typename... Args>
+std::shared_ptr<T> get(const std::string& id, Args&&... args){
+  static_assert(std::is_base_of<Resource, T>::value, "T should inherit from Resource");
+
+  auto& wp = _memory[id];
+  auto  sp = wp.lock();
+
+  if(!sp){
+    wp = sp = std::make_shared<T>(std::forward<Args>(args)...);
+    sp->load();
   }
 
-  ~ResourceManager(){
-    FreeImage_DeInitialise();
-  }
+  return std::dynamic_pointer_cast<T>(sp);
+}
 
-  template<typename T, typename... Args>
-  std::shared_ptr<T> get(std::string id, Args&&... args){
-    static_assert(std::is_base_of<Resource, T>::value, "T should inherit from resource");
+std::shared_ptr<gl::ShaderProgram> load_shader_program(const fs::path& id);
+std::shared_ptr<gl::Shader>        load_shader(const fs::path& id);
+std::shared_ptr<gl::Texture>       load_texture(const fs::path& id);
 
-    auto& wp = _memory[id];
-    auto sp = wp.lock();
-
-    if(!sp){
-      wp = sp = std::make_shared<T>(id, std::forward<Args>(args)...);
-      sp->load();
-    }
-
-    return std::dynamic_pointer_cast<T>(sp);
-  }
-
-private:
-  std::unordered_map<std::string,
-                     std::weak_ptr<Resource>> _memory;
-};
+} // namespace weq::memory::resource_manager

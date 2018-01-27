@@ -1,6 +1,7 @@
 #pragma once
 
-namespace raw{
+namespace weq::system::raw{
+
 enum Key: int{
   UNKNOWN       = -1,
   SPACE         = 31,
@@ -154,4 +155,4 @@ enum Axes: int{
   MOUSE_SCROLL_Y = 13,
 };
 
-} // namespace raw
+} // namespace weq::system::raw

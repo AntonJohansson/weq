@@ -5,9 +5,9 @@
 namespace ex = entityx;
 
 // Defined in <weq/event/Input.hpp>
-namespace event{struct ActiveInput;}
+namespace weq::event{struct ActiveInput;}
 // Defined in <weq/event/UI.hpp>
-namespace event{struct UI;}
+namespace weq::event{struct UI;}
 
 namespace weq::system{
 

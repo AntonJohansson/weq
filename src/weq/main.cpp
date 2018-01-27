@@ -8,10 +8,12 @@
 #include <weq/primitive/Plane.hpp>
 #include <weq/event/Internal.hpp>
 #include <weq/event/DebugDraw.hpp>
+#include <weq/event/Hotloader.hpp>
 
 #include <weq/EmbeddedData.hpp>
 
 #include <weq/Application.hpp>
+#include <weq/system/Hotloader.hpp>
 #include <weq/system/Input.hpp>
 #include <weq/system/UserInterface.hpp>
 #include <weq/system/WaveGPUSimulation.hpp>
@@ -20,7 +22,7 @@
 #include <weq/system/DebugDraw.hpp>
 
 #include <weq/vars/Vars.hpp>
-#include <weq/Hotloader.hpp>
+//#include <weq/Hotloader.hpp>
 
 // TODO ActiveWindow skickas ut i början av run(), move.
 // TODO window is currently created in application.cpp, move this!
@@ -38,14 +40,16 @@ public:
 
     _systems.configure();
 
-    _input    = _systems.add<weq::system::Input>();
-    _ui       = _systems.add<weq::system::UserInterface>();
-    _wgpu     = _systems.add<weq::system::WaveGPUSimulation>();
-    _camera   = _systems.add<weq::system::Camera>();
-    _ddraw    = _systems.add<weq::system::DebugDraw>();
-    _renderer = _systems.add<weq::system::Renderer>();
+    _hotloader = _systems.add<weq::system::Hotloader>();
+    _input     = _systems.add<weq::system::Input>();
+    _ui        = _systems.add<weq::system::UserInterface>();
+    _wgpu      = _systems.add<weq::system::WaveGPUSimulation>();
+    _camera    = _systems.add<weq::system::Camera>();
+    _ddraw     = _systems.add<weq::system::DebugDraw>();
+    _renderer  = _systems.add<weq::system::Renderer>();
 
     //_systems.configure(); // order not guarranteed between systems
+    _hotloader->configure(_events);
     _input->configure(_events);
     _ui->configure(_events);
     _wgpu->configure(_events);
@@ -53,11 +57,15 @@ public:
     _ddraw->configure(_events);
     _renderer->configure(_events);
 
+
     // Init vars
     weq::vars::read_file("..\\res\\System.vars");
     //weq::hotloader::add_directory("..\\res");
-    weq::hotloader::add("..\\res\\System.vars", [](auto path){weq::vars::read_file(path);});
-    //weq::hotloader::add("..\\res\\shaders", [](auto){});
+    //weq::hotloader::add("..\\res\\System.vars", [](auto path){weq::vars::read_file(path);});
+
+    _events.emit(weq::event::Track{"..\\res\\System.vars", [](auto path){
+          weq::vars::read_file(path);
+        }});
   }
 
   void configure() override{
@@ -86,9 +94,9 @@ public:
 
   void add_camera(){
     auto c = _entities.create();
-    c.assign<component::Camera>(LookMode::TARGET);
-    c.assign<component::Transform>()->spherical(10, 0, 0);
-    c.assign<component::ActiveCamera>();
+    c.assign<weq::component::Camera>(LookMode::TARGET);
+    c.assign<weq::component::Transform>()->spherical(10, 0, 0);
+    c.assign<weq::component::ActiveCamera>();
   }
 
   void add_wave(){
@@ -99,7 +107,7 @@ public:
 
 
     //auto wave_mesh = std::make_shared<Mesh>(gl::DrawMode::LINES);
-    auto wave_mesh = std::make_shared<Mesh>(gl::DrawMode::TRIANGLES);
+    auto wave_mesh = std::make_shared<weq::Mesh>(weq::gl::DrawMode::TRIANGLES);
 
     //wave_mesh->generate_vao(scene_p);
     // Mesh for wave plane
@@ -113,7 +121,7 @@ public:
     // TODO this code is currently generating an error, because unused shader attributes is being optimzed away => glGetAttribLocation == -1
 
     auto wave = _entities.create();
-    auto wave_gpu = wave.assign<component::WaveGPU>(resolution,
+    auto wave_gpu = wave.assign<weq::component::WaveGPU>(resolution,
                                                     resolution,
                                                     size/resolution,
                                                     0.2f);
@@ -150,15 +158,15 @@ public:
         });
 
 
-    wave.assign<component::Transform>()->_position = {-size/2, -size/2, 0};
-    auto r = wave.assign<component::Renderable>(wave_mesh);
+    wave.assign<weq::component::Transform>()->_position = {-size/2, -size/2, 0};
+    auto r = wave.assign<weq::component::Renderable>(wave_mesh);
     //xr->scene = scene_p;
   }
 
   //TODO improve UI
   void add_ui(){
     auto ui = _entities.create();
-    ui.assign<component::ImGui>([](ex::EventManager& e){
+    ui.assign<weq::component::ImGui>([](ex::EventManager& e){
         //ImGui::ShowTestWindow();
         ImGui::Begin("Debug", NULL, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::SetWindowCollapsed("Debug", true, ImGuiSetCond_FirstUseEver);
@@ -175,11 +183,12 @@ public:
   }
 
   void update(double dt) override{
-    weq::hotloader::update();
+    //weq::hotloader::update();
     _systems.update_all(dt);
   }
 
 private:
+  std::shared_ptr<weq::system::Hotloader>         _hotloader;
   std::shared_ptr<weq::system::Input>             _input;
   std::shared_ptr<weq::system::UserInterface>     _ui;
   std::shared_ptr<weq::system::WaveGPUSimulation> _wgpu;

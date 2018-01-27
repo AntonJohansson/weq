@@ -3,9 +3,11 @@
 #include <spdlog/spdlog.h>
 #include <FreeImage.h>
 
-Cubemap::Cubemap(const std::string& id,
-                 const std::vector<std::string>& texture_ids)
-  : Resource(id, ResourceType::FILE),
+namespace weq{
+
+Cubemap::Cubemap(const fs::path& path,
+                 const std::vector<fs::path>& texture_ids)
+  : Resource(path),
     _texture_ids(texture_ids){
   glGenTextures(1, &_cubemap);
 }
@@ -15,20 +17,20 @@ Cubemap::~Cubemap(){
 }
 
 void Cubemap::load(){
-  bind();
-
-  for(GLuint i = 0; i < _texture_ids.size(); i++){
-    auto [data, w, h] = load_texture(_resource_path + _texture_ids[i]);
-
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-                 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-  }
-
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+//  bind();
+//
+//  for(GLuint i = 0; i < _texture_ids.size(); i++){
+//    auto [data, w, h] = load_texture(_resource_path + _texture_ids[i]);
+//
+//    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+//                 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+//  }
+//
+//  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 }
 
 void Cubemap::unload(){
@@ -76,3 +78,5 @@ Cubemap::load_texture(const std::string& id){
 
   return {bits, w, h};
 }
+
+} // namespace weq

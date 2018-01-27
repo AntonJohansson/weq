@@ -5,7 +5,9 @@
 namespace ex = entityx;
 
 // Defined in <weq/event/Window.hpp>
-namespace event{struct ActiveWindow;}
+namespace weq::event{
+struct ActiveWindow;
+}
 // Defined in <GLFW/glfw3.h>
 struct GLFWwindow;
 

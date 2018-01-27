@@ -1,5 +1,7 @@
 #pragma once
 
+namespace weq::system{
+
 enum class InputAction{
   SPAWN_PLANE_WAVE,
   SPAWN_WAVELET,
@@ -42,3 +44,5 @@ enum class InputRange{
   CURSOR_SCROLL_Y,
   UNKNOWN,
 };
+
+} // namespace weq::system

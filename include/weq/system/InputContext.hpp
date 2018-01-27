@@ -3,6 +3,8 @@
 #include <weq/system/InputTypes.hpp>
 #include <unordered_map>
 
+namespace weq::system{
+
 template<typename T, typename U>
 using InputMap = std::unordered_map<T, U>;
 
@@ -37,3 +39,5 @@ private:
   InputMap<int, InputState> _state_map;
   InputMap<int, InputRange> _range_map;
 };
+
+} // namespace weq::system

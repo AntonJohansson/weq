@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <spdlog/spdlog.h>
 
-namespace gl::context{
+namespace weq::gl::context{
 
 void error_callback(int error, const char* desc){
   (void)error;
@@ -31,4 +31,4 @@ void shutdown(){
   glfwTerminate();
 }
 
-}
+} // namespace weq::gl::context

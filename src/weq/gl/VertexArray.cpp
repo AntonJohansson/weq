@@ -5,7 +5,7 @@
 
 #include <spdlog/spdlog.h>
 
-namespace gl{
+namespace weq::gl{
 
 VertexArray::VertexArray()
   : _size(0){
@@ -37,4 +37,4 @@ void VertexArray::bind() const{
   glBindVertexArray(_vao);
 }
 
-} // namespace gl
+} // namespace weq::gl

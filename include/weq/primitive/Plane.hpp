@@ -3,7 +3,7 @@
 #include <weq/MeshData.hpp>
 #include <spdlog/spdlog.h>
 
-namespace primitive::plane{
+namespace weq::primitive::plane{
 
 // Generates meshdata for a solid plane (consisting of triangles) of size w * h
 // with a fixed gridsize.
@@ -69,4 +69,4 @@ static MeshData solid(int w, int h, float gridsize, gl::VertexFormat format){
   return data;
 }
 
-} // namespace primitive::plane
+} // namespace weq::primitive::plane

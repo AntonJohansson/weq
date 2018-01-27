@@ -3,9 +3,11 @@
 #include <glad/glad.h>
 #include <memory>
 
-class Texture;
 
-namespace gl{
+
+namespace weq::gl{
+
+class Texture;
 
 // Abstraction of a common OpenGL framebuffer.
 // Also supports depth and stencil render targets
@@ -53,4 +55,4 @@ private:
   GLuint _id;
 };
 
-} // namespace gl
+} // namespace weq::gl

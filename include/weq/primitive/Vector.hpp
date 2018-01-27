@@ -3,7 +3,7 @@
 #include <weq/MeshData.hpp>
 #include <glm/glm.hpp>
 
-namespace primitive::vector{
+namespace weq::primitive::vector{
 
 static MeshData solid(glm::vec3 vec, glm::vec4 color){
   MeshData data(gl::format::VC);
@@ -32,4 +32,4 @@ static MeshData solid(glm::vec3 vec, glm::vec4 color){
   return data;
 }
 
-} // namespace primitive::vector
+} // namespace weq::primitive::vector

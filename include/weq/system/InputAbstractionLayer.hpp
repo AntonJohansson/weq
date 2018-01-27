@@ -6,6 +6,8 @@
 
 #include <memory>
 
+namespace weq::system{
+
 namespace ex = entityx;
 
 // TODO this doesnt need to be a class. Totally useless.
@@ -33,3 +35,5 @@ public:
   const event::ActiveInput get_active();
   void clear();
 };
+
+} // namespace weq::system

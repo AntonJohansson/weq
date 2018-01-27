@@ -4,6 +4,8 @@
 
 #include <unordered_map>
 
+namespace weq::state{
+
 class StateManager{
 public:
   StateManager(){}
@@ -15,3 +17,5 @@ private:
   State* _active_state;
   std::unordered_map<std::string, State> _states;
 };
+
+} // namespace weq::state

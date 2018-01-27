@@ -3,7 +3,7 @@
 #include <glad/glad.h>
 
 
-namespace gl{
+namespace weq::gl{
 
 // Abstracts some common OpenGL draw modes.
 enum class DrawMode: GLenum {
@@ -20,4 +20,4 @@ enum class DrawMode: GLenum {
   TRIANGLES_ADJACENCY       = GL_TRIANGLES_ADJACENCY,
 };
 
-} // namespace gl
+} // namespace weq::gl

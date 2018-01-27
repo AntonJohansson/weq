@@ -146,4 +146,4 @@ void Input::receive(const event::ActiveWindow& event){
   window_height = event.window->height();
 }
 
-}
+} // namespace weq::system

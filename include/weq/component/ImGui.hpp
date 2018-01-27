@@ -5,7 +5,7 @@
 
 namespace entityx{class EventManager;}
 
-namespace component{
+namespace weq::component{
 
 // Dirty ol' component taking a function that will be updated by the renderer
 // once a frame. This allows for implementation of a immediate mode GUI such
@@ -20,4 +20,4 @@ struct ImGui{
   Func _register_ui;
 };
 
-} // namespace component
+} // namespace weq::component

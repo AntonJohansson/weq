@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-namespace gl{
+namespace weq::gl{
 
 namespace{
 
@@ -52,4 +52,4 @@ bool VertexFormat::has(const std::string& name){
 }
 
 
-} // namespace gl
+} // namespace weq::gl

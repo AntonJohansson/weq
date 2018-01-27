@@ -1,6 +1,6 @@
 #pragma once
 
-#include <weq/resource/Resource.hpp>
+#include <weq/memory/Resource.hpp>
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -8,8 +8,11 @@
 #include <unordered_map>
 #include <memory>
 #include <vector>
+#include <filesystem>
 
-namespace gl{
+namespace weq::gl{
+
+namespace fs = std::experimental::filesystem;
 
 // Defined in <weq/gl/Shader.hpp>
 class Shader;
@@ -18,16 +21,11 @@ class Shader;
 // TODO might be cool to give a way to extract vertex-attribs and shader output
 //      from source?
 // TODO better error checking (loaded or not).
-class ShaderProgram : public Resource{
+class ShaderProgram : public memory::Resource{
 public:
-  // Constructs a shaderprogram resource with the given (unique) string id.
-  // Creates the OpenGL handle for the shader program.
-  ShaderProgram(const std::string& id);
-
   // Constructs a shaderprogram with the given id and specified shaders.
   // Creates the OpenGL handle for the shader program.
-  ShaderProgram(const std::string& id,
-                std::shared_ptr<gl::Shader> v = nullptr,
+  ShaderProgram(std::shared_ptr<gl::Shader> v = nullptr,
                 std::shared_ptr<gl::Shader> f = nullptr,
                 std::shared_ptr<gl::Shader> g = nullptr);
 
@@ -62,7 +60,7 @@ public:
   // Needs to be called before the program is linked.
   void set_feedback(std::vector<const char*> varyings);
 
-  // -- Set Uniforms
+  // Set uniforms
   void set(const std::string& name, glm::mat4 mat);
   void set(const std::string& name, glm::vec2 vec);
   void set(const std::string& name, glm::vec3 vec);
@@ -71,9 +69,12 @@ public:
   void set(const std::string& name, float f);
   void set(const std::string& name, int i);
 
+  // Get program handle
+  GLuint handle(){return _program;}
+
 private:
   GLuint _program;
   std::unordered_map<GLenum, std::shared_ptr<Shader>> _shaders;
 };
 
-}
+} // namespace weq::gl

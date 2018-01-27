@@ -59,12 +59,12 @@ void DebugDraw::configure(ex::EventManager& events){
   events.subscribe<event::DebugRay>(*this);
   events.subscribe<event::DebugCircle>(*this);
 
-  auto passthrough_v = std::make_shared<gl::Shader>("vertex", gl::ShaderType::VERTEX, vertex_source);
-  auto passthrough_f = std::make_shared<gl::Shader>("fragment", gl::ShaderType::FRAGMENT, fragment_source);
+  auto passthrough_v = std::make_shared<gl::Shader>(gl::ShaderType::VERTEX, vertex_source);
+  auto passthrough_f = std::make_shared<gl::Shader>(gl::ShaderType::FRAGMENT, fragment_source);
   passthrough_v->load();
   passthrough_f->load();
 
-  _shader = std::make_shared<gl::ShaderProgram>("passthrough", passthrough_v, passthrough_f);
+  _shader = std::make_shared<gl::ShaderProgram>(passthrough_v, passthrough_f);
   _shader->load();
   _shader->link();
 }

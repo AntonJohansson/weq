@@ -5,7 +5,7 @@
 #include <glm/gtc/constants.hpp>
 #include <cmath>
 
-namespace primitive::circle{
+namespace weq::primitive::circle{
 
 static MeshData dotted(float radius, glm::vec4 color){
   MeshData data(gl::format::VC);
@@ -33,4 +33,4 @@ static MeshData dotted(float radius, glm::vec4 color){
   return data;
 }
 
-} // namespace primitive::circle
+} // namespace weq::primitive::circle

@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace gl{
+namespace weq::gl{
 
 // Some standard abstractions of OpenGL types
 enum class Type: GLenum{
@@ -120,4 +120,4 @@ const static VertexFormat T = {{
 
 } // namespace format
 
-} // namespace gl
+} // namespace weq::gl
