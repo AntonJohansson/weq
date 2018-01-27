@@ -44,6 +44,21 @@ std::shared_ptr<gl::ShaderProgram> load_shader_program(const fs::path& id){
   auto ptr = get<gl::ShaderProgram>(id.string(), vert, frag);
   ptr->link();
 
+  _events->emit(event::Track{vert_path.string(), [vert, ptr](auto){
+        vert->reload();
+
+        if(vert->is_loaded()){
+          ptr->link();
+        }
+      }});
+  _events->emit(event::Track{frag_path.string(), [frag, ptr](auto){
+        frag->reload();
+
+        if(frag->is_loaded()){
+          ptr->link();
+        }
+      }});
+
   return ptr;
 }
 
@@ -51,14 +66,6 @@ std::shared_ptr<gl::Shader> load_shader(const fs::path& id){
   // need to include args twice :///
   auto path = _shader_path/id;
   auto ptr = get<gl::Shader>(id.string(), path);
-
-  _events->emit(event::Track{path.string(), [&ptr](auto){
-        ptr->reload();
-
-        if(ptr->is_loaded() && ptr->has_shader_program()){
-          ptr->shader_program()->link();
-        }
-      }});
 
   return ptr;
 }

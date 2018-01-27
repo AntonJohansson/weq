@@ -46,10 +46,10 @@ void UserInterface::update(ex::EntityManager& entities,
 
   // Get position and size of menu
   // TODO this couples the "menu" and render system, which is not nice.
-  ImGui::Begin("Menu");
-  menu_pos = ImGui::GetWindowPos();
-  menu_size = ImGui::GetWindowSize();
-  ImGui::End();
+  //ImGui::Begin("Menu");
+  //menu_pos = ImGui::GetWindowPos();
+  //menu_size = ImGui::GetWindowSize();
+  //ImGui::End();
 
   //ImGui::PopStyleVar();
   //ImGui::PopStyleColor(6);
@@ -61,23 +61,23 @@ void UserInterface::update(ex::EntityManager& entities,
 void UserInterface::receive(const event::ActiveInput& event){
   // TODO hardcoded window size.
   // Have to cast away const, since entityx doesn't allow for non-const events.
-  auto& non_const_event = const_cast<event::ActiveInput&>(event);
+  //auto& non_const_event = const_cast<event::ActiveInput&>(event);
 
-  // Set cursor mode if the mouse is not in the menu => mouse will not be captured in menu.
-  if(non_const_event.has(InputRange::CURSOR_X)
-     && non_const_event.has(InputRange::CURSOR_Y)){
-    float x = non_const_event.ranges.at(InputRange::CURSOR_X);
-    float y = non_const_event.ranges.at(InputRange::CURSOR_Y);
+  //// Set cursor mode if the mouse is not in the menu => mouse will not be captured in menu.
+  //if(non_const_event.has(InputRange::CURSOR_X)
+  //   && non_const_event.has(InputRange::CURSOR_Y)){
+  //  float x = non_const_event.ranges.at(InputRange::CURSOR_X);
+  //  float y = non_const_event.ranges.at(InputRange::CURSOR_Y);
 
-    x = x*window_width;
-    y = y*window_height;
+  //  x = x*window_width;
+  //  y = y*window_height;
 
-    if((x >= menu_pos.x && x <= (menu_pos.x + menu_size.x)) &&
-       (y >= menu_pos.y && y <= (menu_pos.y + menu_size.y))){
-      non_const_event.consume(InputState::CURSOR_DOWN); // consume the cursor down state if it exists.
-    }
-    //spdlog::get("console")->info("{}, {} - {}, {}", menu_pos.x, menu_pos.y, menu_size.x, menu_size.y);
-  }
+  //  if((x >= menu_pos.x && x <= (menu_pos.x + menu_size.x)) &&
+  //     (y >= menu_pos.y && y <= (menu_pos.y + menu_size.y))){
+  //    non_const_event.consume(InputState::CURSOR_DOWN); // consume the cursor down state if it exists.
+  //  }
+  //  //spdlog::get("console")->info("{}, {} - {}, {}", menu_pos.x, menu_pos.y, menu_size.x, menu_size.y);
+  //}
 }
 
 void UserInterface::receive(const event::ActiveWindow& event){

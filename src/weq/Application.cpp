@@ -5,6 +5,8 @@
 
 #include <weq/RunningAverage.hpp>
 
+#include <weq/memory/ResourceManager.hpp>
+
 #include <string>
 
 #include <iostream>
@@ -56,6 +58,9 @@ Application::Application(int argc, char** argv){
     }
   }
 
+  // Initialize resource manager
+  memory::resource_manager::initialize(_events);
+
   // Subscribe to internal engine events
   _events.subscribe<event::Quit>(*this);
 
@@ -64,6 +69,7 @@ Application::Application(int argc, char** argv){
 }
 
 Application::~Application(){
+  memory::resource_manager::shutdown();
 }
 
 void Application::run(){
@@ -71,15 +77,6 @@ void Application::run(){
   _events.emit(event::ActiveWindow(_window)); // This event will not buffer.
 
   using Clock = std::chrono::high_resolution_clock;
-
-  nanoseconds timestep{16ms};
-  nanoseconds lag{0ns};
-  double timestep_value{0.016};
-
-  //constexpr nanoseconds timestep(16ms);
-  //constexpr nanoseconds timestep(5ms);
-  //constexpr nanoseconds timestep(1ms);
-  //constexpr double timestep_value = duration_cast<duration<double>>(timestep).count();
 
   auto start_time = Clock::now();
   auto new_time = start_time;
@@ -98,35 +95,32 @@ void Application::run(){
     delta_time = new_time - start_time;
     start_time = new_time;
 
-    lag += delta_time;
+    _lag += delta_time;
     accum += delta_time;
 
     // Update lag time for all systems
-    _systems.for_each([&lag, &delta_time](auto system){
+    _systems.for_each([&delta_time](auto system){
         system->set_lag(system->get_lag() + delta_time);
       });
 
-    //std::cout << "\r";
     if(accum >= 1s){
       frame_time.add(frames);
-      //std::cout << std::setw(10) << frame_time.average() << "/" << 1.0/timestep_value;
+      _current_update_frequency = frame_time.average();
 
       _systems.for_each([](auto system){
-          //std::cout << std::setw(10) << system->get_frame_counter() << "/" << 1.0/system->get_timestep_value();
-          system->clear_frame_counter();
+          system->second_has_past();
         });
 
       frames = 0.0f;
       accum = 0s;
     }
-    //std::cout << std::flush;
 
-    while(lag >= timestep){
+    while(_lag >= _timestep){
       frames++;
-      _systems.for_each([&timestep, &timestep_value, &lag, &delta_time, this](auto system){
-          if(system->get_timestep() < timestep){
-            timestep = system->get_timestep();
-            timestep_value = system->get_timestep_value();
+      _systems.for_each([&delta_time, this](auto system){
+          if(system->get_timestep() < _timestep){
+            _timestep = system->get_timestep();
+            _timestep_value = system->get_timestep_value();
           }
 
           if(system->get_lag() >= system->get_timestep()){
@@ -136,13 +130,10 @@ void Application::run(){
           }
         });
 
-      lag -= timestep;
+      _lag -= _timestep;
     }
   }
 
-}
-
-void Application::update_systems(){
 }
 
 void Application::receive(const event::Quit& q){

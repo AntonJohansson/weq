@@ -86,6 +86,8 @@ class BaseSystem : entityx::help::NonCopyable {
 
   void increment_frame_counter(){_frame_counter++;}
   void clear_frame_counter(){_frame_counter = 0;}
+  double get_framerate(){return _current_framerate;}
+  void second_has_past(){_current_framerate = _frame_counter; clear_frame_counter();}
   unsigned int get_frame_counter(){return _frame_counter;}
 
  protected:
@@ -99,6 +101,7 @@ class BaseSystem : entityx::help::NonCopyable {
   nanoseconds _timestep{16666667ns};
   nanoseconds _lag{0ns};
   double _timestep_value{0.01666667};
+  double _current_framerate = 0.0;
   unsigned int _frame_counter{0};
 
 };

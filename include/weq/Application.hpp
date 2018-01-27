@@ -47,9 +47,6 @@ public:
   // Responsible for updating systems, called from main_loop().
   virtual void update(double dt){(void)dt;}
 
-  void update_systems();
-
-
   // Fixed timestep update loop that drives the entire simulation,
   // calls update(double dt) which is responsible for dispatching
   // system update calls.
@@ -59,8 +56,13 @@ public:
   void receive(const event::Quit& q);
 
 protected:
-
   bool _should_quit = false; // TODO should be handled by some statemanager?
+
+  double _current_update_frequency = 0.0;
+  nanoseconds _timestep{16ms};
+  nanoseconds _lag{0ns};
+  double _timestep_value{0.016};
+
   EventManager _events;
   EntityManager _entities{_events};
   SystemManager _systems{_entities, _events};
