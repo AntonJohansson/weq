@@ -5,6 +5,8 @@ TODO
     the ui has to update at the same frequency, otherwise, the sim will
     overwrite variables and cause unresponsiveness. :///
 
+- Make is so that tweak files pokes variables on load and update :)
+
 - change maximum c or change maximum dt?
   - c < dh/dt <=> dt < dh/c
   - add a way to set engine dt via events
