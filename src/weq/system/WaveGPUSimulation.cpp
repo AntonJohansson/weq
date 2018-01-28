@@ -28,6 +28,7 @@
 #include <weq/event/Internal.hpp>
 #include <weq/event/DebugDraw.hpp>
 #include <weq/memory/ResourceManager.hpp>
+#include <weq/vars/Vars.hpp>
 
 
 
@@ -35,6 +36,8 @@ namespace weq::system{
 using weq::component::Renderable;
 using weq::component::WaveGPU;
 namespace{
+  Var(float, c_safety_factor, 0.7f)
+  Var(float, dt_safety_factor, 0.7f)
   bool clear_wave             = false;
   bool clear_ri               = false;
   bool set_c                  = false;
@@ -58,7 +61,7 @@ namespace{
   float c                 = 0.2f;
   float droplet_amplitude = 0.1;
   float droplet_sigma     = 0.01;
-  float safetfy_factor    = 0.7;
+//float safety_factor    = 0.7;
 
   glm::vec3 spawn_drop_pos;
 
@@ -88,9 +91,20 @@ namespace{
   }
 
   void bound_c(double dt){
-    float max_c = safetfy_factor*(mesh_size/resolution)/dt;
+    float max_c = c_safety_factor.var*(mesh_size/resolution)/dt;
     if(c < 0.0f)c = 0.0f;
     if(c > max_c) c = max_c;
+  }
+
+  double calculate_dt(float c){
+    double new_dt = dt_safety_factor.var*(mesh_size/resolution)/c;
+    double max_dt = 0.0166667;
+
+    if(new_dt > max_dt){
+      return max_dt;
+    }
+
+    return new_dt;
   }
 
   void apply_shader(std::shared_ptr<Mesh> mesh, gl::Framebuffer& fbo, std::shared_ptr<gl::ShaderProgram> shader){
@@ -283,7 +297,7 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
 
 
   // Components
-  entities.each<WaveGPU, Renderable>([dt](ex::Entity e, WaveGPU& wave, Renderable& r){
+  entities.each<WaveGPU, Renderable>([dt, this](ex::Entity e, WaveGPU& wave, Renderable& r){
       (void)e;
 
       // Recompute grid mesh from new resolution
@@ -295,7 +309,6 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
         wave.width = resolution;
         wave.height = resolution;
         wave.gridsize = mesh_size/resolution;
-        wave.set_c(wave.c);
         wave.height_fbo.resize(resolution, resolution);
         wave.vel_fbo.resize(resolution, resolution);
         wave.edge_fbo.resize(resolution, 4);
@@ -318,7 +331,17 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       glViewport(0, 0, wave.width, wave.height);
 
       // Handle interactivity
-      if(set_c){bound_c(dt); wave.set_c(c); set_c = false;}
+      if(set_c){
+        if(dt_item == 0 && c > 0){ // variable dt
+          set_timestep(std::chrono::nanoseconds((unsigned long long int)(calculate_dt(c)*1e9)));
+          wave.set_c(c);
+        }else if(dt_item == 1){ // bound c
+          bound_c(dt);
+          wave.set_c(c);
+        }
+
+        set_c = false;
+      }
 
       // Clear waves on surface
       if(clear_wave){
@@ -383,10 +406,10 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
 
       // UI
       wave.height_fbo.bind();
-      ImGui::Begin("Debug");
-      ImGui::Text("Input to the velocity shader:");
-      ImGui::Image((void*)wave.height_fbo.texture()->handle(), ImVec2(200, 200));
-      ImGui::End();
+      //ImGui::Begin("Debug");
+      //ImGui::Text("Input to the velocity shader:");
+      //ImGui::Image((void*)wave.height_fbo.texture()->handle(), ImVec2(200, 200));
+      //ImGui::End();
 
       // Velocity shader
       vel_shader->use();
@@ -447,16 +470,16 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
       }
 
       // Visualize the output from each shader.
-      ImGui::Begin("Debug");
-        ImGui::Text("Output from velocity shader:");
-        ImGui::Image((void*)wave.vel_fbo.texture()->handle(), ImVec2(200, 200));
-        ImGui::Text("Output from height shader:");
-        ImGui::Image((void*)wave.height_fbo.texture()->handle(), ImVec2(200, 200));
-        ImGui::Text("Edge");
-        ImGui::Image((void*)wave.edge_fbo.texture()->handle(), ImVec2(200, 32));
-        ImGui::Text("Refractive index");
-        ImGui::Image((void*)grid_texture->handle(), ImVec2(200, 200));
-      ImGui::End();
+      //ImGui::Begin("Debug");
+      //  ImGui::Text("Output from velocity shader:");
+      //  ImGui::Image((void*)wave.vel_fbo.texture()->handle(), ImVec2(200, 200));
+      //  ImGui::Text("Output from height shader:");
+      //  ImGui::Image((void*)wave.height_fbo.texture()->handle(), ImVec2(200, 200));
+      //  ImGui::Text("Edge");
+      //  ImGui::Image((void*)wave.edge_fbo.texture()->handle(), ImVec2(200, 32));
+      //  ImGui::Text("Refractive index");
+      //  ImGui::Image((void*)grid_texture->handle(), ImVec2(200, 200));
+      //ImGui::End();
     });
 }
 
@@ -469,7 +492,11 @@ void WaveGPUSimulation::add_ui(ex::EntityManager& entities, ex::EventManager& ev
 
         ImGui::Separator();
         if(ImGui::InputFloat("Wave velocity (c)", &c)){
-          bound_c(0.016); // HUH
+          if(dt_item == 0 && c > 0.0f && c < 10.0f){
+            set_timestep(std::chrono::nanoseconds((long long int)(calculate_dt(c)*1e9)));
+          }else if(dt_item == 1){
+            bound_c(get_timestep_value());
+          }
           set_c = true;
         }
 
@@ -521,7 +548,13 @@ void WaveGPUSimulation::add_ui(ex::EntityManager& entities, ex::EventManager& ev
         }
 
         if(ImGui::CollapsingHeader("Settings")){
-          ImGui::Combo("How to handle high velocities", &dt_item, "Variable dt, allow any c\0Fix dt, maximum c depending on gridsize\0\0");
+          if(ImGui::Combo("How to handle high velocities", &dt_item, "Variable dt, allow any c\0Fix dt, maximum c depending on gridsize\0\0")){
+            if(dt_item == 0){
+              set_timestep(std::chrono::nanoseconds((unsigned int)(calculate_dt(c)*1e9)));
+            }else if(dt_item == 1){
+              set_timestep(std::chrono::nanoseconds((unsigned int)(calculate_dt(0.0)*1e9)));
+            }
+          }
           events.emit(event::DebugVector({1,0,0}, {0,0,0}, {1, 0, 0, 1}, 0.0f)); // X
           events.emit(event::DebugVector({0,1,0}, {0,0,0}, {0, 1, 0, 1}, 0.0f)); // Y
           events.emit(event::DebugVector({0,0,1}, {0,0,0}, {0, 0, 1, 1}, 0.0f)); // Z
