@@ -5,6 +5,10 @@ TODO
 
 - Remove dependency on entityx
 
+- Use <glm/fwd.hpp> instead of <glm/glm.hpp> in headers :)
+
+- Forward declare headers?
+
 - Currently supports variable dt for wave sim
   - problem with ui variables because if the sim updates at 1k fps,
     the ui has to update at the same frequency, otherwise, the sim will
