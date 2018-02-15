@@ -2,6 +2,7 @@
 
 #include <weq/system/InputTypes.hpp>
 
+#include <algorithm>
 #include <memory>
 #include <deque>
 #include <map>

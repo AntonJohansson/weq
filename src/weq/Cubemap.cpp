@@ -1,7 +1,7 @@
 #include <weq/Cubemap.hpp>
 
 #include <spdlog/spdlog.h>
-#include <FreeImage.h>
+//#include <FreeImage.h>
 
 namespace weq{
 
@@ -42,41 +42,41 @@ void Cubemap::bind() const {
 
 std::tuple<unsigned char*, unsigned int, unsigned int>
 Cubemap::load_texture(const std::string& id){
-  FREE_IMAGE_FORMAT fif;
-  FIBITMAP* data(0);
-  BYTE* bits(0);
+//  FREE_IMAGE_FORMAT fif;
+//  FIBITMAP* data(0);
+//  BYTE* bits(0);
+//
+//  fif = FIF_UNKNOWN;
+//  fif = FreeImage_GetFileType(id.c_str(), 0);
+//
+//  if(fif == FIF_UNKNOWN){
+//    fif = FreeImage_GetFIFFromFilename(id.c_str());
+//  }
+//
+//  if(fif == FIF_UNKNOWN){
+//    spdlog::get("console")->error("Unknown texture file format for: {}!", id);
+//    return {nullptr, 0, 0};
+//  }
+//
+//  if(FreeImage_FIFSupportsReading(fif)){
+//    data = FreeImage_Load(fif, id.c_str());
+//
+//    if(!data){
+//      spdlog::get("console")->error("Failed to read data for {}!", id);
+//      return {nullptr, 0, 0};
+//    }
+//  }else{
+//    spdlog::get("console")->error("FreeImage does not support this extension: {}!", id);
+//    return {nullptr, 0, 0};
+//  }
+//
+//  bits = FreeImage_GetBits(data);
+//  unsigned int w = FreeImage_GetWidth(data);
+//  unsigned int h = FreeImage_GetHeight(data);
+//
+//  FreeImage_Unload(data);
 
-  fif = FIF_UNKNOWN;
-  fif = FreeImage_GetFileType(id.c_str(), 0);
-
-  if(fif == FIF_UNKNOWN){
-    fif = FreeImage_GetFIFFromFilename(id.c_str());
-  }
-
-  if(fif == FIF_UNKNOWN){
-    spdlog::get("console")->error("Unknown texture file format for: {}!", id);
-    return {nullptr, 0, 0};
-  }
-
-  if(FreeImage_FIFSupportsReading(fif)){
-    data = FreeImage_Load(fif, id.c_str());
-
-    if(!data){
-      spdlog::get("console")->error("Failed to read data for {}!", id);
-      return {nullptr, 0, 0};
-    }
-  }else{
-    spdlog::get("console")->error("FreeImage does not support this extension: {}!", id);
-    return {nullptr, 0, 0};
-  }
-
-  bits = FreeImage_GetBits(data);
-  unsigned int w = FreeImage_GetWidth(data);
-  unsigned int h = FreeImage_GetHeight(data);
-
-  FreeImage_Unload(data);
-
-  return {bits, w, h};
+  return {nullptr, 0, 0};
 }
 
 } // namespace weq

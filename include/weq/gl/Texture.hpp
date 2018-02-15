@@ -5,7 +5,13 @@
 #include <glad/glad.h>
 
 #include <map>
+
+#if __has_include(<filesystem>)
 #include <filesystem>
+#elif __has_include(<experimental/filesystem>)
+#include <experimental/filesystem>
+#endif
+
 
 namespace weq::gl{
 

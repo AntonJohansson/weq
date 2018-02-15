@@ -11,7 +11,12 @@
 
 #include <entityx/entityx.h>
 
+#if __has_include(<filesystem>)
 #include <filesystem>
+#elif __has_include(<experimental/filesystem>)
+#include <experimental/filesystem>
+#endif
+
 #include <string>
 #include <memory>
 

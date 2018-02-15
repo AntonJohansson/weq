@@ -8,9 +8,13 @@
 #include <weq/event/Hotloader.hpp>
 
 #include <spdlog/spdlog.h>
-#include <FreeImage.h>
 
+#if __has_include(<filesystem>)
 #include <filesystem>
+#elif __has_include(<experimental/filesystem>)
+#include <experimental/filesystem>
+#endif
+
 #include <unordered_map>
 
 namespace weq::memory::resource_manager{
@@ -27,11 +31,11 @@ std::unordered_map<std::string, std::weak_ptr<Resource>> _memory;
 void initialize(ex::EventManager& events){
   _events = &events;
 
-  FreeImage_Initialise();
+  //FreeImage_Initialise();
 }
 
 void shutdown(){
-  FreeImage_DeInitialise();
+  //FreeImage_DeInitialise();
 }
 
 std::shared_ptr<gl::ShaderProgram> load_shader_program(const fs::path& id){

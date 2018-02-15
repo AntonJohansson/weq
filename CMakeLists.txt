@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 
-set(CXX "cc_args.py clang++")
+#set(CXX "cc_args.py clang++")
 
 project(weq CXX)
 
@@ -13,18 +13,20 @@ if(WIN32)
   set(library_path ${EXTERNAL_PATH}/lib)
   link_directories(${EXTERNAL_PATH}/lib)
 elseif(APPLE)
+  set(CMAKE_CXX_COMPILER "g++-7")
   set(EXTERNAL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/external/osx)
   set(library_path ${EXTERNAL_PATH}/lib)
   link_directories(${EXTERNAL_PATH}/lib)
   find_library(cocoa Cocoa REQUIRED)
   find_library(iokit IOKit REQUIRED)
   find_library(corevideo CoreVideo REQUIRED)
-  set(EXTRA_LIBS ${cocoa} ${iokit} ${corevideo})
+  set(EXTRA_LIBS "stdc++fs" ${cocoa} ${iokit} ${corevideo})
 
+  add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 endif()
 
 #find_library(glfw HINTS ${library_path} NAMES glfw3 REQUIRED)
-find_library(freeimage HINTS ${library_path} NAMES FreeImage REQUIRED)
+#find_library(freeimage HINTS ${library_path} NAMES FreeImage REQUIRED)
 find_library(entityx HINTS ${library_path} NAMES entityx REQUIRED)
 find_library(glfw HINTS ${library_path} NAMES glfw3 REQUIRED)
 #find_package(glfw3 3.2 REQUIRED)
@@ -66,21 +68,21 @@ add_executable(weq
 if(WIN32)
   target_compile_options(weq PRIVATE /std:c++latest)
 else()
-  target_compile_options(weq PRIVATE -std=c++1z -Wall -Wextra -g)
+  target_compile_options(weq PRIVATE -stdlib=libc++ -std=c++1z -Wall -Wextra -Wfatal-errors -g)
 endif()
 
 
 set_target_properties(weq PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(weq PUBLIC
   $<BUILD_INTERFACE:${EXTERNAL_PATH}/include> # SHOULD ONLY BE ADDED ON WINDOWS
-  $<BUILD_INTERFACE:/usr/local/include>
+  #$<BUILD_INTERFACE:/usr/local/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE: include>)
 
-target_compile_definitions(weq PRIVATE FREEIMAGE_LIB)
+#target_compile_definitions(weq PRIVATE FREEIMAGE_LIB)
 
 target_link_libraries(weq
-  ${glfw} ${freeimage} ${entityx}
+  ${glfw} ${entityx}
   ${OPENGL_gl_LIBRARY}
   ${EXTRA_LIBS}
   )

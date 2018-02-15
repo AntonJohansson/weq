@@ -1,5 +1,10 @@
 TODO
 
+- FreeImage is removed,
+  - replace with std_* library
+
+- Remove dependency on entityx
+
 - Currently supports variable dt for wave sim
   - problem with ui variables because if the sim updates at 1k fps,
     the ui has to update at the same frequency, otherwise, the sim will

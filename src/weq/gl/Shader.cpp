@@ -80,7 +80,7 @@ bool Shader::compile(){
  */
 
 ShaderType Shader::type_from_filename(const fs::path& path) const {
-  auto& ext = path.extension();
+  auto ext = path.extension();
 
   if(ext == ".vert")return ShaderType::VERTEX;
   else if(ext == ".frag")return ShaderType::FRAGMENT;

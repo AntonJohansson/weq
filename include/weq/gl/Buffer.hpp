@@ -76,9 +76,9 @@ public:
   }
 
 
-  Buffer<buffer_target, T>& operator=(const Buffer<buffer_target, T>&) = delete;
+  Buffer<buffer_target, T>& operator=(Buffer<buffer_target, T>&) = delete;
 
-  Buffer<buffer_target, T>& operator=(const Buffer<buffer_target, T>&& rhs){
+  Buffer<buffer_target, T>& operator=(Buffer<buffer_target, T>&& rhs){
     using std::swap;
     swap(_usage, rhs._usage);
     swap(_data, rhs._data);

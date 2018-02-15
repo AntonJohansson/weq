@@ -26,7 +26,7 @@ public:
     return _total/static_cast<T>(_data.size());
   }
 
-  void clear(){_total = 0.0; _count = 0;}
+  void clear(){_total = 0.0; _data.clear();}
 
   T total(){return _total;}
   unsigned int count(){return _data.size();}

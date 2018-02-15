@@ -138,7 +138,7 @@ void Camera::update_arcball(component::Camera& camera, component::Transform& t){
   // theta
   t.theta = glm::clamp<float>(t.theta - _delta_cursor.y, 0.0f, glm::pi<float>());
   // phi
-  t.phi = std::fmodf(t.phi - _delta_cursor.x, 360.0f);
+  t.phi = std::fmod(t.phi - _delta_cursor.x, 360.0f);
 
   // In order to get from camera to world space:
   // 1) translate radius in +z-axis,
