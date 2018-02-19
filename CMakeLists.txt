@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 
 project(weq CXX)
 
+add_subdirectory(tests)
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
@@ -59,6 +61,8 @@ add_executable(weq
 
   src/weq/memory/ResourceManager.cpp
 
+  src/weq/ecs/Event.cpp
+
   src/glad/glad.cpp
   src/imgui/imgui.cpp
   src/imgui/imgui_demo.cpp
@@ -86,3 +90,4 @@ target_link_libraries(weq
   ${OPENGL_gl_LIBRARY}
   ${EXTRA_LIBS}
   )
+

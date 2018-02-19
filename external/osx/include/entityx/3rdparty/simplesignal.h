@@ -100,7 +100,8 @@ class ProtoSignal<R(Args...), Collector> : private CollectorInvocation<
     void unlink() {
       function = nullptr;
       if (next) next->prev = prev;
-      if (prev) prev->next = next;
+      if
+ (prev) prev->next = next;
       decref();
       // leave intact ->next, ->prev for stale iterators
     }

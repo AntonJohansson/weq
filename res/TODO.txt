@@ -23,8 +23,6 @@ TODO
   - could have different dts for single threaded engine :), hmmm
   - display error message if used dt is smaller than the actual one (including safety factor)
 
-- Move hotload into system?
-
 - Currently keeping a pointer to the shader program in the shader class, in order to re-link the program
   on hot reload.
 
