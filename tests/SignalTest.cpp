@@ -9,7 +9,7 @@ TEST_CASE("multiple lambdas", "[signal]"){
 
   int sum = 0;
 
-  for(int i = 0; i < size; i++){
+  for(u64 i = 0; i < size; i++){
     sig.connect([&sum](int i){sum += i;});
   }
 
@@ -30,7 +30,7 @@ TEST_CASE("member functions", "[signal]"){
 
   Data data;
 
-  for(int i = 0; i < size; i++){
+  for(u64 i = 0; i < size; i++){
     using std::placeholders::_1;
     sig.connect(std::bind(&Data::receive, &data, _1));
   }
@@ -59,7 +59,7 @@ TEST_CASE("member functions different signatures", "[signal]"){
 
   Data data;
 
-  for(int i = 0; i < size; i++){
+  for(u64 i = 0; i < size; i++){
     using std::placeholders::_1;
     void (Data::*iptr)(int) = &Data::receive;
     void (Data::*fptr)(float) = &Data::receive;
@@ -116,4 +116,54 @@ TEST_CASE("connect/disconnect"){
   sig.emit(1);
 
   REQUIRE(sum == 0);
+}
+
+TEST_CASE("Priority order", "[signal]"){
+  u64 size = 10;
+  weq::Signal<void(int)> sig(size);
+
+  sig.connect([](int){}, 0);
+
+  sig.debug_print();
+  sig.reset();
+
+  sig.connect([](int){}, 0);
+  sig.connect([](int){}, 1);
+
+  sig.debug_print();
+  sig.reset();
+
+  sig.connect([](int){}, 1);
+  sig.connect([](int){}, 0);
+
+  sig.debug_print();
+  sig.reset();
+
+  sig.connect([](int){}, 0);
+  sig.connect([](int){}, 0);
+  sig.connect([](int){}, 0);
+
+  sig.debug_print();
+  sig.reset();
+
+  sig.connect([](int){}, 0);
+  sig.connect([](int){}, 1);
+  sig.connect([](int){}, 2);
+
+  sig.debug_print();
+  sig.reset();
+
+  sig.connect([](int){}, 2);
+  sig.connect([](int){}, 1);
+  sig.connect([](int){}, 0);
+
+  sig.debug_print();
+  sig.reset();
+
+  sig.connect([](int){}, 1);
+  sig.connect([](int){}, 3);
+  sig.connect([](int){}, 2);
+
+  sig.debug_print();
+  sig.reset();
 }

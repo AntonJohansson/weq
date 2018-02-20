@@ -44,6 +44,11 @@ public:
     _size--;
   }
 
+  void reset(){
+    _size = 0;
+    setup_free_list(); // adds every ptr to the free list
+  }
+
   u64 size(){return _size;}
   u64 max_size(){return _max_size;}
   u64 free_size(){return _free_list.size();}
