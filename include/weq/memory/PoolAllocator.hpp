@@ -19,8 +19,10 @@ enum Mode{
   NO_RESIZE,
 };
 
+class Allocator{};
+
 template<typename T>
-class PoolAllocator{
+class PoolAllocator : public Allocator{
 public:
   explicit PoolAllocator(u64 block_size = 16, Mode m = RESIZE)
     : _size(0),

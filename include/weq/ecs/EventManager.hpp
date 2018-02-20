@@ -29,24 +29,7 @@ private:
   std::unordered_map<u64, std::pair<EventSignalWeakPtr, EventSignal::Node*>> _connections;
 };
 
-class BaseType{
-public:
-  virtual ~BaseType(){}
-protected:
-  static u64 _family_counter;
-};
 
-// TEMP -> move to cpp
-u64 BaseType::_family_counter = 0;
-
-template<typename T>
-class Type : public BaseType{
-public:
-  static u64 family(){
-    static u64 family = _family_counter++;
-    return family;
-  }
-};
 
 class EventManager{
 public:
