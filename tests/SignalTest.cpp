@@ -120,50 +120,69 @@ TEST_CASE("connect/disconnect"){
 
 TEST_CASE("Priority order", "[signal]"){
   u64 size = 10;
-  weq::Signal<void(int)> sig(size);
+  weq::Signal<void()> sig(size);
 
-  sig.connect([](int){}, 0);
+  std::string result = "";
+  auto add_a = [&result](){result += "a";};
+  auto add_b = [&result](){result += "b";};
+  auto add_c = [&result](){result += "c";};
 
-  sig.debug_print();
+  sig.connect(add_a, 0);
+  sig.emit();
+
+  REQUIRE(result == "a");
+  result = "";
   sig.reset();
 
-  sig.connect([](int){}, 0);
-  sig.connect([](int){}, 1);
+  sig.connect(add_a, 0);
+  sig.connect(add_b, 1);
+  sig.emit();
 
-  sig.debug_print();
+  REQUIRE(result == "ab");
+  result = "";
   sig.reset();
 
-  sig.connect([](int){}, 1);
-  sig.connect([](int){}, 0);
+  sig.connect(add_b, 1);
+  sig.connect(add_a, 0);
+  sig.emit();
 
-  sig.debug_print();
+  REQUIRE(result == "ab");
+  result = "";
   sig.reset();
 
-  sig.connect([](int){}, 0);
-  sig.connect([](int){}, 0);
-  sig.connect([](int){}, 0);
+  sig.connect(add_a, 0);
+  sig.connect(add_b, 0);
+  sig.connect(add_c, 0);
+  sig.emit();
 
-  sig.debug_print();
+  REQUIRE(result == "abc");
+  result = "";
   sig.reset();
 
-  sig.connect([](int){}, 0);
-  sig.connect([](int){}, 1);
-  sig.connect([](int){}, 2);
+  sig.connect(add_a, 0);
+  sig.connect(add_b, 1);
+  sig.connect(add_c, 2);
+  sig.emit();
 
-  sig.debug_print();
+  REQUIRE(result == "abc");
+  result = "";
   sig.reset();
 
-  sig.connect([](int){}, 2);
-  sig.connect([](int){}, 1);
-  sig.connect([](int){}, 0);
+  sig.connect(add_c, 2);
+  sig.connect(add_b, 1);
+  sig.connect(add_a, 0);
+  sig.emit();
 
-  sig.debug_print();
+  REQUIRE(result == "abc");
+  result = "";
   sig.reset();
 
-  sig.connect([](int){}, 1);
-  sig.connect([](int){}, 3);
-  sig.connect([](int){}, 2);
+  sig.connect(add_a, 0);
+  sig.connect(add_c, 2);
+  sig.connect(add_b, 1);
+  sig.emit();
 
-  sig.debug_print();
+  REQUIRE(result == "abc");
+  result = "";
   sig.reset();
 }

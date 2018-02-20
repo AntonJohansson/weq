@@ -3,7 +3,10 @@
 #include <weq/utility/IntegerTypes.hpp>
 #include <utility>
 #include <queue>
+#include <vector>
 #include <cstdlib>
+
+#include <new>
 
 #include <iostream>
 #include <iomanip>
@@ -11,27 +14,42 @@
 
 namespace weq::memory{
 
+enum Mode{
+  RESIZE,
+  NO_RESIZE,
+};
+
 template<typename T>
 class PoolAllocator{
 public:
-  explicit PoolAllocator(u64 size)
+  explicit PoolAllocator(u64 block_size = 16, Mode m = RESIZE)
     : _size(0),
-      _max_size(size){
-    _memory_block = std::malloc(_max_size * sizeof(T));
-
-    setup_free_list();
+      _block_size(block_size),
+      _mode(m){
+    allocate_block();
   }
 
   ~PoolAllocator(){
-    std::free(_memory_block);
+    for(u8* block : _memory_blocks){
+      delete[] block;
+    }
   }
 
   template<typename... Args>
   T* alloc(Args&&... args){
-    T* ptr = _free_list.front();
+    T* ptr = nullptr;
+
+    // Check out of memory
+    if(_free_list.size() == 0){
+      if(_mode == RESIZE)allocate_block();
+      else throw std::bad_alloc();
+    }
+
+    // Get ptr from free list
+    ptr = _free_list.front();
     _free_list.pop();
 
-    //*ptr = T(std::forward<Args>(args)...);
+    // Placement new
     ptr = new (ptr) T(std::forward<Args>(args)...);
 
     _size++;
@@ -40,34 +58,59 @@ public:
   }
 
   void dealloc(T* t){
+    // Call destructor
+    t->~T();
+
+    // "free" memory
     _free_list.push(t);
     _size--;
+
+    // @TODO should i dealloc a block if it becomes emtpy?
   }
 
   void reset(){
     _size = 0;
-    setup_free_list(); // adds every ptr to the free list
+
+    // Free all pointers, but do not dealloc blocks
+    for(u8* block : _memory_blocks){
+      add_block_to_free_list(block);
+    }
   }
 
   u64 size(){return _size;}
-  u64 max_size(){return _max_size;}
-  u64 free_size(){return _free_list.size();}
+  u64 block_size(){return _block_size;}
+  u64 blocks(){return _memory_blocks.size();}
+  u64 capacity(){return _block_size*_memory_blocks.size();}
+  u64 free(){return _free_list.size();}
+
+  float load_factor(){return _size/capacity();}
 
 private:
-  void setup_free_list(){
-    T* ptr = static_cast<T*>(_memory_block);
+  void allocate_block(){
+    u8* block = new u8[sizeof(T)*_block_size];
+    _memory_blocks.push_back(block);
 
-    for(u64 i = 0; i < _max_size; i++){
+    add_block_to_free_list(block);
+  }
+
+  void add_block_to_free_list(u8* block){
+    // cast to T => ptr++ moves to next T*
+    T* ptr = reinterpret_cast<T*>(block);
+
+    // Add evert T* in the block to the free list
+    for(u64 i = 0; i < _block_size; i++){
       _free_list.push(ptr);
       ptr++;
     }
   }
 
   u64 _size;
-  u64 _max_size;
-  std::queue<T*> _free_list;
+  const u64 _block_size;
 
-  void* _memory_block;
+  Mode _mode;
+
+  std::queue<T*> _free_list;
+  std::vector<u8*> _memory_blocks;
 };
 
 }

@@ -45,6 +45,7 @@ public:
     static u64 id_counter = 0;
     n->id = id_counter++;
 
+    // @TODO simplify :)
     if(prio == -1){
       // Don't care about prio
       if(_head != nullptr){
