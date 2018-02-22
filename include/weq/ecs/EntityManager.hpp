@@ -34,6 +34,11 @@ public:
     return id;
   }
 
+  void destroy(EntityId id){
+    _entity_component_masks[id].reset();
+    _free_ids.push(id);
+  }
+
   template<typename C, typename... Args>
   C* assign(EntityId entity_id, Args&&... args){
     // Get component id
@@ -43,23 +48,41 @@ public:
     PoolAllocator<C>* pool = component_pool<C>();
     C* component = pool->alloc(std::forward<Args>(args)...);
 
+    // @TODO dealloc component from pool, need pointer :/
+    // which is not kept at the moment
+    // combine with bitset?
+
     // Set bit mask for entity
     _entity_component_masks[entity_id].set(component_id);
+
 
     return component;
   }
 
-  void entities_with_components(ComponentMask& match_mask){
+  template<typename C>
+  void remove(EntityId entity_id){
+    ComponentId component_id = ComponentTypeId<C>::id();
+    // Reset component mask
+    _entity_component_masks[entity_id].reset(component_id);
+    // Get pool
+    auto pool = component_pool<C>();
+    
+  }
+
+  std::vector<EntityId> entities_with_components(ComponentMask& match_mask){
+    std::vector<EntityId> entities;
     for(auto [id, mask] pair : _entity_component_masks){
       if(mask == match_mask){
+        entities.push_back(id);
       }
     }
+    return entities;
   }
 
   template<typename... Components>
-  void entities_with_components(){
+  std::vecto<EntityId> entities_with_components(){
     auto mask = generate_component_mask<Components...>();
-    entities_with_components(mask);
+    return entities_with_components(mask);
   }
 
   template<typename C>
