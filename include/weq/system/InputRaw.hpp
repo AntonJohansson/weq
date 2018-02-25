@@ -1,5 +1,13 @@
 #pragma once
 
+// @TODO CMON WINDOW:(
+#ifdef _WIN32
+#undef DELETE
+#undef MOD_SHIFT
+#undef MOD_CONTROL
+#undef MOD_ALT
+#endif
+
 namespace weq::system::raw{
 
 enum Key: int{

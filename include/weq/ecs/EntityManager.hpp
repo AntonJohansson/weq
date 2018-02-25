@@ -4,6 +4,7 @@
 #include <weq/memory/PoolAllocator.hpp>
 #include <weq/ecs/Component.hpp>
 
+#include <functional>
 #include <string>
 #include <queue>
 #include <vector>
