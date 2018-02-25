@@ -1,7 +1,7 @@
 #include <weq/system/UserInterface.hpp>
 
-#include <weq/ecs/System.hpp>
 #include <weq/ecs/EventManager.hpp>
+#include <weq/ecs/EntityManager.hpp>
 
 #include <weq/component/ImGui.hpp>
 
@@ -25,8 +25,8 @@ UserInterface::UserInterface(){}
 UserInterface::~UserInterface(){}
 
 void UserInterface::configure(EventManager& events){
+  System<UserInterface>::configure(events);
   set_timestep(8ms);
-  spdlog::get("console")->info("UI");
   events.subscribe<event::ActiveInput>(*this);
   events.subscribe<event::ActiveWindow>(*this);
 }
@@ -45,7 +45,7 @@ void UserInterface::update(EntityManager& entities,
 
   //ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 
-  entities.each<component::ImGui>([dt, &events](Entity e, component::ImGui& i){
+  entities.each<component::ImGui>([dt, &events](EntityId e, component::ImGui& i){
       if(i._register_ui)i._register_ui(events);
     });
 

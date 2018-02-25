@@ -1,7 +1,7 @@
 #include <weq/system/Renderer.hpp>
 
-#include <weq/ecs/System.hpp>
 #include <weq/ecs/EventManager.hpp>
+#include <weq/ecs/EntityManager.hpp>
 
 #include <weq/gl/ShaderProgram.hpp>
 #include <weq/gl/Shader.hpp>
@@ -48,7 +48,7 @@ Renderer::~Renderer(){
 }
 
 void Renderer::configure(EventManager& events){
-  spdlog::get("console")->info("renderer");
+  System<Renderer>::configure(events);
   // Events
   events.subscribe<event::ActiveInput>(*this);
   events.subscribe<event::ActiveWindow>(*this);
@@ -106,7 +106,7 @@ void Renderer::update(EntityManager& entities,
 
   // Get the active camera (TODO must be a better way).
   component::Camera active_camera;
-  entities.each<component::Camera, component::ActiveCamera>([&active_camera](Entity e, component::Camera& c, component::ActiveCamera& a){active_camera = c;});
+  entities.each<component::Camera, component::ActiveCamera>([&active_camera](EntityId e, component::Camera& c, component::ActiveCamera& a){active_camera = c;});
 
   // caluclate vp-matrix
   active_camera.viewproj = active_camera.projection * active_camera.view;
@@ -127,7 +127,7 @@ void Renderer::update(EntityManager& entities,
   // Move draw code out of entities loop, works fine since there's only a
   // single entity.
 
-  entities.each<Renderable, Transform>([dt, &active_camera](Entity e,
+  entities.each<Renderable, Transform>([dt, &active_camera](EntityId e,
                                                             Renderable& r,
                                                             Transform& t){
       // Draw the mesh if it is drawable.

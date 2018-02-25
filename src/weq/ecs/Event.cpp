@@ -1,5 +1,5 @@
 #include <weq/ecs/Event.hpp>
 
 namespace weq{
-u64 BaseEvent::_family_counter = 0;
+u64 BaseEvent::_type_counter = 0;
 }

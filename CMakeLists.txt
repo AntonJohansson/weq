@@ -6,9 +6,9 @@ project(weq CXX)
 
 add_subdirectory(tests)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 
 if(WIN32)
   set(EXTERNAL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/external/x32)
@@ -62,6 +62,8 @@ add_executable(weq
   src/weq/memory/ResourceManager.cpp
 
   src/weq/ecs/Event.cpp
+  src/weq/ecs/System.cpp
+  src/weq/ecs/Component.cpp
 
   src/glad/glad.cpp
   src/imgui/imgui.cpp
@@ -87,7 +89,7 @@ target_include_directories(weq PUBLIC
 #target_compile_definitions(weq PRIVATE FREEIMAGE_LIB)
 
 target_link_libraries(weq
-  ${glfw} ${entityx}
+  ${glfw}
   ${OPENGL_gl_LIBRARY}
   ${EXTRA_LIBS}
   )

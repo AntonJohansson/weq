@@ -2,6 +2,7 @@
 #include <weq/memory/Resource.hpp>
 
 #include <weq/ecs/EventManager.hpp>
+#include <weq/ecs/EntityManager.hpp>
 
 #include <weq/gl/Texture.hpp>
 #include <weq/gl/Shader.hpp>
@@ -25,12 +26,12 @@ namespace{
   const fs::path _base_path = "../res";
   const fs::path _shader_path = _base_path/fs::path("/shaders");
 
-  ex::EventManager* _events;
+  EventManager* _events;
 }
 
 std::unordered_map<std::string, std::weak_ptr<Resource>> _memory;
 
-void initialize(ex::EventManager& events){
+void initialize(EventManager& events){
   _events = &events;
 
   //FreeImage_Initialise();

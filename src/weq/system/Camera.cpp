@@ -79,7 +79,7 @@ Camera::~Camera(){
 }
 
 void Camera::configure(EventManager& events){
-  spdlog::get("console")->info("camera");
+  System<Camera>::configure(events);
   //events.subscribe<event::WindowUpdate>(*this);
   events.subscribe<event::ActiveWindow>(*this);
   events.subscribe<event::ActiveInput>(*this);
@@ -138,16 +138,16 @@ void Camera::update_direction(component::Camera* camera, component::Transform* t
   //t->transform = glm::rotate(t->transform, glm::radians(10.0f*_dy), right);
   //t->transform = glm::translate(t->transform, _translate);
 
-  t->_position += (right*_movement_amount->x +
-                   local_up*_movement_amount->y +
-                   t->_direction*_movement_amount->z);
+  t->_position += (right*_movement_amount.x +
+                   local_up*_movement_amount.y +
+                   t->_direction*_movement_amount.z);
   _delta_cursor = {0,0};
   _movement_amount = {0,0,0};
 }
 
 void Camera::update_arcball(component::Camera* camera, component::Transform* t){
   // radius
-  t->radius = glm::max(t->radius + _movement_amount->z, 0.0f);
+  t->radius = glm::max(t->radius + _movement_amount.z, 0.0f);
   // theta
   t->theta = glm::clamp<float>(t->theta - _delta_cursor.y, 0.0f, glm::pi<float>());
   // phi
@@ -178,39 +178,39 @@ void Camera::update_arcball(component::Camera* camera, component::Transform* t){
 }
 
 void Camera::receive(const event::ActiveWindow& event){
-  _aspect_ratio = event->window->aspect_ratio();
+  _aspect_ratio = event.window->aspect_ratio();
 }
 
 void Camera::receive(const event::ActiveInput& event){
   // Only update mouse camera direction when mouse is down
-  if(event->has(InputState::CURSOR_DOWN)){
+  if(event.has(InputState::CURSOR_DOWN)){
     // Update mouse delta position
-    if(event->has(InputRange::CURSOR_DX) && event->has(InputRange::CURSOR_DY)){
-      _delta_cursor.x = event->ranges.at(InputRange::CURSOR_DX);
-      _delta_cursor.y = event->ranges.at(InputRange::CURSOR_DY);
+    if(event.has(InputRange::CURSOR_DX) && event.has(InputRange::CURSOR_DY)){
+      _delta_cursor.x = event.ranges.at(InputRange::CURSOR_DX);
+      _delta_cursor.y = event.ranges.at(InputRange::CURSOR_DY);
     }
   }
 
   // Update camera distance with scroll
-  if(event->has(InputRange::CURSOR_SCROLL_X) && event->has(InputRange::CURSOR_SCROLL_Y)){
-    //double x = event->ranges.at(InputRange::CURSOR_SCROLL_X);
-    _movement_amount->z = -0.5*event->ranges.at(InputRange::CURSOR_SCROLL_Y);
+  if(event.has(InputRange::CURSOR_SCROLL_X) && event.has(InputRange::CURSOR_SCROLL_Y)){
+    //double x = event.ranges.at(InputRange::CURSOR_SCROLL_X);
+    _movement_amount.z = -0.5*event.ranges.at(InputRange::CURSOR_SCROLL_Y);
   }
 
   /* First person camera
   // Update camera movement vector
   float speed = 0.05f;
-  if(event->has(InputState::MOVE_LEFT)){
+  if(event.has(InputState::MOVE_LEFT)){
     _movement_amount->x = -speed;
-  }if(event->has(InputState::MOVE_RIGHT)){
+  }if(event.has(InputState::MOVE_RIGHT)){
     _movement_amount->x = +speed;
-  }if(event->has(InputState::MOVE_FORWARD)){
+  }if(event.has(InputState::MOVE_FORWARD)){
     _movement_amount->z = +speed;
-  }if(event->has(InputState::MOVE_BACK)){
+  }if(event.has(InputState::MOVE_BACK)){
     _movement_amount->z = -speed;
-  }if(event->has(InputState::MOVE_UP)){
+  }if(event.has(InputState::MOVE_UP)){
     _movement_amount->y = +speed;
-  }if(event->has(InputState::MOVE_DOWN)){
+  }if(event.has(InputState::MOVE_DOWN)){
     _movement_amount->y = -speed;
   }
   */

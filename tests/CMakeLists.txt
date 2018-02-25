@@ -1,7 +1,11 @@
 enable_testing()
 
 macro(create_test TARGET_NAME SOURCE)
-    add_executable(${TARGET_NAME} ${SOURCE})
+  add_executable(${TARGET_NAME} ${SOURCE}
+    ../src/weq/ecs/Event.cpp
+    ../src/weq/ecs/System.cpp
+    ../src/weq/ecs/Component.cpp
+    )
 
     if(WIN32)
       target_compile_options(${TARGET_NAME} PRIVATE /std:c++latest)
@@ -17,9 +21,9 @@ macro(create_test TARGET_NAME SOURCE)
     add_test(${TARGET_NAME} ${TARGET_NAME})
 endmacro()
 
-create_test(pool_test   PoolAllocatorTest.cpp)
-create_test(signal_test SignalTest.cpp)
-create_test(event_test  EventTest.cpp)
-create_test(em_test     EntityManagerTest.cpp)
-create_test(list_test   CircularListTest.cpp)
-create_test(sm_test     SystemTest.cpp)
+create_test(pool_test   PoolAllocatorTest.cpp )
+create_test(signal_test SignalTest.cpp        )
+create_test(event_test  EventTest.cpp         )
+create_test(em_test     EntityManagerTest.cpp )
+create_test(list_test   CircularListTest.cpp  )
+create_test(sm_test     SystemTest.cpp        )

@@ -8,6 +8,9 @@ using std::chrono::nanoseconds;
 using std::chrono::duration_cast;
 using std::chrono::duration;
 
+// @TODO Temp?
+#include <spdlog/spdlog.h>
+
 
 namespace weq{
 
@@ -18,7 +21,11 @@ class BaseSystem{
 public:
   virtual ~BaseSystem(){}
 
-  virtual void configure(EventManager&){}
+  virtual void configure(EventManager&){
+    if(!_debug_name.empty()){
+      spdlog::get("console")->info("configuring system {}", _debug_name);
+    }
+  }
   virtual void update(EntityManager&,EventManager&, f32) = 0;
 
   static u64 _type_counter;
@@ -45,6 +52,9 @@ public:
   double get_framerate(){return _current_framerate;}
   void second_has_past(){_current_framerate = _frame_counter; clear_frame_counter();}
   unsigned int get_frame_counter(){return _frame_counter;}
+
+  void set_debug_name(const std::string& str){_debug_name = str;}
+  const std::string& get_debug_name(){return _debug_name;}
 protected:
   void set_timestep(nanoseconds timestep){
     _timestep = timestep;
@@ -58,10 +68,8 @@ private:
   double _timestep_value{0.01666667};
   double _current_framerate = 0.0;
   unsigned int _frame_counter{0};
+  std::string _debug_name;
 };
-
-// @TODO move to cpp
-u64 BaseSystem::_type_counter = 0;
 
 template<typename S>
 class System : public BaseSystem{

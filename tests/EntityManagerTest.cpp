@@ -97,4 +97,10 @@ TEST_CASE("entity_with_components, get", "[entity manager]"){
     REQUIRE(em.has_component<FloatComp>(id));
     REQUIRE(em.get<FloatComp>(id)->f == 2.3f);
   }
+
+  // Each test
+  em.each<IntComp, FloatComp>([](weq::EntityId id, IntComp& ic, FloatComp& fc){
+      REQUIRE(ic.i == 1);
+      REQUIRE(fc.f == 2.3f);
+    });
 }

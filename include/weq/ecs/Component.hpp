@@ -11,8 +11,6 @@ protected:
   static u64 _type_counter;
 };
 
-u64 BaseComponentTypeId::_type_counter = 0;
-
 template<typename T>
 class ComponentTypeId : public BaseComponentTypeId{
 public:

@@ -1,10 +1,18 @@
 #include <weq/system/DebugDraw.hpp>
+
+#include <weq/ecs/EventManager.hpp>
+#include <weq/ecs/EntityManager.hpp>
+
 #include <weq/event/DebugDraw.hpp>
+
 #include <weq/component/Transform.hpp>
 #include <weq/component/Renderable.hpp>
+
 #include <weq/Mesh.hpp>
+
 #include <weq/gl/ShaderProgram.hpp>
 #include <weq/gl/Shader.hpp>
+
 #include <weq/primitive/Vector.hpp>
 #include <weq/primitive/Ray.hpp>
 #include <weq/primitive/Circle.hpp>
@@ -52,8 +60,8 @@ DebugDraw::DebugDraw()
 DebugDraw::~DebugDraw(){
 }
 
-void DebugDraw::configure(ex::EventManager& events){
-  spdlog::get("console")->info("debugdraw");
+void DebugDraw::configure(EventManager& events){
+  System<DebugDraw>::configure(events);
   // Events
   events.subscribe<event::DebugVector>(*this);
   events.subscribe<event::DebugRay>(*this);
@@ -69,14 +77,16 @@ void DebugDraw::configure(ex::EventManager& events){
   _shader->link();
 }
 
-void DebugDraw::update(ex::EntityManager& entities,
-            ex::EventManager& events,
-            ex::TimeDelta dt){
+void DebugDraw::update(EntityManager& entities,
+                       EventManager& events,
+                       f32 dt){
   // Update entity durations
   for(auto itr = _timed_entities.begin(); itr != _timed_entities.end();){
     itr->second -= dt;
     if(itr->second < 0.0f){
-      itr->first.destroy();
+      // Destory entity
+      entities.destroy(itr->first);
+      //itr->first.destroy();
       itr = _timed_entities.erase(itr);
     }else{
       ++itr;
@@ -88,9 +98,12 @@ void DebugDraw::update(ex::EntityManager& entities,
     auto& event = pair.first;
     auto& mesh = pair.second;
 
+    // @TODO change to call on entitym
     auto e = entities.create();
-    e.assign<component::Transform>()->_position = event.position;
-    e.assign<component::Renderable>(mesh)->scene = _shader;
+    entities.assign<component::Transform>(e)->_position = event.position;
+    entities.assign<component::Renderable>(e, mesh)->scene = _shader;
+    //ke.assign<component::Transform>()->_position = event.position;
+    //ke.assign<component::Renderable>(mesh)->scene = _shader;
 
     if(event.has_duration){
       _timed_entities.push_back({e, event.duration});

@@ -4,6 +4,7 @@
 #include <weq/utility/NumberTypes.hpp>
 #include <weq/memory/CircularList.hpp>
 #include <unordered_map>
+#include <string>
 #include <memory>
 
 namespace weq{
@@ -47,6 +48,20 @@ public:
 
   u64 size(){
     return _systems.size();
+  }
+
+  std::string debug_info(){
+    std::string str = "Update rates:\n";
+    for_each([&str](auto system){
+        str += system->get_debug_name();
+        str += ":\t";
+        str += std::to_string(system->get_framerate());
+        str += "\t";
+        str += std::to_string(1.0/system->get_timestep_value());
+        str += "\n";
+      });
+
+    return str;
   }
 
 private:

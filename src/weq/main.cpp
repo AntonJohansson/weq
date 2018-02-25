@@ -41,15 +41,15 @@ public:
   Simulation(int argc, char** argv)
     : Application(argc, argv){
 
-    _systems->configure(*_events);
+    _systems->add<weq::system::Hotloader,         0>()->set_debug_name("hotloader");
+    _systems->add<weq::system::Input,             1>()->set_debug_name("input");
+    _systems->add<weq::system::UserInterface,     2>()->set_debug_name("ui");
+    _systems->add<weq::system::WaveGPUSimulation, 3>()->set_debug_name("wave gpu");
+    _systems->add<weq::system::Camera,            4>()->set_debug_name("camera");
+    _systems->add<weq::system::DebugDraw,         5>()->set_debug_name("debug draw");
+    _systems->add<weq::system::Renderer,          6>()->set_debug_name("renderer");
 
-    _systems->add<weq::system::Hotloader,         0>();
-    _systems->add<weq::system::Input,             1>();
-    _systems->add<weq::system::UserInterface,     2>();
-    _systems->add<weq::system::WaveGPUSimulation, 3>();
-    _systems->add<weq::system::Camera,            4>();
-    _systems->add<weq::system::DebugDraw,         5>();
-    _systems->add<weq::system::Renderer,          6>();
+    _systems->configure(*_events);
 
     // Init vars
     weq::vars::read_file("..\\res\\System.vars");
@@ -161,10 +161,12 @@ public:
   //TODO improve UI
   void add_ui(){
     auto ui = _entities->create();
-    auto func = [](weq::EventManager& e){
+    auto func = [this](weq::EventManager& e){
         //ImGui::ShowTestWindow();
         ImGui::Begin("Debug", NULL, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::SetWindowCollapsed("Debug", true, ImGuiSetCond_FirstUseEver);
+        ImGui::Text(_entities->debug_info().c_str());
+        ImGui::Text(_systems->debug_info().c_str());
         //ImGui::Text("Update rates:\n  Engine    %.1f/%.1f\n  Hotloader %.1f/%.1f\n  Input     %.1f/%.1f\n  Ui        %.1f/%.1f\n  WaveSim   %.1f/%.1f\n  Camera    %.1f/%.1f\n  DebugDraw %.1f/%.1f\n  Renderer  %.1f/%.1f",
         //            _current_update_frequency,   1.0/_timestep_value,
         //            _hotloader->get_framerate(), 1.0/_hotloader->get_timestep_value(),
@@ -172,9 +174,9 @@ public:
         //            _ui->get_framerate(),        1.0/_ui->get_timestep_value(),
         //            _wgpu->get_framerate(),      1.0/_wgpu->get_timestep_value(),
         //            _camera->get_framerate(),    1.0/_camera->get_timestep_value(),
-        //            _ddraw->get_framerate(),     1.0/_ddraw->get_timestep_value(),
+        //            _ddraw->get_framerate(),     1.0/_ddraw->get_timestep_value(),std::to_string();
         //            _renderer->get_framerate(),  1.0/_renderer->get_timestep_value());
-        //ImGui::End();
+        ImGui::End();
 
         ImGui::Begin("Menu", NULL, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::SetWindowCollapsed("Menu", false, ImGuiSetCond_FirstUseEver);

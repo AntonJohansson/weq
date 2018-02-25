@@ -4,10 +4,14 @@
 #include <weq/memory/PoolAllocator.hpp>
 #include <weq/ecs/Component.hpp>
 
+#include <string>
 #include <queue>
 #include <vector>
 #include <unordered_map>
 #include <bitset>
+
+// Temp
+#include <iostream>
 
 // @TODO in order to dealloc components, a ptr to the component
 // is stored in a map from (id <-> void*). This is suboptimal,
@@ -111,6 +115,18 @@ public:
     return entities_with_components(mask);
   }
 
+  // @TODO WHYY is this required??
+  template<typename T>
+  struct Identity{using type = T;};
+
+  template<typename... Components>
+  void each(typename Identity<std::function<void(EntityId, Components&...)>>::type func){
+    auto entities = entities_with_components<Components...>();
+    for(auto entity : entities){
+      func(entity, *get<Components>(entity)...);
+    }
+  }
+
   template<typename C>
   bool has_component(EntityId entity_id){
     ComponentId component_id = ComponentTypeId<C>::id();
@@ -124,6 +140,16 @@ public:
     ComponentMask mask;
     (mask.set(ComponentTypeId<Components>::id()), ...);
     return mask;
+  }
+
+  // Returns string of entities and components
+  std::string debug_info(){
+    std::string str = "Entities (id)\n";
+    each<>([&str](EntityId id){
+        str += std::to_string(id) + "\n";
+      });
+
+    return str;
   }
 
   // Returns the number of entities

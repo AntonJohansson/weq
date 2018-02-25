@@ -24,7 +24,7 @@ public:
     // Get function pointer for reciever of this event type
     void (Receiver::*receive)(const E&) = &Receiver::receive;
     // Get event id for this particular event-type
-    u64 event_id = Event<E>::family();
+    u64 event_id = Event<E>::id();
     // Retrieve signal for this event-type
     auto sig = event_signal(event_id);
 
@@ -40,7 +40,7 @@ public:
 
   template<typename E, typename Receiver>
   void unsubscribe(Receiver& receiver){
-    u64 event_id = Event<E>::family();
+    u64 event_id = Event<E>::id();
 
     // Assumes receiver is a parent of Receiver
     auto it = receiver._connections.find(event_id);
@@ -58,7 +58,7 @@ public:
   template<typename E>
   void emit(E event){
     // Get event id
-    u64 event_id = Event<E>::family();
+    u64 event_id = Event<E>::id();
     // Get signal
     auto sig = event_signal(event_id);
     // Emit

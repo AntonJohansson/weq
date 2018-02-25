@@ -8,7 +8,7 @@
 
 //namespace ex = entityx;
 
-class Window;
+namespace weq{class Window;}
 // Defined in <weq/event/Input.hpp>
 namespace weq::event{struct ActiveInput;}
 // Defined in <weq/event/Window.hpp>

@@ -1,4 +1,5 @@
 #include <weq/system/WaveGPUSimulation.hpp>
+#include <weq/ecs/EntityManager.hpp>
 
 #include <weq/ecs/System.hpp>
 #include <weq/ecs/EventManager.hpp>
@@ -142,6 +143,7 @@ namespace{
 }
 
 void WaveGPUSimulation::configure(EventManager& events){
+  System<WaveGPUSimulation>::configure(events);
   namespace rm = memory::resource_manager;
 
   events.subscribe<event::ActiveInput>(*this);
@@ -216,7 +218,7 @@ void WaveGPUSimulation::update(EntityManager& entities,
     entities.each<component::Camera,
                   component::ActiveCamera,
                   component::Transform>(
-                    [&camera, &transform](Entity e,
+                    [&camera, &transform](EntityId e,
                                           component::Camera c,
                                           component::ActiveCamera& a,
                                           component::Transform& t){
@@ -304,7 +306,7 @@ void WaveGPUSimulation::update(EntityManager& entities,
 
 
   // Components
-  entities.each<WaveGPU, Renderable>([dt, this](Entity e, WaveGPU& wave, Renderable& r){
+  entities.each<WaveGPU, Renderable>([dt, this](EntityId e, WaveGPU& wave, Renderable& r){
       (void)e;
 
       // Recompute grid mesh from new resolution
@@ -494,7 +496,7 @@ void WaveGPUSimulation::add_ui(EntityManager& entities, EventManager& events){
   if(!_ui_created){
     _ui_created = true;
     _ui = entities.create();
-    _ui.assign<component::ImGui>([&](EventManager& e){
+    entities.assign<component::ImGui>(_ui, [&](EventManager& e){
         ImGui::Begin("Menu");
 
         ImGui::Separator();

@@ -75,7 +75,7 @@ namespace{
 }
 
 void Input::configure(EventManager& events){
-  spdlog::get("console")->info("input");
+  System<Input>::configure(events);
   (void)events;
 
   // Events

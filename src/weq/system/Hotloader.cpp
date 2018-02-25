@@ -54,6 +54,7 @@ Hotloader::~Hotloader(){
 }
 
 void Hotloader::configure(EventManager& events){
+  System<Hotloader>::configure(events);
   events.subscribe<event::Track>(*this);
 }
 
