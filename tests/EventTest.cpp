@@ -51,3 +51,9 @@ TEST_CASE("subscribe", "[event]"){
 
   REQUIRE(Data::count == tests + (tests - tests/2));
 }
+
+TEST_CASE("priority", "[event]"){
+  weq::EventManager em;
+  int tests = 100;
+
+}

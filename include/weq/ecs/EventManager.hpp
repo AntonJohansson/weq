@@ -8,6 +8,12 @@
 
 namespace weq{
 
+// @TODO how should I handle consume?
+//enum EventFlag{
+//  CONTINUE,
+//  CONSUME
+//};
+
 using EventSignal = Signal<void(const void*)>;
 using EventSignalPtr = std::shared_ptr<EventSignal>;
 using EventSignalWeakPtr = std::weak_ptr<EventSignal>;
@@ -34,7 +40,7 @@ private:
 class EventManager{
 public:
 
-  template<typename E, typename Receiver>
+  template<typename E, typename Receiver, u8 prio = 255>
   void subscribe(Receiver& receiver){
     // Get function pointer for reciever of this event type
     void (Receiver::*receive)(const E&) = &Receiver::receive;
@@ -46,7 +52,7 @@ public:
     // Connect function ptr to signal
     using std::placeholders::_1;
     auto wrapper = EventCallbackWrapper<E>(std::bind(receive, &receiver, _1));
-    auto connection = sig->connect(wrapper);
+    auto connection = sig->connect(wrapper, prio);
 
 
     // Connect Event to receiver (needed for unsubbing etc.)
@@ -88,8 +94,7 @@ private:
     if(it != _signal_map.end()){
       return it->second;
     }else{
-      // Currently predefining 100 function per signal, unefficient
-      _signal_map[event_id] = std::make_shared<EventSignal>(100);
+      _signal_map[event_id] = std::make_shared<EventSignal>();
       return _signal_map[event_id];
     }
   }

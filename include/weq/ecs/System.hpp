@@ -4,21 +4,15 @@
 
 namespace weq{
 
-class SystemManager;
-class EntityManager;
 class EventManager;
-struct Managers{
-  SystemManager* system;
-  EntityManager* entity;
-  EventManager*  event;
-};
+class EntityManager;
 
 class BaseSystem{
 public:
   virtual ~BaseSystem(){}
 
-  virtual void configure(Managers&){}
-  virtual void update(Managers&, f32) = 0;
+  virtual void configure(EventManager&){}
+  virtual void update(EntityManager&,EventManager&, f32) = 0;
 
   static u64 _type_counter;
 };
