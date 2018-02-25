@@ -9,7 +9,9 @@
 #include <weq/memory/ResourceManager.hpp>
 #include <weq/state/StateManager.hpp>
 
-#include <entityx/entityx.h>
+#include <weq/ecs/Fwd.hpp>
+#include <weq/ecs/Receiver.hpp>
+//#include <entityx/entityx.h>
 #include <spdlog/spdlog.h>
 
 #include <chrono>
@@ -20,23 +22,25 @@ using std::chrono::duration;
 
 
 
-// Defined in <weq/Window.hpp>
-class Window;
 
 namespace weq{
+
+// Defined in <weq/Window.hpp>
+class Window;
 
 // Defined in <weq/event/Internal.hpp>
 namespace event{struct Quit;}
 
-namespace ex = entityx;
-using ex::EventManager;
-using ex::EntityManager;
-using ex::SystemManager;
+//namespace ex = entityx;
+//using ex::EventManager;
+//using ex::EntityManager;
+//using ex::SystemManager;
 
 // Helper class for interfacing with the engine,
 // creates and initializes all necessary managers
 // (events, systems, entities, states, resources).
-class Application : public ex::Receiver<Application>{
+//class Application : public Receiver<Application>{
+class Application : public Receiver{
 public:
   Application(int argc, char** argv);
   virtual ~Application();
@@ -63,9 +67,12 @@ protected:
   nanoseconds _lag{0ns};
   double _timestep_value{0.016};
 
-  EventManager _events;
-  EntityManager _entities{_events};
-  SystemManager _systems{_entities, _events};
+  std::shared_ptr<EventManager>  _events;
+  std::shared_ptr<EntityManager> _entities;
+  std::shared_ptr<SystemManager> _systems;
+  //EventManager _events;
+  //EntityManager _entities{_events};
+  //SystemManager _systems{_entities, _events};
 
   //ResourceManager _resource_manager;
   state::StateManager _state_manager; // TODO not functioning

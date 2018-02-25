@@ -1,16 +1,23 @@
 #include <weq/system/Renderer.hpp>
+
+#include <weq/ecs/System.hpp>
+#include <weq/ecs/EventManager.hpp>
+
 #include <weq/gl/ShaderProgram.hpp>
 #include <weq/gl/Shader.hpp>
+#include <weq/gl/VertexFormat.hpp>
+#include <weq/gl/Framebuffer.hpp>
+#include <weq/gl/Texture.hpp>
+
 #include <weq/component/Renderable.hpp>
 #include <weq/component/Transform.hpp>
 #include <weq/component/ImGui.hpp>
 #include <weq/component/Camera.hpp>
+
 #include <weq/event/Input.hpp>
 #include <weq/event/Window.hpp>
-#include <weq/gl/VertexFormat.hpp>
-#include <weq/gl/Framebuffer.hpp>
+
 #include <weq/Window.hpp>
-#include <weq/gl/Texture.hpp>
 #include <weq/memory/ResourceManager.hpp>
 
 #include <glad/glad.h>
@@ -40,7 +47,7 @@ Renderer::Renderer(){
 Renderer::~Renderer(){
 }
 
-void Renderer::configure(ex::EventManager& events){
+void Renderer::configure(EventManager& events){
   spdlog::get("console")->info("renderer");
   // Events
   events.subscribe<event::ActiveInput>(*this);
@@ -88,9 +95,9 @@ void Renderer::configure(ex::EventManager& events){
       });
 }
 
-void Renderer::update(ex::EntityManager& entities,
-                      ex::EventManager& events,
-                      ex::TimeDelta dt){
+void Renderer::update(EntityManager& entities,
+                      EventManager& events,
+                      f32 dt){
 
   (void)events;
 
@@ -99,7 +106,7 @@ void Renderer::update(ex::EntityManager& entities,
 
   // Get the active camera (TODO must be a better way).
   component::Camera active_camera;
-  entities.each<component::Camera, component::ActiveCamera>([&active_camera](ex::Entity e, component::Camera& c, component::ActiveCamera& a){active_camera = c;});
+  entities.each<component::Camera, component::ActiveCamera>([&active_camera](Entity e, component::Camera& c, component::ActiveCamera& a){active_camera = c;});
 
   // caluclate vp-matrix
   active_camera.viewproj = active_camera.projection * active_camera.view;
@@ -120,7 +127,7 @@ void Renderer::update(ex::EntityManager& entities,
   // Move draw code out of entities loop, works fine since there's only a
   // single entity.
 
-  entities.each<Renderable, Transform>([dt, &active_camera](ex::Entity e,
+  entities.each<Renderable, Transform>([dt, &active_camera](Entity e,
                                                             Renderable& r,
                                                             Transform& t){
       // Draw the mesh if it is drawable.

@@ -3,6 +3,10 @@
 #include <weq/event/Window.hpp>
 #include <weq/Window.hpp>
 
+#include <weq/ecs/EventManager.hpp>
+#include <weq/ecs/EntityManager.hpp>
+#include <weq/ecs/SystemManager.hpp>
+
 #include <weq/RunningAverage.hpp>
 
 #include <weq/memory/ResourceManager.hpp>
@@ -12,12 +16,7 @@
 #include <iostream>
 #include <iomanip>
 
-
-// YO SNYGGING
-// YO SNYGGING
-// YO SNYGGING
-// YO SNYGGING
-// get width/height/mode from runtime options (ezpz).
+namespace weq{
 
 // Temporary anonymous namspace, used to store window info
 // inferred from cmd args.
@@ -26,9 +25,11 @@ namespace{
   WindowMode mode = WindowMode::WINDOWED;
 }
 
-namespace weq{
-
 Application::Application(int argc, char** argv){
+  // Initialize managers
+  _events   = std::make_shared<EventManager>();
+  _entities = std::make_shared<EntityManager>();
+  _systems  = std::make_shared<SystemManager>();
 
   // Initialize Logging context
   _console = spdlog::stdout_color_mt("console");
@@ -59,13 +60,13 @@ Application::Application(int argc, char** argv){
   }
 
   // Initialize resource manager
-  memory::resource_manager::initialize(_events);
+  memory::resource_manager::initialize(*_events);
 
   // Subscribe to internal engine events
-  _events.subscribe<event::Quit>(*this);
+  _events->subscribe<event::Quit>(*this);
 
   // Create window (TODO Move!!)
-  _window = std::make_shared<Window>(_events, "Wave Simulation", width, height, mode); // Will also initlize glfw/glad
+  _window = std::make_shared<Window>(*_events, "Wave Simulation", width, height, mode); // Will also initlize glfw/glad
 }
 
 Application::~Application(){
@@ -74,7 +75,7 @@ Application::~Application(){
 
 void Application::run(){
   // TODO move
-  _events.emit(event::ActiveWindow(_window)); // This event will not buffer.
+  _events->emit(event::ActiveWindow(_window)); // This event will not buffer.
 
   using Clock = std::chrono::high_resolution_clock;
 
@@ -99,7 +100,7 @@ void Application::run(){
     accum += delta_time;
 
     // Update lag time for all systems
-    _systems.for_each([&delta_time](auto system){
+    _systems->for_each([&delta_time](auto system){
         system->set_lag(system->get_lag() + delta_time);
       });
 
@@ -107,7 +108,7 @@ void Application::run(){
       frame_time.add(frames);
       _current_update_frequency = frame_time.average();
 
-      _systems.for_each([](auto system){
+      _systems->for_each([](auto system){
           system->second_has_past();
         });
 
@@ -117,14 +118,14 @@ void Application::run(){
 
     while(_lag >= _timestep){
       frames++;
-      _systems.for_each([&delta_time, this](auto system){
+      _systems->for_each([&delta_time, this](auto system){
           if(system->get_timestep() < _timestep){
             _timestep = system->get_timestep();
             _timestep_value = system->get_timestep_value();
           }
 
           if(system->get_lag() >= system->get_timestep()){
-            system->update(_entities, _events, system->get_timestep_value());
+            system->update(*_entities, *_events, system->get_timestep_value());
             system->set_lag(system->get_lag() - system->get_timestep());
             system->increment_frame_counter();
           }

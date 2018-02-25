@@ -1,13 +1,13 @@
 #pragma once
 
+#include <weq/ecs/Fwd.hpp>
 #include <string>
 
 // Defined in <glfw/glfw.h>
 struct GLFWwindow;
 struct GLFWmonitor;
 
-// Defined in <entityx/entityx.h>
-namespace entityx{class EventManager;}
+namespace weq{
 
 // Enum describing the possible window modes
 enum class WindowMode{
@@ -32,7 +32,7 @@ public:
   // TODO remove event manager and forward events from renderer.
   // Also requests a 4.1 OpenGL context if one does not already
   // exist.
-  Window(entityx::EventManager& events, std::string title, unsigned int width,
+  Window(EventManager& events, std::string title, unsigned int width,
          unsigned int height, WindowMode mode = WindowMode::WINDOWED);
 
   // Destorys the current window and all of it's resources.
@@ -98,7 +98,7 @@ private:
   // 0 = primary monitor.
   GLFWmonitor* monitor(int index);
 
-  entityx::EventManager& _events;
+  EventManager& _events;
   unsigned int _x;
   unsigned int _y;
   unsigned int _width;
@@ -107,3 +107,5 @@ private:
   WindowMode _mode;
   GLFWwindow* _window;
 };
+
+} // namespace weq

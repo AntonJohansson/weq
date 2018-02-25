@@ -1,9 +1,13 @@
 #pragma once
 
-#include <entityx/entityx.h>
-#include <memory>
+#include <weq/ecs/Fwd.hpp>
+#include <weq/ecs/System.hpp>
+#include <weq/ecs/Receiver.hpp>
 
-namespace ex = entityx;
+#include <memory>
+//#include <entityx/entityx.h>
+
+//namespace ex = entityx;
 
 class Window;
 // Defined in <weq/event/Input.hpp>
@@ -13,16 +17,16 @@ namespace weq::event{struct ActiveWindow;}
 
 namespace weq::system{
 
-class UserInterface : public ex::System<UserInterface>, public ex::Receiver<UserInterface>{
+class UserInterface : public System<UserInterface>, public Receiver{
 public:
   UserInterface();
   ~UserInterface();
 
-  void configure(ex::EventManager& events) override;
+  void configure(EventManager& events) override;
 
-  void update(ex::EntityManager& entities,
-              ex::EventManager& events,
-              ex::TimeDelta dt) override;
+  void update(EntityManager& entities,
+              EventManager& events,
+              f32 dt) override;
 
   void receive(const event::ActiveInput& event);
   void receive(const event::ActiveWindow& event);

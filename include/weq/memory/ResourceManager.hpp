@@ -9,7 +9,8 @@
 //
 //#include <FreeImage.h>
 
-#include <entityx/entityx.h>
+//#include <entityx/entityx.h>
+#include <weq/ecs/Fwd.hpp>
 
 #if __has_include(<filesystem>)
 #include <filesystem>
@@ -19,6 +20,7 @@
 
 #include <string>
 #include <memory>
+#include <unordered_map>
 
 // Forward declarations
 namespace weq::gl{
@@ -63,12 +65,12 @@ class Resource;
 
 namespace weq::memory::resource_manager{
 
-namespace ex = entityx;
+//namespace ex = entityx;
 namespace fs = std::experimental::filesystem;
 
 extern std::unordered_map<std::string, std::weak_ptr<memory::Resource>> _memory;
 
-void initialize(ex::EventManager& events);
+void initialize(EventManager& events);
 void shutdown();
 
 template<typename T, typename... Args>

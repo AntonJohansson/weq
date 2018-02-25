@@ -1,6 +1,8 @@
 #include <weq/memory/ResourceManager.hpp>
 #include <weq/memory/Resource.hpp>
 
+#include <weq/ecs/EventManager.hpp>
+
 #include <weq/gl/Texture.hpp>
 #include <weq/gl/Shader.hpp>
 #include <weq/gl/ShaderProgram.hpp>

@@ -1,4 +1,8 @@
 #include <weq/system/Input.hpp>
+
+#include <weq/ecs/System.hpp>
+#include <weq/ecs/EventManager.hpp>
+
 #include <weq/system/InputAbstractionLayer.hpp>
 #include <weq/system/InputRaw.hpp>
 #include <weq/system/InputTypes.hpp>
@@ -70,7 +74,7 @@ namespace{
   }
 }
 
-void Input::configure(ex::EventManager& events){
+void Input::configure(EventManager& events){
   spdlog::get("console")->info("input");
   (void)events;
 
@@ -130,9 +134,9 @@ void Input::configure(ex::EventManager& events){
   _ial = new InputAbstractionLayer(context); // hmmm nope
 }
 
-void Input::update(ex::EntityManager& entities,
-            ex::EventManager& events,
-            ex::TimeDelta dt){
+void Input::update(EntityManager& entities,
+                   EventManager& events,
+                   f32 dt){
   (void) entities;
   (void) dt;
 

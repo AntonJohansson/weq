@@ -2,13 +2,14 @@
 
 #include <weq/event/Input.hpp> // temporary
 
-#include <entityx/entityx.h>
+#include <weq/ecs/Receiver.hpp>
+//#include <entityx/entityx.h>
 
 #include <memory>
 
 namespace weq::system{
 
-namespace ex = entityx;
+//namespace ex = entityx;
 
 // TODO this doesnt need to be a class. Totally useless.
 // TODO move event handling to input system and forward.
@@ -22,7 +23,7 @@ namespace ex = entityx;
 // Defined in <weq/system/InputContext.hpp>
 class InputContext;
 
-class InputAbstractionLayer : public ex::Receiver<InputAbstractionLayer>{
+class InputAbstractionLayer : public Receiver{
 public:
   InputAbstractionLayer(std::shared_ptr<InputContext> context);
 

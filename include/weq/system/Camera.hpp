@@ -1,9 +1,12 @@
 #pragma once
 
-#include <entityx/entityx.h>
+#include <weq/ecs/Fwd.hpp>
+#include <weq/ecs/System.hpp>
+#include <weq/ecs/Receiver.hpp>
+//#include <entityx/entityx.h>
 #include <glm/glm.hpp> //TODO temp
 
-namespace ex = entityx;
+//namespace ex = entityx;
 
 namespace weq::component{
 // Defined in <weq/component/Camera.hpp>
@@ -21,19 +24,20 @@ struct ActiveInput;
 
 namespace weq::system{
 
-class Camera : public ex::System<Camera>,
-               public ex::Receiver<Camera>{
+class Camera : public System<Camera>,
+               public Receiver{
 public:
   Camera();
   ~Camera();
 
-  void configure(ex::EventManager& events) override;
-  void update(ex::EntityManager& entities,
-              ex::EventManager& events,
-              ex::TimeDelta dt) override;
+  void configure(EventManager& events) override;
 
-  void update_direction(component::Camera& camera, component::Transform& t);
-  void update_arcball(component::Camera& camera, component::Transform& t);
+  void update(EntityManager& entities,
+              EventManager& events,
+              f32 dt) override;
+
+  void update_direction(component::Camera* camera, component::Transform* t);
+  void update_arcball(component::Camera* camera, component::Transform* t);
 
   void receive(const event::ActiveWindow& event);
   void receive(const event::ActiveInput& event);

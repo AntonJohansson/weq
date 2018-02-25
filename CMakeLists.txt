@@ -72,7 +72,8 @@ add_executable(weq
 if(WIN32)
   target_compile_options(weq PRIVATE /std:c++latest)
 else()
-  target_compile_options(weq PRIVATE -stdlib=libc++ -std=c++1z -Wall -Wextra -Wfatal-errors -g)
+  # -stdlib=libc++ ?
+  target_compile_options(weq PRIVATE -std=c++1z -Wall -Wextra -Wfatal-errors -g)
 endif()
 
 

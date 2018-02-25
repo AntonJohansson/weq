@@ -1,9 +1,10 @@
 #include <weq/Window.hpp>
+#include <weq/ecs/EventManager.hpp>
 #include <weq/event/Window.hpp>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <entityx/entityx.h>
+//#include <entityx/entityx.h>
 #include <spdlog/spdlog.h>
 
 namespace{
@@ -11,7 +12,9 @@ namespace{
   bool glad_initialized;
 }
 
-Window::Window(entityx::EventManager& events, std::string title, unsigned int width,
+namespace weq{
+
+Window::Window(EventManager& events, std::string title, unsigned int width,
                unsigned int height, WindowMode mode)
   : _events(events),
     _x(0),
@@ -174,3 +177,5 @@ GLFWmonitor* Window::monitor(int index){
 
   return (index < count && index >= 0) ? monitors[index] : nullptr;
 }
+
+} // namespace weq

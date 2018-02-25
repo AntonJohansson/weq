@@ -1,5 +1,10 @@
 #include <weq/system/UserInterface.hpp>
+
+#include <weq/ecs/System.hpp>
+#include <weq/ecs/EventManager.hpp>
+
 #include <weq/component/ImGui.hpp>
+
 #include <weq/event/Input.hpp>
 #include <weq/event/Window.hpp>
 
@@ -19,16 +24,16 @@ namespace weq::system{
 UserInterface::UserInterface(){}
 UserInterface::~UserInterface(){}
 
-void UserInterface::configure(ex::EventManager& events){
+void UserInterface::configure(EventManager& events){
   set_timestep(8ms);
   spdlog::get("console")->info("UI");
   events.subscribe<event::ActiveInput>(*this);
   events.subscribe<event::ActiveWindow>(*this);
 }
 
-void UserInterface::update(ex::EntityManager& entities,
-                           ex::EventManager& events,
-                           ex::TimeDelta dt){
+void UserInterface::update(EntityManager& entities,
+                           EventManager& events,
+                           f32 dt){
   ImGui_ImplGlfwGL3_NewFrame();
 
   //ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, ImVec4(20/255.f, 20/255.f, 20/255.f, 1.0f));
@@ -40,7 +45,7 @@ void UserInterface::update(ex::EntityManager& entities,
 
   //ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 
-  entities.each<component::ImGui>([dt, &events](ex::Entity e, component::ImGui& i){
+  entities.each<component::ImGui>([dt, &events](Entity e, component::ImGui& i){
       if(i._register_ui)i._register_ui(events);
     });
 

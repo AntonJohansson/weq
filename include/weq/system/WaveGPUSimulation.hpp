@@ -1,8 +1,11 @@
 #pragma once
 
-#include <entityx/entityx.h>
+#include <weq/ecs/Fwd.hpp>
+#include <weq/ecs/System.hpp>
+#include <weq/ecs/Receiver.hpp>
+//#include <entityx/entityx.h>
 
-namespace ex = entityx;
+//namespace ex = entityx;
 
 // Defined in <weq/event/Input.hpp>
 namespace weq::event{struct ActiveInput;}
@@ -11,21 +14,21 @@ namespace weq::event{struct UI;}
 
 namespace weq::system{
 
-class WaveGPUSimulation : public ex::System<WaveGPUSimulation>,
-                          public ex::Receiver<WaveGPUSimulation>{
+class WaveGPUSimulation : public System<WaveGPUSimulation>,
+                          public Receiver{
 public:
-  void configure(ex::EventManager& events) override;
+  void configure(EventManager& events) override;
 
-  void update(ex::EntityManager& entities,
-              ex::EventManager& events,
-              ex::TimeDelta dt) override;
+  void update(EntityManager& entities,
+              EventManager& events,
+              f32 dt) override;
 
-  void add_ui(ex::EntityManager& entities, ex::EventManager& events);
+  void add_ui(EntityManager& entities, EventManager& events);
 
   void receive(const event::ActiveInput& event);
 private:
   bool _ui_created = false;
-  ex::Entity _ui;
+  EntityId _ui;
 };
 
 }

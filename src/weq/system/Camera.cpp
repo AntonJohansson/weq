@@ -1,6 +1,11 @@
 #include <weq/system/Camera.hpp>
+
+#include <weq/ecs/EventManager.hpp>
+#include <weq/ecs/EntityManager.hpp>
+
 #include <weq/component/Camera.hpp>
 #include <weq/component/Transform.hpp>
+
 #include <weq/event/Window.hpp>
 #include <weq/event/Input.hpp>
 #include <weq/event/DebugDraw.hpp>
@@ -73,72 +78,80 @@ Camera::Camera(){
 Camera::~Camera(){
 }
 
-void Camera::configure(ex::EventManager& events){
+void Camera::configure(EventManager& events){
   spdlog::get("console")->info("camera");
   //events.subscribe<event::WindowUpdate>(*this);
   events.subscribe<event::ActiveWindow>(*this);
   events.subscribe<event::ActiveInput>(*this);
 }
 
-void Camera::update(ex::EntityManager& entities,
-                    ex::EventManager& events,
-                    ex::TimeDelta dt){
+void Camera::update(EntityManager& entities,
+                    EventManager& events,
+                    f32 dt){
 
   // TODO don't use glm lookat -> manual rot with quaternions.
+  static auto mask = entities.generate_component_mask<component::Camera, component::Transform>();
+  component::Transform* t;
+  component::Camera* c;
 
-  auto update_perspective = [dt, this, &events](ex::Entity e,
-                                               component::Camera& c,
-                                               component::Transform& t){
+  for(auto entity : entities.entities_with_components(mask)){
+    t = entities.get<component::Transform>(entity);
+    c = entities.get<component::Camera>(entity);
+
+  //auto update_perspective = [dt, this, &events](Entity e,
+  //                                             component::Camera& c,
+  //                                             component::Transform& t){
     // Check aspect ratio
-    if(c.inherit_aspect){
-      c.aspect_ratio = _aspect_ratio;
-      c.update_projection = true;
+    if(c->inherit_aspect){
+      c->aspect_ratio = _aspect_ratio;
+      c->update_projection = true;
     }
 
     // Update look direction for both camera modes.
-    if(c.look_mode == LookMode::TARGET){
+    if(c->look_mode == LookMode::TARGET){
       update_arcball(c, t);
-    }else if(c.look_mode == LookMode::DIRECTION){
+    }else if(c->look_mode == LookMode::DIRECTION){
       update_direction(c, t);
-      c.view = glm::lookAt(t._position, t._position + t._direction, c.up);
+      c->view = glm::lookAt(t->_position, t->_position + t->_direction, c->up);
     }
 
     //TODO Move this? model needs to be built before render anc camera pass
-    //c.normal_matrix = glm::transpose(glm::inverse(c.view*t.transform));
+    //c->normal_matrix = glm::transpose(glm::inverse(c->view*t->transform));
 
-    if(c.update_projection){
-      c.projection = glm::perspective(glm::radians(c.fov), c.aspect_ratio, c.near, c.far);
-      c.update_projection = false;
+    if(c->update_projection){
+      c->projection = glm::perspective(glm::radians(c->fov), c->aspect_ratio, c->near, c->far);
+      c->update_projection = false;
     }
-  };
+  }
+    //};
 
-  entities.each<component::Camera, component::Transform>(update_perspective);
+  //entities.each<component::Camera, component::Transform>(update_perspective);
 }
 
-void Camera::update_direction(component::Camera& camera, component::Transform& t){
-  auto right    = glm::cross(t._direction, camera.up);
-  auto local_up = glm::cross(right, t._direction);
+void Camera::update_direction(component::Camera* camera, component::Transform* t){
+  auto right    = glm::cross(t->_direction, camera->up);
+  auto local_up = glm::cross(right, t->_direction);
 
-  t.rotate({glm::radians(_delta_cursor.y), glm::radians(_delta_cursor.x), 0});
+  t->rotate({glm::radians(_delta_cursor.y), glm::radians(_delta_cursor.x), 0});
 
-  //t.transform = glm::rotate(t.transform, glm::radians(10.0f*_dx), local_up);
-  //t.transform = glm::rotate(t.transform, glm::radians(10.0f*_dy), right);
-  //t.transform = glm::translate(t.transform, _translate);
+  //t->transform = glm::rotate(t->transform, glm::radians(10.0f*_dx), local_up);
+  //t->transform = glm::rotate(t->transform, glm::radians(10.0f*_dy), right);
+  //t->transform = glm::translate(t->transform, _translate);
 
-  t._position += (right*_movement_amount.x +
-                   local_up*_movement_amount.y +
-                   t._direction*_movement_amount.z);
+  t->_position += (right*_movement_amount->x +
+                   local_up*_movement_amount->y +
+                   t->_direction*_movement_amount->z);
   _delta_cursor = {0,0};
   _movement_amount = {0,0,0};
 }
 
-void Camera::update_arcball(component::Camera& camera, component::Transform& t){
+void Camera::update_arcball(component::Camera* camera, component::Transform* t){
   // radius
-  t.radius = glm::max(t.radius + _movement_amount.z, 0.0f);
+  t->radius = glm::max(t->radius + _movement_amount->z, 0.0f);
   // theta
-  t.theta = glm::clamp<float>(t.theta - _delta_cursor.y, 0.0f, glm::pi<float>());
+  t->theta = glm::clamp<float>(t->theta - _delta_cursor.y, 0.0f, glm::pi<float>());
   // phi
-  t.phi = std::fmod(t.phi - _delta_cursor.x, 360.0f);
+  t->phi = std::fmod(t->phi - _delta_cursor.x, 360.0f);
 
   // In order to get from camera to world space:
   // 1) translate radius in +z-axis,
@@ -147,17 +160,17 @@ void Camera::update_arcball(component::Camera& camera, component::Transform& t){
   // 4) translate to camera target,
 
   auto view = glm::mat4();
-  view = glm::translate(view, camera.target);
-  view = glm::rotate(view, t.phi + glm::half_pi<float>(), glm::vec3(0,0,1));
-  view = glm::rotate(view, t.theta, glm::vec3(1,0,0));
-  view = glm::translate(view, glm::vec3(0,0,t.radius));
+  view = glm::translate(view, camera->target);
+  view = glm::rotate(view, t->phi + glm::half_pi<float>(), glm::vec3(0,0,1));
+  view = glm::rotate(view, t->theta, glm::vec3(1,0,0));
+  view = glm::translate(view, glm::vec3(0,0,t->radius));
 
   // 5) the cameras position is then given as the 4th column in the matrix,
-  t._position  = glm::vec3(view[3]);
-  t._direction = -glm::vec3(view[2]);
+  t->_position  = glm::vec3(view[3]);
+  t->_direction = -glm::vec3(view[2]);
 
   // 6) inverse of this matrix gives the view matrix.
-  camera.view = glm::inverse(view);
+  camera->view = glm::inverse(view);
 
   // Reset mouse variables.
   _delta_cursor = {0,0};
@@ -165,40 +178,40 @@ void Camera::update_arcball(component::Camera& camera, component::Transform& t){
 }
 
 void Camera::receive(const event::ActiveWindow& event){
-  _aspect_ratio = event.window->aspect_ratio();
+  _aspect_ratio = event->window->aspect_ratio();
 }
 
 void Camera::receive(const event::ActiveInput& event){
   // Only update mouse camera direction when mouse is down
-  if(event.has(InputState::CURSOR_DOWN)){
+  if(event->has(InputState::CURSOR_DOWN)){
     // Update mouse delta position
-    if(event.has(InputRange::CURSOR_DX) && event.has(InputRange::CURSOR_DY)){
-      _delta_cursor.x = event.ranges.at(InputRange::CURSOR_DX);
-      _delta_cursor.y = event.ranges.at(InputRange::CURSOR_DY);
+    if(event->has(InputRange::CURSOR_DX) && event->has(InputRange::CURSOR_DY)){
+      _delta_cursor.x = event->ranges.at(InputRange::CURSOR_DX);
+      _delta_cursor.y = event->ranges.at(InputRange::CURSOR_DY);
     }
   }
 
   // Update camera distance with scroll
-  if(event.has(InputRange::CURSOR_SCROLL_X) && event.has(InputRange::CURSOR_SCROLL_Y)){
-    //double x = event.ranges.at(InputRange::CURSOR_SCROLL_X);
-    _movement_amount.z = -0.5*event.ranges.at(InputRange::CURSOR_SCROLL_Y);
+  if(event->has(InputRange::CURSOR_SCROLL_X) && event->has(InputRange::CURSOR_SCROLL_Y)){
+    //double x = event->ranges.at(InputRange::CURSOR_SCROLL_X);
+    _movement_amount->z = -0.5*event->ranges.at(InputRange::CURSOR_SCROLL_Y);
   }
 
   /* First person camera
   // Update camera movement vector
   float speed = 0.05f;
-  if(event.has(InputState::MOVE_LEFT)){
-    _movement_amount.x = -speed;
-  }if(event.has(InputState::MOVE_RIGHT)){
-    _movement_amount.x = +speed;
-  }if(event.has(InputState::MOVE_FORWARD)){
-    _movement_amount.z = +speed;
-  }if(event.has(InputState::MOVE_BACK)){
-    _movement_amount.z = -speed;
-  }if(event.has(InputState::MOVE_UP)){
-    _movement_amount.y = +speed;
-  }if(event.has(InputState::MOVE_DOWN)){
-    _movement_amount.y = -speed;
+  if(event->has(InputState::MOVE_LEFT)){
+    _movement_amount->x = -speed;
+  }if(event->has(InputState::MOVE_RIGHT)){
+    _movement_amount->x = +speed;
+  }if(event->has(InputState::MOVE_FORWARD)){
+    _movement_amount->z = +speed;
+  }if(event->has(InputState::MOVE_BACK)){
+    _movement_amount->z = -speed;
+  }if(event->has(InputState::MOVE_UP)){
+    _movement_amount->y = +speed;
+  }if(event->has(InputState::MOVE_DOWN)){
+    _movement_amount->y = -speed;
   }
   */
 }

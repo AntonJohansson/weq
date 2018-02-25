@@ -1,6 +1,7 @@
 #include <weq/system/InputAbstractionLayer.hpp>
 #include <weq/system/InputRaw.hpp>
 #include <weq/system/InputContext.hpp>
+#include <weq/ecs/EventManager.hpp>
 #include <weq/event/Input.hpp>
 
 #include <glfw/glfw3.h>

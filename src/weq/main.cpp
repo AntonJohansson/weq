@@ -1,3 +1,6 @@
+#include <weq/ecs/EventManager.hpp>
+#include <weq/ecs/EntityManager.hpp>
+#include <weq/ecs/SystemManager.hpp>
 #include <weq/gl/Shader.hpp>
 #include <weq/gl/ShaderProgram.hpp>
 #include <weq/component/Renderable.hpp>
@@ -38,32 +41,22 @@ public:
   Simulation(int argc, char** argv)
     : Application(argc, argv){
 
-    _systems.configure();
+    _systems->configure(*_events);
 
-    _hotloader = _systems.add<weq::system::Hotloader>();
-    _input     = _systems.add<weq::system::Input>();
-    _ui        = _systems.add<weq::system::UserInterface>();
-    _wgpu      = _systems.add<weq::system::WaveGPUSimulation>();
-    _camera    = _systems.add<weq::system::Camera>();
-    _ddraw     = _systems.add<weq::system::DebugDraw>();
-    _renderer  = _systems.add<weq::system::Renderer>();
-
-    //_systems.configure(); // order not guarranteed between systems
-    _hotloader->configure(_events);
-    _input->configure(_events);
-    _ui->configure(_events);
-    _wgpu->configure(_events);
-    _camera->configure(_events);
-    _ddraw->configure(_events);
-    _renderer->configure(_events);
-
+    _systems->add<weq::system::Hotloader,         0>();
+    _systems->add<weq::system::Input,             1>();
+    _systems->add<weq::system::UserInterface,     2>();
+    _systems->add<weq::system::WaveGPUSimulation, 3>();
+    _systems->add<weq::system::Camera,            4>();
+    _systems->add<weq::system::DebugDraw,         5>();
+    _systems->add<weq::system::Renderer,          6>();
 
     // Init vars
     weq::vars::read_file("..\\res\\System.vars");
     //weq::hotloader::add_directory("..\\res");
     //weq::hotloader::add("..\\res\\System.vars", [](auto path){weq::vars::read_file(path);});
 
-    _events.emit(weq::event::Track{"..\\res\\System.vars", [](auto path){
+    _events->emit(weq::event::Track{"..\\res\\System.vars", [](auto path){
           weq::vars::read_file(path);
         }});
   }
@@ -93,10 +86,11 @@ public:
   }
 
   void add_camera(){
-    auto c = _entities.create();
-    c.assign<weq::component::Camera>(LookMode::TARGET);
-    c.assign<weq::component::Transform>()->spherical(10, 0, 0);
-    c.assign<weq::component::ActiveCamera>();
+    using namespace weq::component;
+    auto c = _entities->create();
+    _entities->assign<Camera>(c, LookMode::TARGET);
+    _entities->assign<Transform>(c)->spherical(10, 0, 0);
+    _entities->assign<ActiveCamera>(c);
   }
 
   void add_wave(){
@@ -120,11 +114,13 @@ public:
     //wave_mesh->set_data(wave_mesh_data);
     // TODO this code is currently generating an error, because unused shader attributes is being optimzed away => glGetAttribLocation == -1
 
-    auto wave = _entities.create();
-    auto wave_gpu = wave.assign<weq::component::WaveGPU>(resolution,
-                                                    resolution,
-                                                    size/resolution,
-                                                    0.2f);
+    using namespace weq::component;
+    auto wave = _entities->create();
+    auto wave_gpu = _entities->assign<WaveGPU>(wave,
+                                               resolution,
+                                               resolution,
+                                               size/resolution,
+                                               0.2f);
 
     wave_gpu->vel_fbo.texture()->set_parameters({
         {GL_TEXTURE_BASE_LEVEL, 0},
@@ -158,49 +154,41 @@ public:
         });
 
 
-    wave.assign<weq::component::Transform>()->_position = {-size/2, -size/2, 0};
-    auto r = wave.assign<weq::component::Renderable>(wave_mesh);
-    //xr->scene = scene_p;
+    _entities->assign<Transform>(wave)->_position = {-size/2, -size/2, 0};
+    _entities->assign<Renderable>(wave, wave_mesh);
   }
 
   //TODO improve UI
   void add_ui(){
-    auto ui = _entities.create();
-    ui.assign<weq::component::ImGui>([this](ex::EventManager& e){
+    auto ui = _entities->create();
+    auto func = [](weq::EventManager& e){
         //ImGui::ShowTestWindow();
         ImGui::Begin("Debug", NULL, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::SetWindowCollapsed("Debug", true, ImGuiSetCond_FirstUseEver);
-        ImGui::Text("Update rates:\n  Engine    %.1f/%.1f\n  Hotloader %.1f/%.1f\n  Input     %.1f/%.1f\n  Ui        %.1f/%.1f\n  WaveSim   %.1f/%.1f\n  Camera    %.1f/%.1f\n  DebugDraw %.1f/%.1f\n  Renderer  %.1f/%.1f",
-                    _current_update_frequency,   1.0/_timestep_value,
-                    _hotloader->get_framerate(), 1.0/_hotloader->get_timestep_value(),
-                    _input->get_framerate(),     1.0/_input->get_timestep_value(),
-                    _ui->get_framerate(),        1.0/_ui->get_timestep_value(),
-                    _wgpu->get_framerate(),      1.0/_wgpu->get_timestep_value(),
-                    _camera->get_framerate(),    1.0/_camera->get_timestep_value(),
-                    _ddraw->get_framerate(),     1.0/_ddraw->get_timestep_value(),
-                    _renderer->get_framerate(),  1.0/_renderer->get_timestep_value());
-        ImGui::End();
+        //ImGui::Text("Update rates:\n  Engine    %.1f/%.1f\n  Hotloader %.1f/%.1f\n  Input     %.1f/%.1f\n  Ui        %.1f/%.1f\n  WaveSim   %.1f/%.1f\n  Camera    %.1f/%.1f\n  DebugDraw %.1f/%.1f\n  Renderer  %.1f/%.1f",
+        //            _current_update_frequency,   1.0/_timestep_value,
+        //            _hotloader->get_framerate(), 1.0/_hotloader->get_timestep_value(),
+        //            _input->get_framerate(),     1.0/_input->get_timestep_value(),
+        //            _ui->get_framerate(),        1.0/_ui->get_timestep_value(),
+        //            _wgpu->get_framerate(),      1.0/_wgpu->get_timestep_value(),
+        //            _camera->get_framerate(),    1.0/_camera->get_timestep_value(),
+        //            _ddraw->get_framerate(),     1.0/_ddraw->get_timestep_value(),
+        //            _renderer->get_framerate(),  1.0/_renderer->get_timestep_value());
+        //ImGui::End();
 
         ImGui::Begin("Menu", NULL, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::SetWindowCollapsed("Menu", false, ImGuiSetCond_FirstUseEver);
         ImGui::SetWindowPos("Menu", ImVec2(10,10), ImGuiSetCond_FirstUseEver);
         ImGui::End();
-      });
+    };
+
+    _entities->assign<weq::component::ImGui>(ui, func);
   }
 
   void update(double dt) override{
     //weq::hotloader::update();
-    _systems.update_all(dt);
+    _systems->update_all(*_entities, *_events, dt);
   }
-
-private:
-  std::shared_ptr<weq::system::Hotloader>         _hotloader;
-  std::shared_ptr<weq::system::Input>             _input;
-  std::shared_ptr<weq::system::UserInterface>     _ui;
-  std::shared_ptr<weq::system::WaveGPUSimulation> _wgpu;
-  std::shared_ptr<weq::system::Camera>            _camera;
-  std::shared_ptr<weq::system::DebugDraw>         _ddraw;
-  std::shared_ptr<weq::system::Renderer>          _renderer;
 };
 
 int main(int argc, char** argv){

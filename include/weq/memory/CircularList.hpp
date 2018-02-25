@@ -122,11 +122,11 @@ public:
     _node_pool.dealloc(n);
   }
 
-  void for_each(std::function<void(Node*)> func){
+  void for_each(std::function<void(T&)> callback){
     auto* current = _head;
 
     while(current){
-      func(current);
+      callback(current->data);
 
       current = current->next;
       if(current == _head)break;

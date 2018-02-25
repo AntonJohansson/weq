@@ -1,18 +1,25 @@
 #include <weq/system/WaveGPUSimulation.hpp>
+
+#include <weq/ecs/System.hpp>
+#include <weq/ecs/EventManager.hpp>
+
 #include <weq/component/Renderable.hpp>
 #include <weq/component/Wave.hpp>
 #include <weq/component/ImGui.hpp>
 #include <weq/component/Camera.hpp>
 #include <weq/component/Transform.hpp>
+
 #include <weq/event/Input.hpp>
 #include <weq/event/DebugDraw.hpp>
+#include <weq/event/Hotloader.hpp>
 //#include <weq/event/Camera.hpp>
+
 #include <weq/gl/Texture.hpp>
 #include <weq/gl/ShaderProgram.hpp>
 #include <weq/gl/Shader.hpp>
+
 #include <weq/primitive/Plane.hpp>
 
-#include <weq/event/Hotloader.hpp>
 
 #include <spdlog/spdlog.h>
 #include <glm/gtc/matrix_transform.hpp>
@@ -134,7 +141,7 @@ namespace{
   glm::vec2 mouse;
 }
 
-void WaveGPUSimulation::configure(ex::EventManager& events){
+void WaveGPUSimulation::configure(EventManager& events){
   namespace rm = memory::resource_manager;
 
   events.subscribe<event::ActiveInput>(*this);
@@ -195,9 +202,9 @@ void WaveGPUSimulation::configure(ex::EventManager& events){
   clear_ri = true;
 }
 
-void WaveGPUSimulation::update(ex::EntityManager& entities,
-                            ex::EventManager& events,
-                            ex::TimeDelta dt){
+void WaveGPUSimulation::update(EntityManager& entities,
+                               EventManager& events,
+                               f32 dt){
   (void)dt;
 
   // Add UI if it doesn't exist (!)
@@ -209,7 +216,7 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
     entities.each<component::Camera,
                   component::ActiveCamera,
                   component::Transform>(
-                    [&camera, &transform](ex::Entity e,
+                    [&camera, &transform](Entity e,
                                           component::Camera c,
                                           component::ActiveCamera& a,
                                           component::Transform& t){
@@ -297,7 +304,7 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
 
 
   // Components
-  entities.each<WaveGPU, Renderable>([dt, this](ex::Entity e, WaveGPU& wave, Renderable& r){
+  entities.each<WaveGPU, Renderable>([dt, this](Entity e, WaveGPU& wave, Renderable& r){
       (void)e;
 
       // Recompute grid mesh from new resolution
@@ -483,11 +490,11 @@ void WaveGPUSimulation::update(ex::EntityManager& entities,
     });
 }
 
-void WaveGPUSimulation::add_ui(ex::EntityManager& entities, ex::EventManager& events){
+void WaveGPUSimulation::add_ui(EntityManager& entities, EventManager& events){
   if(!_ui_created){
     _ui_created = true;
     _ui = entities.create();
-    _ui.assign<component::ImGui>([&](ex::EventManager& e){
+    _ui.assign<component::ImGui>([&](EventManager& e){
         ImGui::Begin("Menu");
 
         ImGui::Separator();

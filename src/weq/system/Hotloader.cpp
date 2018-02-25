@@ -1,4 +1,8 @@
 #include <weq/system/Hotloader.hpp>
+
+#include <weq/ecs/System.hpp>
+#include <weq/ecs/EventManager.hpp>
+
 #include <weq/event/Hotloader.hpp>
 
 #include <spdlog/spdlog.h>
@@ -49,13 +53,13 @@ Hotloader::Hotloader(){
 Hotloader::~Hotloader(){
 }
 
-void Hotloader::configure(ex::EventManager& events){
+void Hotloader::configure(EventManager& events){
   events.subscribe<event::Track>(*this);
 }
 
-void Hotloader::update(ex::EntityManager& entities,
-                       ex::EventManager& events,
-                       ex::TimeDelta dt){
+void Hotloader::update(EntityManager& entities,
+                       EventManager& events,
+                       f32 dt){
   for(auto& [path, func] : path_map){
     // Directories, check files in dir recusively.
     if(fs::is_directory(path)){

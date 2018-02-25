@@ -1,9 +1,8 @@
 #pragma once
 
-#include <functional>
+#include <weq/ecs/Fwd.hpp>
 #include <imgui/imgui.h>
-
-namespace entityx{class EventManager;}
+#include <functional>
 
 namespace weq::component{
 
@@ -11,7 +10,7 @@ namespace weq::component{
 // once a frame. This allows for implementation of a immediate mode GUI such
 // as ImGui.
 struct ImGui{
-  using Func = std::function<void(entityx::EventManager& e)>;
+  using Func = std::function<void(EventManager& e)>;
 
   ImGui(Func func)
     : _register_ui(func){
