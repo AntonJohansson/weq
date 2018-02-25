@@ -1,6 +1,6 @@
 #pragma once
 
-#include <weq/utility/IntegerTypes.hpp>
+#include <weq/utility/NumberTypes.hpp>
 
 namespace weq{
 

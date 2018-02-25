@@ -1,11 +1,19 @@
 #pragma once
 
-#include <weq/utility/IntegerTypes.hpp>
+#include <weq/utility/NumberTypes.hpp>
 #include <weq/memory/PoolAllocator.hpp>
 #include <weq/ecs/Component.hpp>
+
 #include <queue>
+#include <vector>
 #include <unordered_map>
 #include <bitset>
+
+// @TODO in order to dealloc components, a ptr to the component
+// is stored in a map from (id <-> void*). This is suboptimal,
+// perhaps a better allocator can be used instead of a pool map;
+// An allocator with [id] -> ptr support would be nice, but requries
+// fixed pointer locations.
 
 namespace weq{
 
@@ -48,31 +56,49 @@ public:
     PoolAllocator<C>* pool = component_pool<C>();
     C* component = pool->alloc(std::forward<Args>(args)...);
 
-    // @TODO dealloc component from pool, need pointer :/
-    // which is not kept at the moment
-    // combine with bitset?
 
     // Set bit mask for entity
     _entity_component_masks[entity_id].set(component_id);
 
+    // @TODO currently documenting component ptr, should I do it this way?
+    _component_ptrs[component_id] = reinterpret_cast<void*>(component);
 
     return component;
+  }
+
+  // @TODO check if component actually exists :)
+  template<typename C>
+  C* get(){
+    // Get component id
+    ComponentId component_id = ComponentTypeId<C>::id();
+    // Get ptr
+    C* ptr = reinterpret_cast<C*>(_component_ptrs[component_id]);
+
+    return ptr;
   }
 
   template<typename C>
   void remove(EntityId entity_id){
     ComponentId component_id = ComponentTypeId<C>::id();
-    // Reset component mask
+    // Reset component mask for component
     _entity_component_masks[entity_id].reset(component_id);
+
+    // Get component btr
+    // @TODO check if a pointer is present for component_id,
+    // instead of assuming it is
+    C* ptr = reinterpret_cast<C*>(_component_ptrs[component_id]);
+
     // Get pool
     auto pool = component_pool<C>();
-    
+
+    // Dealloc ptr in pool
+    pool->dealloc(ptr);
   }
 
   std::vector<EntityId> entities_with_components(ComponentMask& match_mask){
     std::vector<EntityId> entities;
-    for(auto [id, mask] pair : _entity_component_masks){
-      if(mask == match_mask){
+    for(auto [id, mask]: _entity_component_masks){
+      if((match_mask & mask) == match_mask){
         entities.push_back(id);
       }
     }
@@ -80,7 +106,7 @@ public:
   }
 
   template<typename... Components>
-  std::vecto<EntityId> entities_with_components(){
+  std::vector<EntityId> entities_with_components(){
     auto mask = generate_component_mask<Components...>();
     return entities_with_components(mask);
   }
@@ -98,6 +124,11 @@ public:
     ComponentMask mask;
     (mask.set(ComponentTypeId<Components>::id()), ...);
     return mask;
+  }
+
+  // Returns the number of entities
+  u64 size(){
+    return _entity_component_masks.size();
   }
 
 private:
@@ -134,6 +165,7 @@ private:
   //}
 
   // Member variables
+  std::unordered_map<ComponentId, void*>      _component_ptrs;
   std::unordered_map<EntityId, ComponentMask> _entity_component_masks;
   std::unordered_map<ComponentId, Allocator*> _component_pools;
   std::queue<u64> _free_ids;

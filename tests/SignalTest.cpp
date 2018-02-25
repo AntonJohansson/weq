@@ -5,7 +5,7 @@
 
 TEST_CASE("multiple lambdas", "[signal]"){
   u64 size = 100;
-  weq::Signal<void(int)> sig(size);
+  weq::Signal<void(int)> sig;
 
   int sum = 0;
 
@@ -26,7 +26,7 @@ TEST_CASE("member functions", "[signal]"){
   };
 
   u64 size = 100;
-  weq::Signal<void(int)> sig(size);
+  weq::Signal<void(int)> sig;
 
   Data data;
 
@@ -54,8 +54,8 @@ TEST_CASE("member functions different signatures", "[signal]"){
   };
 
   u64 size = 100;
-  weq::Signal<void(int)> i_sig(size);
-  weq::Signal<void(float)> f_sig(size);
+  weq::Signal<void(int)> i_sig;
+  weq::Signal<void(float)> f_sig;
 
   Data data;
 
@@ -75,7 +75,7 @@ TEST_CASE("member functions different signatures", "[signal]"){
 
 TEST_CASE("connect/disconnect"){
   u64 size = 100;
-  weq::Signal<void(int)> sig(size);
+  weq::Signal<void(int)> sig;
 
   std::vector<weq::Signal<void(int)>::Node*> connections;
 
@@ -119,8 +119,8 @@ TEST_CASE("connect/disconnect"){
 }
 
 TEST_CASE("Priority order", "[signal]"){
-  u64 size = 10;
-  weq::Signal<void()> sig(size);
+  u64 size = 100;
+  weq::Signal<void()> sig;
 
   std::string result = "";
   auto add_a = [&result](){result += "a";};
