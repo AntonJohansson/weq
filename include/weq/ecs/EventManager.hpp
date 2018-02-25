@@ -1,6 +1,8 @@
 #pragma once
 
+#include <weq/ecs/Fwd.hpp>
 #include <weq/ecs/Event.hpp>
+#include <weq/ecs/Receiver.hpp>
 #include <weq/ecs/Signal.hpp>
 #include <memory>
 #include <vector>
@@ -13,29 +15,6 @@ namespace weq{
 //  CONTINUE,
 //  CONSUME
 //};
-
-using EventSignal = Signal<void(const void*)>;
-using EventSignalPtr = std::shared_ptr<EventSignal>;
-using EventSignalWeakPtr = std::weak_ptr<EventSignal>;
-
-class EventManager;
-class Receiver{
-public:
-  virtual ~Receiver(){
-    for(auto pair : _connections){
-      auto& ptr = pair.second.first;
-      if(!ptr.expired()){
-        ptr.lock()->disconnect(pair.second.second);
-      }
-    }
-  }
-
-private:
-  friend class EventManager;
-  std::unordered_map<u64, std::pair<EventSignalWeakPtr, EventSignal::Node*>> _connections;
-};
-
-
 
 class EventManager{
 public:
@@ -76,16 +55,22 @@ public:
     }
   }
 
-  template<typename E, typename... Args>
-  void emit(Args&&... args){
-    // Create the event type
-    E event = E(std::forward<Args>(args)...);
+  template<typename E>
+  void emit(E event){
     // Get event id
     u64 event_id = Event<E>::family();
     // Get signal
     auto sig = event_signal(event_id);
     // Emit
     sig->emit(&event);
+  }
+
+  template<typename E, typename... Args>
+  void emit(Args&&... args){
+    // Create the event type
+    E event = E(std::forward<Args>(args)...);
+    // Emit constructed event
+    emit(event);
   }
 private:
   EventSignalPtr event_signal(u64 event_id){

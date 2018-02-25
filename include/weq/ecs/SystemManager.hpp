@@ -24,6 +24,10 @@ public:
     return system;
   }
 
+  void for_each(std::function<void(BaseSystem*)> func){
+    _system_order.for_each(func);
+  }
+
   void update_all(EntityManager& entities, EventManager& events, f32 dt){
     _system_order.for_each([&entities, &events, &dt](auto system){
         system->update(entities, events, dt);

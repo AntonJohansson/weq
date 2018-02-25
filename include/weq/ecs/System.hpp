@@ -2,6 +2,13 @@
 
 #include <weq/utility/NumberTypes.hpp>
 
+#include <chrono> // needed for multiple dts
+using namespace std::chrono_literals;
+using std::chrono::nanoseconds;
+using std::chrono::duration_cast;
+using std::chrono::duration;
+
+
 namespace weq{
 
 class EventManager;
@@ -15,6 +22,42 @@ public:
   virtual void update(EntityManager&,EventManager&, f32) = 0;
 
   static u64 _type_counter;
+
+  // extending for multiple dts
+  const nanoseconds& get_timestep(){
+    return _timestep;
+  }
+
+  double get_timestep_value(){
+    return _timestep_value;
+  }
+
+  const nanoseconds& get_lag(){
+    return _lag;
+  }
+
+  void set_lag(const nanoseconds& lag){
+    _lag = lag;
+  }
+
+  void increment_frame_counter(){_frame_counter++;}
+  void clear_frame_counter(){_frame_counter = 0;}
+  double get_framerate(){return _current_framerate;}
+  void second_has_past(){_current_framerate = _frame_counter; clear_frame_counter();}
+  unsigned int get_frame_counter(){return _frame_counter;}
+protected:
+  void set_timestep(nanoseconds timestep){
+    _timestep = timestep;
+    _timestep_value = duration_cast<duration<double>>(_timestep).count();
+  }
+
+private:
+  // Extending to support multiple dts
+  nanoseconds _timestep{16666667ns};
+  nanoseconds _lag{0ns};
+  double _timestep_value{0.01666667};
+  double _current_framerate = 0.0;
+  unsigned int _frame_counter{0};
 };
 
 // @TODO move to cpp

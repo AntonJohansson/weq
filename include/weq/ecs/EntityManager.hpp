@@ -61,18 +61,18 @@ public:
     _entity_component_masks[entity_id].set(component_id);
 
     // @TODO currently documenting component ptr, should I do it this way?
-    _component_ptrs[component_id] = reinterpret_cast<void*>(component);
+    _component_ptrs[entity_id][component_id] = reinterpret_cast<void*>(component);
 
     return component;
   }
 
   // @TODO check if component actually exists :)
   template<typename C>
-  C* get(){
+  C* get(EntityId entity_id){
     // Get component id
     ComponentId component_id = ComponentTypeId<C>::id();
     // Get ptr
-    C* ptr = reinterpret_cast<C*>(_component_ptrs[component_id]);
+    C* ptr = reinterpret_cast<C*>(_component_ptrs[entity_id][component_id]);
 
     return ptr;
   }
@@ -86,7 +86,7 @@ public:
     // Get component btr
     // @TODO check if a pointer is present for component_id,
     // instead of assuming it is
-    C* ptr = reinterpret_cast<C*>(_component_ptrs[component_id]);
+    C* ptr = reinterpret_cast<C*>(_component_ptrs[entity_id][component_id]);
 
     // Get pool
     auto pool = component_pool<C>();
@@ -149,23 +149,8 @@ private:
     return static_cast<PoolAllocator<C>*>(_component_pools[component_id]);
   }
 
-
-  //// Base case
-  //template<typename C>
-  //ComponentMask generate_component_mask(){
-  //  ComponentMask mask;
-  //  mask.set(ComponenTypeId<C>::id());
-  //  return mask;
-  //}
-
-  //// "Peel" off one component and or it with the remaining ones
-  //template<typename C1, typname C2, typename... Components>
-  //ComponentMask generate_component_mask(){
-  //  return generate_component_mask<C1>() | generate_component_mask<C2, Components...>
-  //}
-
   // Member variables
-  std::unordered_map<ComponentId, void*>      _component_ptrs;
+  std::unordered_map<EntityId, std::unordered_map<ComponentId, void*>>      _component_ptrs;
   std::unordered_map<EntityId, ComponentMask> _entity_component_masks;
   std::unordered_map<ComponentId, Allocator*> _component_pools;
   std::queue<u64> _free_ids;

@@ -87,7 +87,7 @@ TEST_CASE("entity_with_components, get", "[entity manager]"){
   REQUIRE(vec.size() == 2*n);
   for(auto id : vec){
     REQUIRE(em.has_component<IntComp>(id));
-    REQUIRE(em.get<IntComp>()->i == 1);
+    REQUIRE(em.get<IntComp>(id)->i == 1);
   }
 
   // Check float comp
@@ -95,6 +95,6 @@ TEST_CASE("entity_with_components, get", "[entity manager]"){
   REQUIRE(vec.size() == 2*n);
   for(auto id : vec){
     REQUIRE(em.has_component<FloatComp>(id));
-    REQUIRE(em.get<FloatComp>()->f == 2.3f);
+    REQUIRE(em.get<FloatComp>(id)->f == 2.3f);
   }
 }

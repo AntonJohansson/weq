@@ -19,8 +19,8 @@ TEST_CASE("circular tests", "[Circular List]"){
     REQUIRE(list.head()->data == 1);
 
     // for_each
-    list.for_each([](auto node){
-        std::cout << std::setw(16) << node->data << std::endl;
+    list.for_each([](auto data){
+        std::cout << std::setw(16) << data << std::endl;
       });
 
     // Remove
