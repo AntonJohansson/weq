@@ -4,7 +4,8 @@
 #include <weq/utility/NumberTypes.hpp>
 #include <weq/memory/CircularList.hpp>
 #include <unordered_map>
-#include <string>
+#include <sstream>
+#include <iomanip>
 #include <memory>
 
 namespace weq{
@@ -51,17 +52,18 @@ public:
   }
 
   std::string debug_info(){
-    std::string str = "Update rates:\n";
-    for_each([&str](auto system){
-        str += system->get_debug_name();
-        str += ":\t";
-        str += std::to_string(system->get_framerate());
-        str += "\t";
-        str += std::to_string(1.0/system->get_timestep_value());
-        str += "\n";
+    std::stringstream stream;
+    stream << std::setw(20) << std::left << "Update Rates:"
+           << std::setw(8) << std::left << "current"
+           << std::setw(8) << std::right << "max\n";
+    for_each([&stream](auto system){
+        stream << std::setw(4) << " " << std::setw(16) << std::left << system->get_debug_name()
+               << std::setw(4) << " " << std::setw(8)  << std::setprecision(5) << system->get_framerate()
+               << std::setw(4) << " " << std::setw(8)  << std::setprecision(5) << 1.0/system->get_timestep_value()
+               << "\n";
       });
 
-    return str;
+    return stream.str();
   }
 
 private:

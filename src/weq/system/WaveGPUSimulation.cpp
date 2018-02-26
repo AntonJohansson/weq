@@ -374,7 +374,9 @@ void WaveGPUSimulation::update(EntityManager& entities,
         int w = grid_texture->width();
         int h = grid_texture->height();
         float* bits = new float[w*h];
-        for(int i = 0; i < w*h; i++)bits[i] = 1.0f;
+		for (int i = 0; i < w*h; i++) {
+			bits[i] = 1.0f;
+		}
         grid_texture->set_subdata(0,0,w,h,bits);
         delete[] bits;
 
