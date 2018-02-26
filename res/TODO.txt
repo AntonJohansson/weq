@@ -3,8 +3,6 @@ TODO
 - FreeImage is removed,
   - replace with std_* library
 
-- Remove dependency on entityx
-
 - Use <glm/fwd.hpp> instead of <glm/glm.hpp> in headers :)
 
 - Forward declare headers?
