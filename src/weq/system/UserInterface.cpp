@@ -12,11 +12,13 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
 
+#include <vector>
+
 namespace{
-  ImVec2 menu_pos;
-  ImVec2 menu_size;
-  unsigned int window_width;
   unsigned int window_height;
+  unsigned int window_width;
+  std::vector<ImVec2> menu_pos;
+  std::vector<ImVec2> menu_size;
 }
 
 namespace weq::system{
@@ -27,7 +29,7 @@ UserInterface::~UserInterface(){}
 void UserInterface::configure(EventManager& events){
   System<UserInterface>::configure(events);
   set_timestep(8ms);
-  events.subscribe<event::ActiveInput>(*this);
+  events.subscribe<event::ActiveInput, 0>(*this); // userinterface while have high prio on input events
   events.subscribe<event::ActiveWindow>(*this);
 }
 
@@ -49,6 +51,16 @@ void UserInterface::update(EntityManager& entities,
       if(i._register_ui)i._register_ui(events);
     });
 
+  for(std::string window : {"Menu", "Debug"}){
+    ImGui::Begin(window.c_str());
+    auto pos  = ImGui::GetWindowPos();
+    auto size = ImGui::GetWindowSize();
+    menu_pos.push_back(pos);
+    menu_size.push_back(size);
+    ImGui::End();
+  }
+
+
   // Get position and size of menu
   // TODO this couples the "menu" and render system, which is not nice.
   //ImGui::Begin("Menu");
@@ -64,6 +76,38 @@ void UserInterface::update(EntityManager& entities,
 }
 
 void UserInterface::receive(const event::ActiveInput& event){
+  // @TODO hardcoded window width
+  // @TODO windows are curretnly hardcoded
+
+  for(int i = 0; i < menu_pos.size(); i++){
+    auto pos  = menu_pos[i];
+    auto size = menu_size[i];
+
+    if(event.has(InputRange::CURSOR_X) && event.has(InputRange::CURSOR_Y)){
+      float x = event.ranges.at(InputRange::CURSOR_X);
+      float y = event.ranges.at(InputRange::CURSOR_Y);
+
+      x = window_width/2 + x*window_width/2;
+      y = window_height - (window_height/2 + y*window_height/2); // ImGui inverted y-axis
+
+      //spdlog::get("console")->info("{}, {}", pos.x, pos.y);
+      //spdlog::get("console")->info("{}, {}", x, y);
+
+      if(x >= pos.x && x <= (pos.x + size.x) &&
+         y >= pos.y && y <= (pos.y + size.y)){
+        spdlog::get("console")->info("in menu!");
+        alpha = 1.0f;
+        return;
+      }
+    }
+  }
+  //spdlog::get("console")->info("");
+
+  menu_pos.clear();
+  menu_size.clear();
+
+
+
   // TODO hardcoded window size.
   // Have to cast away const, since entityx doesn't allow for non-const events.
   //auto& non_const_event = const_cast<event::ActiveInput&>(event);

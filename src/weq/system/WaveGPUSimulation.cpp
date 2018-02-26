@@ -144,6 +144,7 @@ namespace{
 
 void WaveGPUSimulation::configure(EventManager& events){
   System<WaveGPUSimulation>::configure(events);
+
   namespace rm = memory::resource_manager;
 
   events.subscribe<event::ActiveInput>(*this);

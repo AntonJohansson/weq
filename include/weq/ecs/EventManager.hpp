@@ -19,7 +19,7 @@ namespace weq{
 class EventManager{
 public:
 
-  template<typename E, typename Receiver, u8 prio = 255>
+  template<typename E, u8 prio = 255, typename Receiver>
   void subscribe(Receiver& receiver){
     // Get function pointer for reciever of this event type
     void (Receiver::*receive)(const E&) = &Receiver::receive;
