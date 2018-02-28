@@ -77,9 +77,8 @@ public:
 
 private:
   // Internal function that handles loading a texture with filename id from
-  // disk. The returned tuple contains (raw data, width, height).
-  std::tuple<unsigned char*, unsigned int, unsigned int>
-  load_texture(const fs::path& path);
+  // disk.
+  void load_texture(const fs::path& path);
 
   GLenum _target;
   GLenum _format_internal;

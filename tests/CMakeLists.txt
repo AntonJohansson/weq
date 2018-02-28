@@ -1,7 +1,8 @@
 enable_testing()
 
 if(WIN32)
-  set(EXTERNAL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../external/x32)
+  set(EXTERNAL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../external/x64)
+  #set(EXTERNAL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../external/x32)
   set(library_path ${EXTERNAL_PATH}/lib)
   link_directories(${EXTERNAL_PATH}/lib)
 elseif(APPLE)

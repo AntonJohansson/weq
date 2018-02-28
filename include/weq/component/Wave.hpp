@@ -25,9 +25,9 @@ struct WaveGPU{
       gridsize(gridsz),
       c(wavespeed),
       r(wavespeed*wavespeed/(gridsz*gridsz)),
-      vel_fbo(w, h, GL_R32F, GL_RED, GL_FLOAT),
+      vel_fbo(   w, h, GL_R32F, GL_RED, GL_FLOAT),
       height_fbo(w, h, GL_R32F, GL_RED, GL_FLOAT),
-      edge_fbo(w, 4, GL_R32F, GL_RED, GL_FLOAT){
+      edge_fbo(  w, 4, GL_R32F, GL_RED, GL_FLOAT){
   }
 
   void set_c(float wavespeed){

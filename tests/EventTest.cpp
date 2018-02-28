@@ -15,7 +15,7 @@ struct Event{
 
 struct Data : public weq::Receiver{
   static int count;
-  void receive(const Event& e){
+  void receive(Event& e){
     count++;
     REQUIRE(e.i == 1);
     REQUIRE(e.f == 2.3f);

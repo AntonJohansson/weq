@@ -12,6 +12,9 @@
 
 #include <spdlog/spdlog.h>
 
+//#define STB_IMAGE_IMPLEMENTATION
+//#include <stb/stb_image.h>
+
 #if __has_include(<filesystem>)
 #include <filesystem>
 #elif __has_include(<experimental/filesystem>)
@@ -78,6 +81,8 @@ std::shared_ptr<gl::Shader> load_shader(const fs::path& id){
 }
 
 std::shared_ptr<gl::Texture> load_texture(fs::path id){
+  //i32 w, h, bpp;
+  //u8 rgb = stbi_load(id.string().c_str(), &w, &h, &bpp, 3);
   return nullptr;
 }
 

@@ -1,13 +1,12 @@
 #include <weq/gl/Texture.hpp>
+#include <weq/utility/NumberTypes.hpp>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
 
 #include <spdlog/spdlog.h>
 
 namespace weq::gl{
-
-namespace{ // Anonymous namespace to keep track of texture data. // TODO TEMP
-  // @RM NOT USING FREEIMAGE
-  //FIBITMAP* _data(0);
-}
 
 Texture::Texture(const fs::path& path, GLenum target)
    : Resource(path),
@@ -81,16 +80,13 @@ void Texture::load(){
   _is_loaded = true;
 
   if(_type == memory::ResourceType::FILE){
-    const auto& [bits, width, height] = load_texture(_path);
-    _width = width;
-    _height = height;
-    _bits = (void*)bits;
+    load_texture(_path);
   }
 
   set_data(_bits);
 
-  // TODO unload freeimage data after this. TEMP
-  //if(_type == memory::ResourceType::FILE)FreeImage_Unload(_data);
+  // Free data, it has been copied to OpenGL!
+  if(_type == memory::ResourceType::FILE)stbi_image_free(_bits);
 }
 
 void Texture::unload(){
@@ -115,45 +111,16 @@ void Texture::resize(unsigned int w, unsigned int h){
 }
 
 // Private functions
+void Texture::load_texture(const fs::path& path){
+  i32 w, h, bpp;
+  _bits = stbi_load(path.string().c_str(), &w, &h, &bpp, 3);
 
-std::tuple<unsigned char*, unsigned int, unsigned int>
-Texture::load_texture(const fs::path& path){
-  //std::string path_str = path.string();
-  //const char* path_cstr = path_str.c_str();
-  //FREE_IMAGE_FORMAT fif;
-  //BYTE* bits(0);
-
-  //fif = FIF_UNKNOWN;
-  //fif = FreeImage_GetFileType(path_cstr, 0);
-
-  //if(fif == FIF_UNKNOWN){
-  //  fif = FreeImage_GetFIFFromFilename(path_cstr);
-  //}
-
-  //if(fif == FIF_UNKNOWN){
-  //  spdlog::get("console")->error("Unknown texture file format for: {}!", path.string());
-  //  return {nullptr, 0, 0};
-  //}
-
-  //if(FreeImage_FIFSupportsReading(fif)){
-  //  _data = FreeImage_Load(fif, path_cstr);
-
-  //  if(!_data){
-  //    spdlog::get("console")->error("Failed to read data for {}!", path.string());
-  //    return {nullptr, 0, 0};
-  //  }
-  //}else{
-  //  spdlog::get("console")->error("FreeImage does not support this extension: {}!", path.string());
-  //  return {nullptr, 0, 0};
-  //}
-
-  //bits = FreeImage_GetBits(_data);
-  //unsigned int w = FreeImage_GetWidth(_data);
-  //unsigned int h = FreeImage_GetHeight(_data);
-
-  ////FreeImage_Unload(data); TODO this should be called after glTexImage2D - could cause problems otherwise
-
-  return {nullptr, 0, 0};
+  if(_bits){
+    _width  = static_cast<u32>(w);
+    _height = static_cast<u32>(h);
+  }else{
+    spdlog::get("console")->info("Failed to load data for {}", path.string());
+  }
 }
 
 } // namespace weq::gl
