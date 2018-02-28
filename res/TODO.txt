@@ -1,5 +1,8 @@
 TODO
 
+- Make WGPU more memory efficient?
+  - encode more info in RGB?
+
 - receive-function currently accepts an event by reference
   const reference would be more logical and much safer.
   One should not ve able to alter the data of an event.

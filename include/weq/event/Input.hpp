@@ -59,6 +59,13 @@ struct ActiveInput{
       ranges.erase(it);
     }
   }
+
+  // Consumes all inputs, making the event useless (yay!)
+  void consume_all(){
+    actions.clear();
+    states.clear();
+    ranges.clear();
+  }
 };
 
 // TODO requried?

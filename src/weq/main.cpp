@@ -166,6 +166,7 @@ public:
         ImGui::Begin("Debug", NULL, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::SetWindowCollapsed("Debug", true, ImGuiSetCond_FirstUseEver);
         ImGui::Text(_entities->debug_info().c_str());
+        ImGui::Text("Engine update frequency: %.1f/%.1f", _current_update_frequency, 1.0/_timestep_value);
         ImGui::Text(_systems->debug_info().c_str());
         ImGui::End();
 

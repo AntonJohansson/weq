@@ -14,6 +14,8 @@
 //#include <entityx/entityx.h>
 #include <spdlog/spdlog.h>
 
+#include <string>
+
 #include <chrono>
 using namespace std::chrono_literals;
 using std::chrono::nanoseconds;

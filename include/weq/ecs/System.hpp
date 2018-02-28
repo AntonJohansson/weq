@@ -55,11 +55,13 @@ public:
 
   void set_debug_name(const std::string& str){_debug_name = str;}
   const std::string& get_debug_name(){return _debug_name;}
-protected:
+
   void set_timestep(nanoseconds timestep){
     _timestep = timestep;
     _timestep_value = duration_cast<duration<double>>(_timestep).count();
   }
+
+protected:
 
 private:
   // Extending to support multiple dts

@@ -12,7 +12,84 @@ namespace{
   bool glad_initialized;
 }
 
+static std::string APIENTRY gl_error_source_to_string(GLenum source){
+  switch(source){
+  case GL_DEBUG_SOURCE_API:
+    return "api"; break;
+  case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+    return "window system"; break;
+  case GL_DEBUG_SOURCE_SHADER_COMPILER:
+    return "shader compiler"; break;
+  case GL_DEBUG_SOURCE_APPLICATION:
+    return "shader compiler"; break;
+  case GL_DEBUG_SOURCE_THIRD_PARTY:
+    return "third party"; break;
+  case GL_DEBUG_SOURCE_OTHER:
+    return "other"; break;
+  default:
+    return "unknown source";
+  }
+}
+
+static std::string APIENTRY gl_error_type_to_string(GLenum type){
+  switch(type){
+  case GL_DEBUG_TYPE_ERROR:
+    return "ERROR"; break;
+  case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+    return "undefined behaviour"; break;
+  case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+    return "deprecated behaviour"; break;
+  case GL_DEBUG_TYPE_PORTABILITY:
+    return "portability"; break;
+  case GL_DEBUG_TYPE_PERFORMANCE:
+    return "performance"; break;
+  case GL_DEBUG_TYPE_MARKER:
+    return "marker"; break;
+  case GL_DEBUG_TYPE_PUSH_GROUP:
+    return "push group"; break;
+  case GL_DEBUG_TYPE_POP_GROUP:
+    return "pop group"; break;
+  case GL_DEBUG_TYPE_OTHER:
+    return "other"; break;
+  default:
+    return "unknown message type";
+  };
+}
+
+static std::string APIENTRY gl_error_severity_to_string(GLenum severity){
+  switch(severity){
+  case GL_DEBUG_SEVERITY_NOTIFICATION:
+    return "notification"; break;
+  case GL_DEBUG_SEVERITY_LOW:
+    return "low"; break;
+  case GL_DEBUG_SEVERITY_MEDIUM:
+    return "medium"; break;
+  case GL_DEBUG_SEVERITY_HIGH:
+    return "high"; break;
+  default:
+    return "unknown severity";
+  };
+}
+
+static void APIENTRY gl_error_callback( GLenum source,
+                        GLenum type,
+                        GLuint id,
+                        GLenum severity,
+                        GLsizei length,
+                        const GLchar* message,
+                        const void* userParam ){
+  if(severity == GL_DEBUG_SEVERITY_NOTIFICATION)return;
+  spdlog::get("console")->error("OpenGL debug message\nsource: {}\ntype: {}\nseverity: {}\nmessage: {}",
+                                gl_error_source_to_string(source),
+                                gl_error_type_to_string(type),
+                                gl_error_severity_to_string(severity),
+                                message);
+}
+
 namespace weq{
+
+
+
 
 Window::Window(EventManager& events, std::string title, unsigned int width,
                unsigned int height, WindowMode mode)
@@ -81,6 +158,11 @@ Window::Window(EventManager& events, std::string title, unsigned int width,
   // Calculate aspect ratio and send an update event.
   float aspect_ratio = static_cast<float>(_width)/static_cast<float>(_height);
   //_events.emit(event::WindowUpdate(_width, _height, _refresh_rate, aspect_ratio));
+
+  glEnable(GL_DEBUG_OUTPUT);
+  glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+  //glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+  glDebugMessageCallback((GLDEBUGPROC) gl_error_callback, 0);
 }
 
 Window::~Window(){

@@ -45,7 +45,7 @@ namespace{
     (void)window;
     (void)x;
     (void)y;
-    _ial->register_mouse(x, y, window_width, window_height); 
+    _ial->register_mouse(x, y, window_width, window_height);
   }
 
   static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods){

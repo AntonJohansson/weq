@@ -21,7 +21,7 @@ Framebuffer::Framebuffer(unsigned int w, unsigned int h, GLenum internal, GLenum
     glDrawBuffers(1, DrawBuffers);
 
     // Renderbuffer Depth
-    // TODO support resizing rbos
+    // @TODO support resizing rbos
     glGenRenderbuffers(1, &_rbo_depth);
     glBindRenderbuffer(GL_RENDERBUFFER, _rbo_depth);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, w, h);
@@ -54,6 +54,7 @@ void Framebuffer::resize(unsigned int w, unsigned int h){
   _texture->resize(w, h);
 
   // Resize depth buffer
+  bind();
   glBindRenderbuffer(GL_RENDERBUFFER, _rbo_depth);
   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, w, h);
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _rbo_depth);

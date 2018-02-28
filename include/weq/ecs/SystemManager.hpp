@@ -26,6 +26,13 @@ public:
     return system;
   }
 
+  template<typename S>
+  S* get(){
+    // @TODO check if we actually have the system
+    BaseSystem* base = _systems[S::id()];
+    return static_cast<S*>(base);
+  }
+
   void for_each(std::function<void(BaseSystem*)> func){
     _system_order.for_each(func);
   }

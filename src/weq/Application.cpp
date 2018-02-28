@@ -104,6 +104,7 @@ void Application::run(){
         system->set_lag(system->get_lag() + delta_time);
       });
 
+    // Update fps counters for all systems
     if(accum >= 1s){
       frame_time.add(frames);
       _current_update_frequency = frame_time.average();
@@ -116,14 +117,18 @@ void Application::run(){
       accum = 0s;
     }
 
+    // Update systems
     while(_lag >= _timestep){
       frames++;
+
       _systems->for_each([&delta_time, this](auto system){
+          // Check if increasing the engine fps is needed
           if(system->get_timestep() < _timestep){
             _timestep = system->get_timestep();
             _timestep_value = system->get_timestep_value();
           }
 
+          // Update stuff
           if(system->get_lag() >= system->get_timestep()){
             system->update(*_entities, *_events, system->get_timestep_value());
             system->set_lag(system->get_lag() - system->get_timestep());

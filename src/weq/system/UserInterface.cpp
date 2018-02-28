@@ -28,7 +28,6 @@ UserInterface::~UserInterface(){}
 
 void UserInterface::configure(EventManager& events){
   System<UserInterface>::configure(events);
-  set_timestep(8ms);
   events.subscribe<event::ActiveInput, 0>(*this); // userinterface while have high prio on input events
   events.subscribe<event::ActiveWindow>(*this);
 }
@@ -60,7 +59,8 @@ void UserInterface::update(EntityManager& entities,
     ImGui::End();
   }
 
-
+  //ImGui_ImplGlfwGL3_EndFrame();
+ 
   // Get position and size of menu
   // TODO this couples the "menu" and render system, which is not nice.
   //ImGui::Begin("Menu");
@@ -79,31 +79,29 @@ void UserInterface::receive(event::ActiveInput& event){
   // @TODO hardcoded window width
   // @TODO windows are curretnly hardcoded
 
-  for(int i = 0; i < menu_pos.size(); i++){
-    auto pos  = menu_pos[i];
-    auto size = menu_size[i];
+  //for(int i = 0; i < menu_pos.size(); i++){
+  //  auto pos  = menu_pos[i];
+  //  auto size = menu_size[i];
 
-    if(event.has(InputRange::CURSOR_X) && event.has(InputRange::CURSOR_Y)){
-      float x = event.ranges.at(InputRange::CURSOR_X);
-      float y = event.ranges.at(InputRange::CURSOR_Y);
+  //  if(event.has(InputRange::CURSOR_X) && event.has(InputRange::CURSOR_Y)){
+  //    float x = event.ranges.at(InputRange::CURSOR_X);
+  //    float y = event.ranges.at(InputRange::CURSOR_Y);
 
-      x = window_width/2 + x*window_width/2;
-      y = window_height - (window_height/2 + y*window_height/2); // ImGui inverted y-axis
+  //    x = window_width/2 + x*window_width/2;
+  //    y = window_height - (window_height/2 + y*window_height/2); // ImGui inverted y-axis
 
-      //spdlog::get("console")->info("{}, {}", pos.x, pos.y);
-      //spdlog::get("console")->info("{}, {}", x, y);
+  //    //spdlog::get("console")->info("{}, {}", pos.x, pos.y);
+  //    //spdlog::get("console")->info("{}, {}", x, y);
 
-      if(x >= pos.x && x <= (pos.x + size.x) &&
-         y >= pos.y && y <= (pos.y + size.y)){
-        spdlog::get("console")->info("in menu!");
-        return;
-      }
-    }
-  }
-  //spdlog::get("console")->info("");
+  //    if(x >= pos.x && x <= (pos.x + size.x) &&
+  //       y >= pos.y && y <= (pos.y + size.y)){
+  //    }
+  //  }
+  //}
+  ////spdlog::get("console")->info("");
 
-  menu_pos.clear();
-  menu_size.clear();
+  //menu_pos.clear();
+  //menu_size.clear();
 
 
 

@@ -38,6 +38,8 @@
 #include <weq/memory/ResourceManager.hpp>
 #include <weq/vars/Vars.hpp>
 
+#include <thread>
+#include <atomic>
 
 
 namespace weq::system{
@@ -70,6 +72,9 @@ namespace{
   float droplet_amplitude = 0.1;
   float droplet_sigma     = 0.01;
 //float safety_factor    = 0.7;
+
+  std::atomic<bool> mesh_updated = false;
+  MeshData mesh_data;
 
   glm::vec3 spawn_drop_pos;
 
@@ -311,6 +316,7 @@ void WaveGPUSimulation::update(EntityManager& entities,
       (void)e;
 
       // Recompute grid mesh from new resolution
+      static std::thread t;
       if(resolution_changed){
         // Update grid paint textures size
         grid_texture->resize(resolution, resolution);
@@ -329,10 +335,20 @@ void WaveGPUSimulation::update(EntityManager& entities,
         set_c = true;
         resolution_changed = false;
 
-        // OpenGL is per thread, so this will be anoying to split out.
-        r.mesh->set_data(primitive::plane::solid(resolution, resolution,
-                                                 mesh_size/(float)resolution,
-                                                 gl::format::VNCT));
+        t = std::thread([&](){
+            // OpenGL is per thread, so this will be anoying to split out.
+            mesh_data = primitive::plane::solid(resolution, resolution,
+                                                mesh_size/(float)resolution,
+                                                gl::format::VNCT);
+            mesh_updated = true;
+          });
+      }
+
+      if(mesh_updated){
+        t.join();
+        spdlog::get("console")->info("mesh-updated");
+        r.mesh->set_data(mesh_data);
+        mesh_updated = false;
       }
 
       // Retrive old viewport settings.
@@ -528,9 +544,13 @@ void WaveGPUSimulation::add_ui(EntityManager& entities, EventManager& events){
 
         // Grid resolution
         if(ImGui::InputInt("Grid resolution", &resolution)){
-          if(resolution < 16)resolution = 16;
-          if(resolution > 2000)resolution = 2000;
+        }
+
+        // Set Grid resolution
+        if(ImGui::Button("Set resolution")){
           resolution_changed = true;
+		  if (resolution < 16)resolution = 16;
+		  if (resolution > 2000)resolution = 2000;
         }
 
         // Boundary behaviour
