@@ -75,7 +75,7 @@ void UserInterface::update(EntityManager& entities,
   //ImGui::Render();
 }
 
-void UserInterface::receive(const event::ActiveInput& event){
+void UserInterface::receive(event::ActiveInput& event){
   // @TODO hardcoded window width
   // @TODO windows are curretnly hardcoded
 
@@ -96,7 +96,6 @@ void UserInterface::receive(const event::ActiveInput& event){
       if(x >= pos.x && x <= (pos.x + size.x) &&
          y >= pos.y && y <= (pos.y + size.y)){
         spdlog::get("console")->info("in menu!");
-        alpha = 1.0f;
         return;
       }
     }
@@ -129,7 +128,7 @@ void UserInterface::receive(const event::ActiveInput& event){
   //}
 }
 
-void UserInterface::receive(const event::ActiveWindow& event){
+void UserInterface::receive(event::ActiveWindow& event){
   window_width = event.window->width();
   window_height = event.window->height();
 }

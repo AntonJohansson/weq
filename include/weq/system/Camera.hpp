@@ -39,8 +39,8 @@ public:
   void update_direction(component::Camera* camera, component::Transform* t);
   void update_arcball(component::Camera* camera, component::Transform* t);
 
-  void receive(const event::ActiveWindow& event);
-  void receive(const event::ActiveInput& event);
+  void receive(event::ActiveWindow& event);
+  void receive(event::ActiveInput& event);
 
 private:
   // TODO: Not sure about these ones.

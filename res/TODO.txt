@@ -1,7 +1,11 @@
 TODO
 
+- receive-function currently accepts an event by reference
+  const reference would be more logical and much safer.
+  One should not ve able to alter the data of an event.
+
 - FreeImage is removed,
-  - replace with std_* library
+  - replace with stb_* library
 
 - Use <glm/fwd.hpp> instead of <glm/glm.hpp> in headers :)
 

@@ -25,7 +25,7 @@ public:
               EventManager& events,
               f32 dt) override;
 
-  void receive(const event::Track& event);
+  void receive(event::Track& event);
 private:
 };
 

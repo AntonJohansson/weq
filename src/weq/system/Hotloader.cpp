@@ -77,7 +77,7 @@ void Hotloader::update(EntityManager& entities,
 }
 
 
-void Hotloader::receive(const event::Track& event){
+void Hotloader::receive(event::Track& event){
   path_map.insert({event.path, event.func});
 }
 

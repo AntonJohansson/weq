@@ -115,17 +115,17 @@ void DebugDraw::update(EntityManager& entities,
   _buffered_events.clear();
 }
 
-void DebugDraw::receive(const event::DebugVector& event){
+void DebugDraw::receive(event::DebugVector& event){
   auto mesh = std::make_shared<Mesh>(primitive::vector::solid(event.vector, event.color), gl::DrawMode::LINES);
   _buffered_events.push_back({event, mesh});
 }
 
-void DebugDraw::receive(const event::DebugRay& event){
+void DebugDraw::receive(event::DebugRay& event){
   auto mesh = std::make_shared<Mesh>(primitive::ray::solid(event.direction, event.color), gl::DrawMode::LINES);
   _buffered_events.push_back({event, mesh});
 }
 
-void DebugDraw::receive(const event::DebugCircle& event){
+void DebugDraw::receive(event::DebugCircle& event){
   auto mesh = std::make_shared<Mesh>(primitive::circle::dotted(event.radius, event.color), gl::DrawMode::LINES);
   _buffered_events.push_back({event, mesh});
 }

@@ -585,7 +585,7 @@ void WaveGPUSimulation::add_ui(EntityManager& entities, EventManager& events){
   }
 }
 
-void WaveGPUSimulation::receive(const event::ActiveInput& event){
+void WaveGPUSimulation::receive(event::ActiveInput& event){
   if(event.has(InputState::SPAWN_RAY)){
     should_raycast = true;
     if(change_grid){

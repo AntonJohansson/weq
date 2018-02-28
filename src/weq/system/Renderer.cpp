@@ -184,7 +184,7 @@ void Renderer::update(EntityManager& entities,
   }
 }
 
-void Renderer::receive(const event::ActiveInput& event){
+void Renderer::receive(event::ActiveInput& event){
   // Unproject doesn't work correctly.
   //if(event.has(InputRange::CURSOR_X) && event.has(InputRange::CURSOR_Y)){
   //  // Unproject mouse coords.
@@ -214,7 +214,7 @@ void Renderer::receive(const event::ActiveInput& event){
   }
 }
 
-void Renderer::receive(const event::ActiveWindow& event){
+void Renderer::receive(event::ActiveWindow& event){
   _window = event.window;
   configure_scene_fbo();
 }

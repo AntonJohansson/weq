@@ -167,15 +167,6 @@ public:
         ImGui::SetWindowCollapsed("Debug", true, ImGuiSetCond_FirstUseEver);
         ImGui::Text(_entities->debug_info().c_str());
         ImGui::Text(_systems->debug_info().c_str());
-        //ImGui::Text("Update rates:\n  Engine    %.1f/%.1f\n  Hotloader %.1f/%.1f\n  Input     %.1f/%.1f\n  Ui        %.1f/%.1f\n  WaveSim   %.1f/%.1f\n  Camera    %.1f/%.1f\n  DebugDraw %.1f/%.1f\n  Renderer  %.1f/%.1f",
-        //            _current_update_frequency,   1.0/_timestep_value,
-        //            _hotloader->get_framerate(), 1.0/_hotloader->get_timestep_value(),
-        //            _input->get_framerate(),     1.0/_input->get_timestep_value(),
-        //            _ui->get_framerate(),        1.0/_ui->get_timestep_value(),
-        //            _wgpu->get_framerate(),      1.0/_wgpu->get_timestep_value(),
-        //            _camera->get_framerate(),    1.0/_camera->get_timestep_value(),
-        //            _ddraw->get_framerate(),     1.0/_ddraw->get_timestep_value(),std::to_string();
-        //            _renderer->get_framerate(),  1.0/_renderer->get_timestep_value());
         ImGui::End();
 
         ImGui::Begin("Menu", NULL, ImGuiWindowFlags_AlwaysAutoResize);

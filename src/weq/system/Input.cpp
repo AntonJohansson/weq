@@ -145,7 +145,7 @@ void Input::update(EntityManager& entities,
   _ial->clear();
 }
 
-void Input::receive(const event::ActiveWindow& event){
+void Input::receive(event::ActiveWindow& event){
   window_width = event.window->width();
   window_height = event.window->height();
 }

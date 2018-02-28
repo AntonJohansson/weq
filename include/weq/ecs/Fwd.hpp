@@ -11,7 +11,8 @@ class SystemManager;
 template<typename>
 class Signal;
 
-using EventSignal = Signal<void(const void*)>;
+// @TODO const void* ????
+using EventSignal = Signal<void(void*)>;
 using EventSignalPtr = std::shared_ptr<EventSignal>;
 using EventSignalWeakPtr = std::weak_ptr<EventSignal>;
 

@@ -137,7 +137,7 @@ void Application::run(){
 
 }
 
-void Application::receive(const event::Quit& q){
+void Application::receive(event::Quit& q){
   (void)q;
   _should_quit = true;
 }

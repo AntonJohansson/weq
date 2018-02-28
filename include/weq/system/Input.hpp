@@ -28,7 +28,7 @@ public:
               EventManager& events,
               f32 dt) override;
 
-  void receive(const event::ActiveWindow& event);
+  void receive(event::ActiveWindow& event);
 private:
   GLFWwindow* _window_context;
 };

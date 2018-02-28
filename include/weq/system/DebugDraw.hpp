@@ -43,9 +43,9 @@ public:
               EventManager& events,
               f32 dt) override;
 
-  void receive(const event::DebugVector& event);
-  void receive(const event::DebugRay& event);
-  void receive(const event::DebugCircle& event);
+  void receive(event::DebugVector& event);
+  void receive(event::DebugRay& event);
+  void receive(event::DebugCircle& event);
 private:
   std::vector<std::pair<event::DebugDrawBase, std::shared_ptr<Mesh>>> _buffered_events;
   std::vector<std::pair<EntityId, float>> _timed_entities;

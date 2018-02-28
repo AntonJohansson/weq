@@ -27,8 +27,8 @@ public:
               EventManager& events,
               f32 dt) override;
 
-  void receive(const event::ActiveInput& event);
-  void receive(const event::ActiveWindow& event);
+  void receive(event::ActiveInput& event);
+  void receive(event::ActiveWindow& event);
 private:
   void configure_scene_fbo();
   std::shared_ptr<Window> _window;

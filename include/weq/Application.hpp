@@ -57,7 +57,7 @@ public:
   void run();
 
   // Handles internal engine events such as Quit
-  void receive(const event::Quit& q);
+  void receive(event::Quit& q);
 
 protected:
   bool _should_quit = false; // TODO should be handled by some statemanager?

@@ -25,7 +25,7 @@ public:
 
   void add_ui(EntityManager& entities, EventManager& events);
 
-  void receive(const event::ActiveInput& event);
+  void receive(event::ActiveInput& event);
 private:
   bool _ui_created = false;
   EntityId _ui;

@@ -10,19 +10,15 @@
 
 namespace weq{
 
-// @TODO how should I handle consume?
-//enum EventFlag{
-//  CONTINUE,
-//  CONSUME
-//};
-
 class EventManager{
 public:
 
   template<typename E, u8 prio = 255, typename Receiver>
   void subscribe(Receiver& receiver){
     // Get function pointer for reciever of this event type
-    void (Receiver::*receive)(const E&) = &Receiver::receive;
+    // @TODO events are not const when passed,
+    // should they be?
+    void (Receiver::*receive)(E&) = &Receiver::receive;
     // Get event id for this particular event-type
     u64 event_id = Event<E>::id();
     // Retrieve signal for this event-type
@@ -87,9 +83,10 @@ private:
   // Convert void(void*) to void(const E&)
   template <typename E>
   struct EventCallbackWrapper {
-    explicit EventCallbackWrapper(std::function<void(const E &)> callback) : callback(callback) {}
-    void operator()(const void *event) { callback(*(static_cast<const E*>(event))); }
-    std::function<void(const E &)> callback;
+	// @TODO const E&?
+    explicit EventCallbackWrapper(std::function<void(E&)> callback) : callback(callback) {}
+    void operator()(void *event) { callback(*(static_cast<E*>(event))); }
+    std::function<void(E&)> callback;
   };
 
 

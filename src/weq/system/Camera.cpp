@@ -177,11 +177,11 @@ void Camera::update_arcball(component::Camera* camera, component::Transform* t){
   _movement_amount = {0,0,0};
 }
 
-void Camera::receive(const event::ActiveWindow& event){
+void Camera::receive(event::ActiveWindow& event){
   _aspect_ratio = event.window->aspect_ratio();
 }
 
-void Camera::receive(const event::ActiveInput& event){
+void Camera::receive(event::ActiveInput& event){
   // Only update mouse camera direction when mouse is down
   if(event.has(InputState::CURSOR_DOWN)){
     // Update mouse delta position
