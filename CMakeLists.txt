@@ -38,9 +38,7 @@ find_package(OpenGL REQUIRED)
 add_executable(weq
   src/weq/Window.cpp
   src/weq/main.cpp
-  src/weq/Cubemap.cpp
   src/weq/Application.cpp
-  src/weq/Hotloader.cpp
 
   src/weq/gl/Framebuffer.cpp
   src/weq/gl/Shader.cpp
@@ -48,6 +46,7 @@ add_executable(weq
   src/weq/gl/VertexArray.cpp
   src/weq/gl/VertexFormat.cpp
   src/weq/gl/Texture.cpp
+  src/weq/gl/Cubemap.cpp
 
   src/weq/system/Camera.cpp
   src/weq/system/Hotloader.cpp

@@ -7,6 +7,7 @@
 #include <weq/gl/Texture.hpp>
 #include <weq/gl/Shader.hpp>
 #include <weq/gl/ShaderProgram.hpp>
+#include <weq/gl/Cubemap.hpp>
 
 #include <weq/event/Hotloader.hpp>
 
@@ -26,8 +27,9 @@
 namespace weq::memory::resource_manager{
 
 namespace{
-  const fs::path _base_path = "../res";
-  const fs::path _shader_path = _base_path/fs::path("/shaders");
+  const fs::path _base_path     = "../res";
+  const fs::path _shader_path   = _base_path/fs::path("/shaders");
+  const fs::path _texture_path  = _base_path/fs::path("/textures");
 
   EventManager* _events;
 }
@@ -36,12 +38,9 @@ std::unordered_map<std::string, std::weak_ptr<Resource>> _memory;
 
 void initialize(EventManager& events){
   _events = &events;
-
-  //FreeImage_Initialise();
 }
 
 void shutdown(){
-  //FreeImage_DeInitialise();
 }
 
 std::shared_ptr<gl::ShaderProgram> load_shader_program(const fs::path& id){
@@ -80,10 +79,31 @@ std::shared_ptr<gl::Shader> load_shader(const fs::path& id){
   return ptr;
 }
 
-std::shared_ptr<gl::Texture> load_texture(fs::path id){
+std::shared_ptr<gl::Texture> load_texture(const fs::path& id){
+  auto path = _texture_path/id;
+  auto ptr = get<gl::Texture>(id.string(), path);
   //i32 w, h, bpp;
   //u8 rgb = stbi_load(id.string().c_str(), &w, &h, &bpp, 3);
-  return nullptr;
+  return ptr;
 }
+
+std::shared_ptr<gl::Cubemap> load_cubemap(const fs::path& front,
+                                          const fs::path& back,
+                                          const fs::path& up,
+                                          const fs::path& down,
+                                          const fs::path& left,
+                                          const fs::path& right){
+  auto path = front.filename();
+  return get<gl::Cubemap>(path.string(), path,
+                          std::array<fs::path, 6>{
+                            _texture_path/right,
+                            _texture_path/left,
+                            _texture_path/back,
+                            _texture_path/front,
+                            _texture_path/up,
+                            _texture_path/down,
+                            });
+}
+
 
 } // namespace weq::memory::resource_manager

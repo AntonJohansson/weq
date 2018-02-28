@@ -27,6 +27,7 @@ namespace weq::gl{
 class ShaderProgram;
 class Shader;
 class Texture;
+class Cubemap;
 }
 
 namespace weq::memory{
@@ -91,5 +92,12 @@ std::shared_ptr<T> get(const std::string& id, Args&&... args){
 std::shared_ptr<gl::ShaderProgram> load_shader_program(const fs::path& id);
 std::shared_ptr<gl::Shader>        load_shader(const fs::path& id);
 std::shared_ptr<gl::Texture>       load_texture(const fs::path& id);
+std::shared_ptr<gl::Cubemap>       load_cubemap(const fs::path& front,
+                                                const fs::path& back,
+                                                const fs::path& up,
+                                                const fs::path& down,
+                                                const fs::path& left,
+                                                const fs::path& right);
+
 
 } // namespace weq::memory::resource_manager

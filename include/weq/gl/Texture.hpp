@@ -27,7 +27,7 @@ class Texture : public memory::Resource{
 public:
   // Contructs a texture resource with given id,
   // also generates the OpenGL texture id.
-  Texture(const fs::path& path, GLenum target);
+  Texture(const fs::path& path);
 
   // Constructs an empty texture form memory.
   Texture(GLenum target,
@@ -37,6 +37,9 @@ public:
           GLenum external = GL_RGB,
           GLenum type = GL_UNSIGNED_BYTE,
           void* bits = nullptr);
+
+  // Binds to an already existing texture.
+  Texture::Texture(const fs::path& path, GLuint texture, GLenum target);
 
   // Destorys the previously generated texture id.
   ~Texture();

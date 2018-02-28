@@ -8,6 +8,9 @@
 #include <weq/gl/VertexFormat.hpp>
 #include <weq/gl/Framebuffer.hpp>
 #include <weq/gl/Texture.hpp>
+#include <weq/gl/Cubemap.hpp>
+
+#include <weq/primitive/Cube.hpp>
 
 #include <weq/component/Renderable.hpp>
 #include <weq/component/Transform.hpp>
@@ -29,9 +32,11 @@
 namespace weq::system{
 
 namespace{
-std::shared_ptr<gl::Texture> texture;
+std::shared_ptr<gl::Cubemap> cubemap;
 std::shared_ptr<gl::ShaderProgram> screen_p;
+std::shared_ptr<gl::ShaderProgram> skymap_p;
 std::shared_ptr<Mesh> screen_mesh;
+std::shared_ptr<Mesh> skymap_mesh;
 std::shared_ptr<gl::Framebuffer> scene_fbo;
 glm::mat4 view;
 glm::mat4 proj;
@@ -53,8 +58,11 @@ void Renderer::configure(EventManager& events){
   events.subscribe<event::ActiveInput>(*this);
   events.subscribe<event::ActiveWindow>(*this);
 
+  namespace rm = memory::resource_manager;
+
   // Setup screen shader
-  screen_p = memory::resource_manager::load_shader_program("screen.prog");
+  screen_p = rm::load_shader_program("screen.prog");
+  skymap_p = rm::load_shader_program("skymap.prog");
 
   // Setup screen mesh
   gl::VertexFormat VT2 = {{
@@ -81,18 +89,16 @@ void Renderer::configure(EventManager& events){
 
 
   // Setup cubemap
-  texture = std::make_shared<gl::Texture>("cloudtop_bk.tga", GL_TEXTURE_2D);
-  texture->load();
-  texture->set_parameters({
-      {GL_TEXTURE_BASE_LEVEL, 0},
-      {GL_TEXTURE_MAX_LEVEL, 0},
-
-      {GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
-      {GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE},
-
-      {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
-      {GL_TEXTURE_MAG_FILTER, GL_LINEAR},
-      });
+  auto skymap_mesh_data = primitive::cube::solid(20.0f);
+  skymap_mesh = std::make_shared<Mesh>(skymap_mesh_data,
+                                       gl::DrawMode::TRIANGLES);
+  skymap_mesh->generate_vao(skymap_p);
+  cubemap = rm::load_cubemap("cloudtop_ft.tga",
+                             "cloudtop_bk.tga",
+                             "cloudtop_up.tga",
+                             "cloudtop_dn.tga",
+                             "cloudtop_lf.tga",
+                             "cloudtop_rt.tga");
 }
 
 void Renderer::update(EntityManager& entities,
@@ -123,6 +129,24 @@ void Renderer::update(EntityManager& entities,
   glClearColor(0, 0, 0, 1);
   glClearDepth(1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+  // Draw skybox
+  glDepthMask(GL_FALSE);
+  skymap_p->use();
+  skymap_p->set("vp", active_camera.viewproj);
+  screen_p->set("cube_texture", 0);
+
+  skymap_mesh->vao(skymap_p).bind();
+  skymap_mesh->ebo().bind();
+
+  cubemap->bind(0);
+
+  glDrawElements(GLenum(skymap_mesh->draw_mode()),
+                 skymap_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
+
+  glDepthMask(GL_TRUE);
+
 
   // Move draw code out of entities loop, works fine since there's only a
   // single entity.

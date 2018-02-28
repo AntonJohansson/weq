@@ -8,9 +8,9 @@
 
 namespace weq::gl{
 
-Texture::Texture(const fs::path& path, GLenum target)
+Texture::Texture(const fs::path& path)
    : Resource(path),
-    _target(target),
+    _target(GL_TEXTURE_2D),
     _format_internal(GL_RGB),
     _format_external(GL_RGB),
     _format_type(GL_UNSIGNED_BYTE){
@@ -33,6 +33,11 @@ Texture::Texture(GLenum target,
     _bits(bits){
   glGenTextures(1, &_texture);
 }
+
+Texture::Texture(const fs::path& path, GLuint texture, GLenum target)
+  : Resource(path),
+    _texture(texture),
+    _target(target){}
 
 Texture::~Texture(){
   glDeleteTextures(1, &_texture);

@@ -30,7 +30,7 @@ struct ActiveCamera{};
 struct Camera{
   Camera(LookMode look_mode = LookMode::DIRECTION,
          float n = 1.0f,
-         float f = 20.0f,
+         float f = 40.0f,
          float fov = 45.0f,
          float a_ratio = 0.0f,
          glm::vec3 target = {0, 0, 0})
