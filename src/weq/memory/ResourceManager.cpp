@@ -96,12 +96,18 @@ std::shared_ptr<gl::Cubemap> load_cubemap(const fs::path& front,
   auto path = front.filename();
   return get<gl::Cubemap>(path.string(), path,
                           std::array<fs::path, 6>{
-                            _texture_path/right,
-                            _texture_path/left,
-                            _texture_path/back,
-                            _texture_path/front,
-                            _texture_path/up,
-                            _texture_path/down,
+                            //_texture_path/right,
+                            //_texture_path/left,
+                            //_texture_path/back,
+                            //_texture_path/front,
+                            //_texture_path/up,
+                            //_texture_path/down,
+ _texture_path/right,
+ _texture_path/left,
+ _texture_path/up,
+ _texture_path/down,
+ _texture_path/front,
+ _texture_path/back,
                             });
 }
 

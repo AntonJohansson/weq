@@ -20,6 +20,7 @@ struct DebugDrawBase;
 struct DebugVector;
 struct DebugRay;
 struct DebugCircle;
+struct DebugSphere;
 class Mesh;
 }
 
@@ -44,8 +45,9 @@ public:
               f32 dt) override;
 
   void receive(event::DebugVector& event);
-  void receive(event::DebugRay& event);
+  void receive(event::DebugRay&    event);
   void receive(event::DebugCircle& event);
+  void receive(event::DebugSphere& event);
 private:
   std::vector<std::pair<event::DebugDrawBase, std::shared_ptr<Mesh>>> _buffered_events;
   std::vector<std::pair<EntityId, float>> _timed_entities;

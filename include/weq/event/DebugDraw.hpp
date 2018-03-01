@@ -12,9 +12,9 @@ struct DebugDrawBase{
 
   DebugDrawBase(glm::vec3 p, glm::vec4 c, float d = -1.0f)
     : position(p),
-      color(c),
-      duration(d),
-      has_duration(d >= 0.0f) {}
+	  color(c),
+	  duration(d),
+	  has_duration(d >= 0.0f) {}
 };
 
 struct DebugVector : DebugDrawBase{
@@ -39,6 +39,18 @@ struct DebugCircle : DebugDrawBase{
   DebugCircle(float r, glm::vec3 p, glm::vec4 c, float t = -1.0f)
     : DebugDrawBase(p, c, t),
       radius(r) {}
+};
+
+struct DebugSphere : DebugDrawBase{
+  float radius;
+  int   parallels;
+  int   meridians;
+
+  DebugSphere(float r, int pl, int m, glm::vec3 p, glm::vec4 c, float t = -1.0f)
+    : DebugDrawBase(p, c, t),
+      radius(r),
+      parallels(pl),
+      meridians(m){}
 };
 
 } // namespace weq::event

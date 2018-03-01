@@ -1,5 +1,7 @@
 TODO
 
+- Since +z is up, cubemap has to be rotated
+
 - Make WGPU more memory efficient?
   - encode more info in RGB?
 

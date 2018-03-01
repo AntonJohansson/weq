@@ -159,10 +159,14 @@ Window::Window(EventManager& events, std::string title, unsigned int width,
   float aspect_ratio = static_cast<float>(_width)/static_cast<float>(_height);
   //_events.emit(event::WindowUpdate(_width, _height, _refresh_rate, aspect_ratio));
 
-  glEnable(GL_DEBUG_OUTPUT);
-  glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-  //glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-  glDebugMessageCallback((GLDEBUGPROC) gl_error_callback, 0);
+  //glEnable(GL_DEBUG_OUTPUT);
+  //glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+  ////glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+  //glDebugMessageCallback((GLDEBUGPROC) gl_error_callback, 0);
+
+  glFrontFace(GL_CW);
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
 }
 
 Window::~Window(){

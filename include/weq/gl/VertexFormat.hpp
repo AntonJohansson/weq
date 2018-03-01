@@ -64,59 +64,65 @@ struct VertexFormat{
 namespace format{
 
 const static VertexFormat VNCT = {{
-  {"position", Type::FLOAT, 3},
-  {"normal",   Type::FLOAT, 3},
-  {"color",    Type::FLOAT, 4},
-  {"texcoord", Type::FLOAT, 2}
-}};
+    {"position", Type::FLOAT, 3},
+    {"normal",   Type::FLOAT, 3},
+    {"color",    Type::FLOAT, 4},
+    {"texcoord", Type::FLOAT, 2}
+  }};
 
 const static VertexFormat VNC = {{
-  {"position", Type::FLOAT, 3},
-  {"normal",   Type::FLOAT, 3},
-  {"color",    Type::FLOAT, 4},
-}};
+    {"position", Type::FLOAT, 3},
+    {"normal",   Type::FLOAT, 3},
+    {"color",    Type::FLOAT, 4},
+  }};
 
 const static VertexFormat VNT = {{
-  {"position", Type::FLOAT, 3},
-  {"normal",   Type::FLOAT, 3},
-  {"texcoord", Type::FLOAT, 2}
-}};
+    {"position", Type::FLOAT, 3},
+    {"normal",   Type::FLOAT, 3},
+    {"texcoord", Type::FLOAT, 2}
+  }};
 
 const static VertexFormat VC = {{
-  {"position", Type::FLOAT, 3},
-  {"color",    Type::FLOAT, 4}
-}};
+    {"position", Type::FLOAT, 3},
+    {"color",    Type::FLOAT, 4}
+  }};
 
 const static VertexFormat VT = {{
-  {"position", Type::FLOAT, 3},
-  {"texcoord", Type::FLOAT, 2}
-}};
+    {"position", Type::FLOAT, 3},
+    {"texcoord", Type::FLOAT, 2}
+  }};
 
 const static VertexFormat NT = {{
-  {"normal",   Type::FLOAT, 3},
-  {"texcoord", Type::FLOAT, 2}
-}};
+    {"normal",   Type::FLOAT, 3},
+    {"texcoord", Type::FLOAT, 2}
+  }};
+
+const static VertexFormat VN = {{
+    {"position",   Type::FLOAT, 3},
+    {"normal",     Type::FLOAT, 3}
+  }};
+
 
 const static VertexFormat NC = {{
-  {"normal", Type::FLOAT, 3},
-  {"color",  Type::FLOAT, 4}
-}};
+    {"normal", Type::FLOAT, 3},
+    {"color",  Type::FLOAT, 4}
+  }};
 
 const static VertexFormat V = {{
-  {"position", Type::FLOAT, 3}
-}};
+    {"position", Type::FLOAT, 3}
+  }};
 
 const static VertexFormat N = {{
-  {"normal", Type::FLOAT, 3}
-}};
+    {"normal", Type::FLOAT, 3}
+  }};
 
 const static VertexFormat C = {{
-  {"color", Type::FLOAT, 4}
-}};
+    {"color", Type::FLOAT, 4}
+  }};
 
 const static VertexFormat T = {{
-  {"texcoord", Type::FLOAT, 2}
-}};
+    {"texcoord", Type::FLOAT, 2}
+  }};
 
 } // namespace format
 

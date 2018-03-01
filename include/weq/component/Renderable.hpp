@@ -22,6 +22,11 @@ struct Renderable{
   // TODO there is a better data type for this.
   // should also keep track of name to bind to in shaders.
   std::vector<std::shared_ptr<gl::Texture>> textures;
+  // @TODO this is probably not the best solution.
+  bool require_skybox     = false;
+  bool require_camera_pos = false;
+  bool wireframe          = false;
+
 };
 
 } // namespace weq::component

@@ -16,11 +16,11 @@
 #include <weq/primitive/Vector.hpp>
 #include <weq/primitive/Ray.hpp>
 #include <weq/primitive/Circle.hpp>
+#include <weq/primitive/Sphere.hpp>
 
 #include <spdlog/spdlog.h>
 
 #include <algorithm>
-
 
 namespace weq::system{
 
@@ -28,15 +28,18 @@ const std::string vertex_source = R"(
 #version 410
 
 in vec3 position;
+in vec3 normal;
 in vec4 color;
 
 out vec4 v_color;
+out vec3 v_normal;
 
 uniform mat4 mvp;
 
 void main(){
   gl_Position = mvp * vec4(position, 1.0);
-  v_color = color;
+  v_color  = color;
+  v_normal = normal;
 }
 )";
 
@@ -44,11 +47,12 @@ const std::string fragment_source = R"(
 #version 410
 
 in vec4 v_color;
+in vec3 v_normal;
 
 out vec4 frag_color;
 
 void main(){
-  frag_color = v_color;
+  frag_color = v_color + vec4(v_normal, 1.0);
 }
 )";
 
@@ -66,6 +70,7 @@ void DebugDraw::configure(EventManager& events){
   events.subscribe<event::DebugVector>(*this);
   events.subscribe<event::DebugRay>(*this);
   events.subscribe<event::DebugCircle>(*this);
+  events.subscribe<event::DebugSphere>(*this);
 
   auto passthrough_v = std::make_shared<gl::Shader>(gl::ShaderType::VERTEX, vertex_source);
   auto passthrough_f = std::make_shared<gl::Shader>(gl::ShaderType::FRAGMENT, fragment_source);
@@ -127,6 +132,11 @@ void DebugDraw::receive(event::DebugRay& event){
 
 void DebugDraw::receive(event::DebugCircle& event){
   auto mesh = std::make_shared<Mesh>(primitive::circle::dotted(event.radius, event.color), gl::DrawMode::LINES);
+  _buffered_events.push_back({event, mesh});
+}
+
+void DebugDraw::receive(event::DebugSphere& event){
+  auto mesh = std::make_shared<Mesh>(primitive::sphere::uv(event.radius, event.parallels, event.meridians), gl::DrawMode::TRIANGLES);
   _buffered_events.push_back({event, mesh});
 }
 

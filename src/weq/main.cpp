@@ -9,6 +9,8 @@
 #include <weq/component/Wave.hpp>
 #include <weq/component/Camera.hpp>
 #include <weq/primitive/Plane.hpp>
+#include <weq/primitive/Sphere.hpp>
+#include <weq/primitive/Cube.hpp>
 #include <weq/event/Internal.hpp>
 #include <weq/event/DebugDraw.hpp>
 #include <weq/event/Hotloader.hpp>
@@ -69,6 +71,8 @@ public:
     add_camera();
     add_wave();
     add_ui();
+    add_reflection_sphere();
+    add_reflection_cube();
   }
 
   void configure_states(){
@@ -83,6 +87,32 @@ public:
     //        {},
     //        {}
     //      }});
+  }
+
+  void add_reflection_sphere(){
+    auto shader = weq::memory::resource_manager::load_shader_program("reflection.prog");
+    auto mesh = std::make_shared<weq::Mesh>(weq::primitive::sphere::uv(1.0f, 100, 100), weq::gl::DrawMode::TRIANGLES);
+
+    auto e = _entities->create();
+    auto t = _entities->assign<weq::component::Transform>(e)->_position = {2.0f, 0, 2.0f};
+	  auto r = _entities->assign<weq::component::Renderable>(e, mesh);
+	  r->scene = shader;
+    r->require_camera_pos = true;
+    r->require_skybox     = true;
+    //r->wireframe          = true;
+  }
+
+  void add_reflection_cube(){
+    auto shader = weq::memory::resource_manager::load_shader_program("reflection.prog");
+    auto mesh = std::make_shared<weq::Mesh>(weq::primitive::cube::solid(1.0f), weq::gl::DrawMode::TRIANGLES);
+
+    auto e = _entities->create();
+    auto t = _entities->assign<weq::component::Transform>(e)->_position = {-2.0f, 0, 2.0f};
+	  auto r = _entities->assign<weq::component::Renderable>(e, mesh);
+	  r->scene = shader;
+    r->require_camera_pos = true;
+    r->require_skybox     = true;
+    //r->wireframe          = true;
   }
 
   void add_camera(){

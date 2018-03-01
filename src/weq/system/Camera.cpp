@@ -10,6 +10,8 @@
 #include <weq/event/Input.hpp>
 #include <weq/event/DebugDraw.hpp>
 
+#include <weq/vars/Vars.hpp>
+
 #include <spdlog/spdlog.h>
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -35,6 +37,10 @@
 // TODO inverted x-movement
 
 namespace{
+  bool fps_mode = false;
+  Var(float, camera_speed, 0.5f);
+  Var(float, camera_sensitivity, 1.0f);
+
   void draw_mat(glm::mat4 m){
     spdlog::get("console")->info(
       "\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n",
@@ -111,12 +117,15 @@ void Camera::update(EntityManager& entities,
     if(c->look_mode == LookMode::TARGET){
       update_arcball(c, t);
     }else if(c->look_mode == LookMode::DIRECTION){
+      if(!fps_mode)fps_mode = true;
+
       update_direction(c, t);
       c->view = glm::lookAt(t->_position, t->_position + t->_direction, c->up);
     }
 
     //TODO Move this? model needs to be built before render anc camera pass
-    //c->normal_matrix = glm::transpose(glm::inverse(c->view*t->transform));
+    //c->normal_matrix = glm::transpose(glm::inverse(c->view*t->model()));
+    //c->normal_matrix = glm::transpose(glm::inverse(glm::mat4(glm::mat3(t->model()))));
 
     if(c->update_projection){
       c->projection = glm::perspective(glm::radians(c->fov), c->aspect_ratio, c->near, c->far);
@@ -132,15 +141,16 @@ void Camera::update_direction(component::Camera* camera, component::Transform* t
   auto right    = glm::cross(t->_direction, camera->up);
   auto local_up = glm::cross(right, t->_direction);
 
-  t->rotate({glm::radians(_delta_cursor.y), glm::radians(_delta_cursor.x), 0});
+  _delta_cursor = -camera_sensitivity.var*_delta_cursor;
+  t->rotate({glm::radians(_delta_cursor.y), 0, glm::radians(_delta_cursor.x)});
 
   //t->transform = glm::rotate(t->transform, glm::radians(10.0f*_dx), local_up);
   //t->transform = glm::rotate(t->transform, glm::radians(10.0f*_dy), right);
   //t->transform = glm::translate(t->transform, _translate);
 
   t->_position += (right*_movement_amount.x +
-                   local_up*_movement_amount.y +
-                   t->_direction*_movement_amount.z);
+                   t->_direction*_movement_amount.y +
+                   local_up*_movement_amount.z);
   _delta_cursor = {0,0};
   _movement_amount = {0,0,0};
 }
@@ -197,23 +207,23 @@ void Camera::receive(event::ActiveInput& event){
     _movement_amount.z = -0.5*event.ranges.at(InputRange::CURSOR_SCROLL_Y);
   }
 
-  /* First person camera
+  // First person
   // Update camera movement vector
-  float speed = 0.05f;
-  if(event.has(InputState::MOVE_LEFT)){
-    _movement_amount->x = -speed;
-  }if(event.has(InputState::MOVE_RIGHT)){
-    _movement_amount->x = +speed;
-  }if(event.has(InputState::MOVE_FORWARD)){
-    _movement_amount->z = +speed;
-  }if(event.has(InputState::MOVE_BACK)){
-    _movement_amount->z = -speed;
-  }if(event.has(InputState::MOVE_UP)){
-    _movement_amount->y = +speed;
-  }if(event.has(InputState::MOVE_DOWN)){
-    _movement_amount->y = -speed;
+  if(fps_mode){
+    if(event.has(InputState::MOVE_LEFT)){
+      _movement_amount.x = -camera_speed.var;
+    }if(event.has(InputState::MOVE_RIGHT)){
+      _movement_amount.x = +camera_speed.var;
+    }if(event.has(InputState::MOVE_FORWARD)){
+      _movement_amount.y = +camera_speed.var;
+    }if(event.has(InputState::MOVE_BACK)){
+      _movement_amount.y = -camera_speed.var;
+    }if(event.has(InputState::MOVE_UP)){
+      _movement_amount.z = +camera_speed.var;
+    }if(event.has(InputState::MOVE_DOWN)){
+      _movement_amount.z = -camera_speed.var;
+    }
   }
-  */
 }
 
 }

@@ -19,6 +19,7 @@
 
 #include <weq/event/Input.hpp>
 #include <weq/event/Window.hpp>
+#include <weq/event/Hotloader.hpp>
 
 #include <weq/Window.hpp>
 #include <weq/memory/ResourceManager.hpp>
@@ -89,16 +90,17 @@ void Renderer::configure(EventManager& events){
 
 
   // Setup cubemap
-  auto skymap_mesh_data = primitive::cube::solid(20.0f);
+  auto skymap_mesh_data = primitive::cube::inwards_facing(20.0f);
   skymap_mesh = std::make_shared<Mesh>(skymap_mesh_data,
                                        gl::DrawMode::TRIANGLES);
   skymap_mesh->generate_vao(skymap_p);
-  cubemap = rm::load_cubemap("cloudtop_ft.tga",
-                             "cloudtop_bk.tga",
-                             "cloudtop_up.tga",
-                             "cloudtop_dn.tga",
-                             "cloudtop_lf.tga",
-                             "cloudtop_rt.tga");
+
+  cubemap = rm::load_cubemap("miramar_ft.tga",
+                             "miramar_bk.tga",
+                             "miramar_up.tga",
+                             "miramar_dn.tga",
+                             "miramar_lf.tga",
+                             "miramar_rt.tga");
 }
 
 void Renderer::update(EntityManager& entities,
@@ -112,7 +114,11 @@ void Renderer::update(EntityManager& entities,
 
   // Get the active camera (TODO must be a better way).
   component::Camera active_camera;
-  entities.each<component::Camera, component::ActiveCamera>([&active_camera](EntityId e, component::Camera& c, component::ActiveCamera& a){active_camera = c;});
+  component::Transform active_camera_transform;
+  entities.each<component::Transform, component::Camera, component::ActiveCamera>([&](EntityId e, component::Transform& t, component::Camera& c, component::ActiveCamera& a){
+      active_camera = c;
+      active_camera_transform = t;
+    });
 
   // caluclate vp-matrix
   active_camera.viewproj = active_camera.projection * active_camera.view;
@@ -132,9 +138,14 @@ void Renderer::update(EntityManager& entities,
 
 
   // Draw skybox
+  glEnable(GL_CULL_FACE);
+
   glDepthMask(GL_FALSE);
   skymap_p->use();
-  skymap_p->set("vp", active_camera.viewproj);
+  auto skymap_m = glm::rotate(glm::mat4(), glm::half_pi<float>(), {1,0,0});
+  // Converting view to mat3 -> mat4 removes translation component!
+  auto skymap_vp = active_camera.projection * glm::mat4(glm::mat3(active_camera.view)) * skymap_m;
+  skymap_p->set("vp", skymap_vp);
   screen_p->set("cube_texture", 0);
 
   skymap_mesh->vao(skymap_p).bind();
@@ -147,13 +158,16 @@ void Renderer::update(EntityManager& entities,
 
   glDepthMask(GL_TRUE);
 
+  // Assume entities won't need culling.
+  // Naive as fuck @TODO fix
+  glDisable(GL_CULL_FACE);
+
 
   // Move draw code out of entities loop, works fine since there's only a
   // single entity.
-
-  entities.each<Renderable, Transform>([dt, &active_camera](EntityId e,
-                                                            Renderable& r,
-                                                            Transform& t){
+  entities.each<Renderable, Transform>([dt, &active_camera, &active_camera_transform](EntityId e,
+                                                                                      Renderable& r,
+                                                                                      Transform& t){
       // Draw the mesh if it is drawable.
       if(r.mesh->is_valid()){
         tmp_model = t.model();
@@ -163,6 +177,7 @@ void Renderer::update(EntityManager& entities,
         r.scene->set("mvp", mvp);
         r.scene->set("normal_matrix", active_camera.normal_matrix);
 
+        // Bind textures
         for(int i = 0; i < r.textures.size(); i++){
           auto ptr = r.textures[i];
           if(ptr){
@@ -170,11 +185,34 @@ void Renderer::update(EntityManager& entities,
           }
         }
 
+        // Bind skybox if requested
+        if(r.require_skybox){
+          r.scene->set("skybox", (int)r.textures.size());
+          cubemap->bind(r.textures.size());
+        }
+        // Bind camera pos if requrested
+        if(r.require_camera_pos){
+          r.scene->set("camera_pos", active_camera_transform._position);
+          r.scene->set("normal_mat", active_camera.normal_matrix);
+          r.scene->set("camera_model", active_camera_transform.model());
+          r.scene->set("model", t.model());
+        }
+        // Bind wireframe if requested
+        if(r.wireframe){
+          glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+        }
+
+
         r.mesh->vao(r.scene).bind();
         r.mesh->ebo().bind();
 
         glDrawElements(GLenum(r.mesh->draw_mode()),
                        r.mesh->ebo().size(), GL_UNSIGNED_INT, 0);
+
+        // Unbind wireframe if it was requested
+        if(r.wireframe){
+          glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+        }
       }
     });
 
