@@ -1,5 +1,7 @@
 TODO
 
+- calculate normal for grid by sampling in a shader? :)
+
 - Since +z is up, cubemap has to be rotated
 
 - Make WGPU more memory efficient?
