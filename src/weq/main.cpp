@@ -72,8 +72,8 @@ public:
     add_camera();
     add_wave();
     add_ui();
-    add_reflection_sphere();
-    add_reflection_cube();
+    //add_reflection_sphere();
+    //add_reflection_cube();
   }
 
   void configure_states(){

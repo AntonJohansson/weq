@@ -14,6 +14,7 @@ in vec3 v_position;
 uniform samplerCube skybox;
 uniform vec3 camera_pos;
 uniform mat4 model; // which model lol...
+uniform float reflectivity;
 
 void main(){
   float h = v_height;
@@ -41,7 +42,7 @@ void main(){
   // to get the ray to line up! :) anoying...
   R = vec3(R.x, R.z, -R.y);
 
-  frag_color = vec4(0.1, 0.1, 0.1, 1) + 0.25*vec4(texture(skybox, R).rgb, 1.0) + color;
+  frag_color = vec4(0.1, 0.1, 0.1, 1) + reflectivity*vec4(texture(skybox, R).rgb, 1.0) + color;
 //
 //
 //  color = vec4(normal, 1);

@@ -72,6 +72,7 @@ namespace{
   float droplet_amplitude = 0.1;
   float droplet_sigma     = 0.01;
 //float safety_factor    = 0.7;
+  float graphics_reflectivity = 0.25f;
 
   std::atomic<bool> mesh_updated = false;
   MeshData mesh_data;
@@ -515,6 +516,7 @@ void WaveGPUSimulation::update(EntityManager& entities,
         r.textures.push_back(wave.normal_fbo.texture());
 
         // @TODO TEMP (add option?)
+        r.scene->set("reflectivity", graphics_reflectivity);
         r.require_skybox = true;
         r.require_camera_pos = true;
       }
@@ -614,6 +616,9 @@ void WaveGPUSimulation::add_ui(EntityManager& entities, EventManager& events){
               set_timestep(std::chrono::nanoseconds((unsigned int)(calculate_dt(0.0)*1e9)));
             }
           }
+
+          ImGui::SliderFloat("Surface reflectivity", &graphics_reflectivity, 0.0f, 1.0f);
+
           events.emit(event::DebugVector({1,0,0}, {0,0,0}, {1, 0, 0, 1}, 0.0f)); // X
           events.emit(event::DebugVector({0,1,0}, {0,0,0}, {0, 1, 0, 1}, 0.0f)); // Y
           events.emit(event::DebugVector({0,0,1}, {0,0,0}, {0, 0, 1, 1}, 0.0f)); // Z
