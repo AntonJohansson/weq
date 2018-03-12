@@ -133,6 +133,7 @@ namespace{
 
 namespace{
   std::shared_ptr<Mesh> screen_mesh;
+  std::shared_ptr<gl::ShaderProgram> normal_shader;
   std::shared_ptr<gl::ShaderProgram> drop_shader;
   std::shared_ptr<gl::ShaderProgram> edge_shader;
   std::shared_ptr<gl::ShaderProgram> clear_shader;
@@ -162,6 +163,7 @@ void WaveGPUSimulation::configure(EventManager& events){
   drop_shader       = rm::load_shader_program("drop.prog");
   clear_shader      = rm::load_shader_program("clear.prog");
   edge_shader       = rm::load_shader_program("edge.prog");
+  normal_shader     = rm::load_shader_program("normal.prog");
 
   // Setup 2D mesh for rendering textures
   gl::VertexFormat VT2 = {{
@@ -191,6 +193,7 @@ void WaveGPUSimulation::configure(EventManager& events){
   screen_mesh->generate_vao(drop_shader);
   screen_mesh->generate_vao(clear_shader);
   screen_mesh->generate_vao(edge_shader);
+  screen_mesh->generate_vao(normal_shader);
 
   // Grid texture
   grid_texture = std::make_shared<gl::Texture>(GL_TEXTURE_2D, resolution, resolution, GL_R32F, GL_RED, GL_FLOAT, nullptr);
@@ -328,6 +331,7 @@ void WaveGPUSimulation::update(EntityManager& entities,
         wave.height_fbo.resize(resolution, resolution);
         wave.vel_fbo.resize(resolution, resolution);
         wave.edge_fbo.resize(resolution, 4);
+        wave.normal_fbo.resize(resolution, resolution);
 
 
         clear_wave = true;
@@ -432,6 +436,17 @@ void WaveGPUSimulation::update(EntityManager& entities,
         spawn_drop = false;
       }
 
+      // Normal calculation shader
+      normal_shader->use();
+      normal_shader->set("normal_field", 0);
+      normal_shader->set("height_field", 1);
+      edge_shader->set("pixelsize", glm::vec2(1.0/wave.width, 1.0/wave.height));
+      wave.normal_fbo.texture()->bind(0);
+      wave.height_fbo.texture()->bind(1);
+
+      apply_shader(screen_mesh, wave.normal_fbo, normal_shader);
+
+
       // UI
       wave.height_fbo.bind();
       //ImGui::Begin("Debug");
@@ -450,7 +465,7 @@ void WaveGPUSimulation::update(EntityManager& entities,
       vel_shader->set("gridsize", glm::vec2(wave.gridsize, wave.gridsize));
       vel_shader->set("c", wave.c);
 
-      //temp
+      //temp radiate edge shader
       vel_shader->set("radiate_edge", boundary_item == 1);
 
       wave.height_fbo.texture()->bind(0);
@@ -470,6 +485,8 @@ void WaveGPUSimulation::update(EntityManager& entities,
 
       apply_shader(screen_mesh, wave.height_fbo, height_shader);
 
+
+      
       // Reset viewport settings.
       glViewport(old_viewport[0],
                  old_viewport[1],
@@ -495,6 +512,8 @@ void WaveGPUSimulation::update(EntityManager& entities,
         r.scene->use();
         r.scene->set("height_field", 0);
         r.textures.push_back(wave.height_fbo.texture());
+        r.scene->set("normal_field", 1);
+        r.textures.push_back(wave.normal_fbo.texture());
       }
 
       // Visualize the output from each shader.

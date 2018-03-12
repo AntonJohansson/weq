@@ -8,4 +8,4 @@ uniform samplerCube cube_texture;
 
 void main(){
   frag_color = texture(cube_texture, v_texcoords);
-} 
+}

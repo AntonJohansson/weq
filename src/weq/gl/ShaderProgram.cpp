@@ -79,6 +79,11 @@ void ShaderProgram::bind_attribute(const std::string& attribute,
     glVertexAttribPointer(attrib_location, size, type, GL_FALSE, stride, offset_pointer);
     glEnableVertexAttribArray(attrib_location);
   }else{
+    spdlog::get("console")->error("Error in shader program consisting of:");
+    for(auto& pair : _shaders){
+      spdlog::get("console")->error("\t{}", pair.second->path().string());
+    }
+
     spdlog::get("console")->error("Shader Error: Attribute \"{}\" cannot be found for shader {}.\n\t Either it is being optimzed out, or isn't being declared.", attribute, _path.string());
   }
 }

@@ -12,6 +12,17 @@ Framebuffer::Framebuffer(unsigned int w, unsigned int h, GLenum internal, GLenum
 
     _texture = std::make_shared<Texture>(GL_TEXTURE_2D, w, h, internal, external, type);
     _texture->load();
+    _texture->set_parameters({
+        {GL_TEXTURE_BASE_LEVEL, 0},
+        {GL_TEXTURE_MAX_LEVEL, 0},
+
+        {GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
+        {GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE},
+
+        {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
+        {GL_TEXTURE_MAG_FILTER, GL_LINEAR},
+        });
+
 
     //glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, _texture, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _texture->handle(), 0);

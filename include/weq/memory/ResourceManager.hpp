@@ -21,6 +21,7 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
+#include <functional>
 
 // Forward declarations
 namespace weq::gl{
@@ -89,7 +90,7 @@ std::shared_ptr<T> get(const std::string& id, Args&&... args){
   return std::dynamic_pointer_cast<T>(sp);
 }
 
-void load_tweak_file(const fs::path& id);
+void load_tweak_file(const fs::path& id, std::function<void()> on_load = nullptr);
 
 std::shared_ptr<gl::ShaderProgram> load_shader_program(const fs::path& id);
 std::shared_ptr<gl::Shader>        load_shader(const fs::path& id);

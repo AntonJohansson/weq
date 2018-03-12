@@ -2,6 +2,9 @@
 #include <weq/ecs/EventManager.hpp>
 #include <weq/event/Window.hpp>
 
+#include <weq/memory/ResourceManager.hpp>
+#include <weq/vars/Vars.hpp>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 //#include <entityx/entityx.h>
@@ -10,6 +13,9 @@
 namespace{
   bool glfw_initialized;
   bool glad_initialized;
+  Var(bool, gl_debug_output, false);
+  Var(bool, gl_cullface, true);
+  Var(int,  gl_multisample, 0);
 }
 
 static std::string APIENTRY gl_error_source_to_string(GLenum source){
@@ -101,6 +107,12 @@ Window::Window(EventManager& events, std::string title, unsigned int width,
     _mode(mode),
     _refresh_rate(60){
 
+  // Load config file for window
+  // Callback will never be called since hotloader system hasn't been created yet.
+  // buffer events? (@TODO)
+  memory::resource_manager::load_tweak_file("OpenGL.vars", [&](){
+    });
+
   // Initialize GLFW
   if(!glfw_initialized && !glfwInit()){
     spdlog::get("console")->error("Failed to initialize GLFW!");
@@ -114,6 +126,9 @@ Window::Window(EventManager& events, std::string title, unsigned int width,
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+  if(gl_multisample.var > 0){
+    glfwWindowHint(GLFW_SAMPLES, gl_multisample.var);
+  }
 
   if(_mode == WindowMode::WINDOWED){
     _window = glfwCreateWindow(_width, _height, title.c_str(), nullptr, nullptr);
@@ -161,12 +176,27 @@ Window::Window(EventManager& events, std::string title, unsigned int width,
 
   //glEnable(GL_DEBUG_OUTPUT);
   //glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-  ////glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+  //glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
   //glDebugMessageCallback((GLDEBUGPROC) gl_error_callback, 0);
 
-  glFrontFace(GL_CW);
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
+  if(gl_multisample.var > 0){
+    glEnable(GL_MULTISAMPLE);
+  }
+
+  if(gl_cullface.var){
+    glFrontFace(GL_CW);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+  }
+
+  if(gl_debug_output.var){
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+    glDebugMessageCallback((GLDEBUGPROC) gl_error_callback, 0);
+  }else{
+    glDisable(GL_DEBUG_OUTPUT);
+  }
 }
 
 Window::~Window(){

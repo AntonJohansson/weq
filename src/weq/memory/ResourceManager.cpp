@@ -49,12 +49,13 @@ void shutdown(){
 
 
 
-void load_tweak_file(const fs::path& id){
+void load_tweak_file(const fs::path& id, std::function<void()> on_load){
   auto path = _base_path/id;
   vars::read_file(path.string());
 
-  _events->emit(weq::event::Track{path.string(), [](auto path){
+  _events->emit(weq::event::Track{path.string(), [&](auto path){
         weq::vars::read_file(path);
+        if(on_load)on_load();
       }});
 
 }
