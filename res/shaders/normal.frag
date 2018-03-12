@@ -10,46 +10,39 @@ uniform vec2 pixelsize;
 void main(){
   vec2 uv = v_texcoord;
 
-  vec3 base = vec3(uv, texture(height_field, uv).r);
-  //vec3 base = vec3(0,0,0);
+  float base_height = texture(height_field, uv).r;
 
-  //vec3 average = vec3(0,0,base.z);
   vec3 average = vec3(0,0,0);
-  vec3 up = vec3(0,0,1);
+
+  vec3 l = vec3(0,0,0);
+  vec3 r = vec3(0,0,0);
+  vec3 d = vec3(0,0,0);
+  vec3 u = vec3(0,0,0);
+
   // left
   if(uv.x - pixelsize.x > 0){
-    vec2 new_uv = uv - vec2(pixelsize.x, 0);
-    vec3 v = vec3(new_uv, texture(height_field, new_uv).r) - base;
-    vec3 r = cross(v, up);
-    average = (average + normalize(cross(r,v)))/2;
+    l = vec3(-1, 0, 0);
+    l.z = textureOffset(height_field, uv, ivec2(-1,0)).r - base_height;
   }
   // right
   if(uv.x + pixelsize.x < 1){
-    vec2 new_uv = uv + vec2(pixelsize.x, 0);
-    vec3 v = vec3(new_uv, texture(height_field, new_uv).r) - base;
-    vec3 r = cross(v, up);
-    average = (average + normalize(cross(r,v)))/2;
-    //average += cross(r,v);
+    r = vec3(1, 0, 0);
+    r.z = textureOffset(height_field, uv, ivec2(1,0)).r - base_height;
   }
   // down
   if(uv.y + pixelsize.x < 1){
-    vec2 new_uv = uv + vec2(0, pixelsize.y);
-    vec3 v = vec3(new_uv, texture(height_field, new_uv).r);
-    vec3 r = cross(v, up);
-    //average = (average + normalize(cross(r,v)))/2;
-    //average = v;
-    average = (average + normalize(cross(r,v)))/2;
+    d = vec3(0, 1, 0);
+    d.z = textureOffset(height_field, uv, ivec2(0,1)).r - base_height;
   }
   // up
   if(uv.y - pixelsize.x > 0){
-    vec2 new_uv = uv - vec2(0, pixelsize.y);
-    vec3 v = vec3(new_uv, texture(height_field, new_uv).r) - base;
-    vec3 r = cross(v, up);
-    //average = (average + normalize(cross(r,v)))/2;
-    average = (average + normalize(cross(r,v)))/2;
+    u = vec3(0, -1, 0);
+    u.z = textureOffset(height_field, uv, ivec2(0,-1)).r - base_height;
   }
 
-  average = normalize(average);
+  average = cross(r, u) + cross(u, l) + cross(l, d) + cross(d, r);
 
-  frag_color = vec4((average), 1);
+  //average = normalize(average);
+
+  frag_color = vec4((-average), 1);
 }
