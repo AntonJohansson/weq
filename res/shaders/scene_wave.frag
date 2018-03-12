@@ -24,7 +24,8 @@ void main(){
     color += vec4(0, -h, 0.25, 1);
   }
 
-  vec3 normal = texture2D(normal_field, v_texcoord).rgb;
+  vec3 normal_color = texture2D(normal_field, v_texcoord).rgb;
+  vec3 normal = (2*normal_color) - vec3(1,1,1);
   color = vec4(normal, 1);
   frag_color = color;
 }

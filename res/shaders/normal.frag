@@ -42,7 +42,7 @@ void main(){
 
   average = cross(r, u) + cross(u, l) + cross(l, d) + cross(d, r);
 
-  //average = normalize(average);
+  average = -normalize(average);
 
-  frag_color = vec4((-average), 1);
+  frag_color = vec4((average + vec3(1,1,1))/2, 1);
 }
