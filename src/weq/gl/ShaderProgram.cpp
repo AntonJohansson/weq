@@ -13,6 +13,10 @@ ShaderProgram::ShaderProgram(std::shared_ptr<gl::Shader> v,
   if(f)_shaders[GLenum(f->type())] = f;
   if(g)_shaders[GLenum(g->type())] = g;
 
+  if(v){
+    _path = v->path();
+  }
+
   _program = glCreateProgram();
 }
 

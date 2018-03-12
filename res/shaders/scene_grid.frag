@@ -17,7 +17,7 @@ void main(){
 //    color += 0.25*k*(1.0/r);
 //  }
 
-  vec4 color = 0.5*texture(r_field, v_texcoord).r + vec4(0,0,0.25,1);
+  vec4 color = 0.25*texture(r_field, v_texcoord).r + vec4(0,0,0.25,1);
 
   frag_color = color;
 }

@@ -395,9 +395,9 @@ void WaveGPUSimulation::update(EntityManager& entities,
         int w = grid_texture->width();
         int h = grid_texture->height();
         float* bits = new float[w*h];
-		for (int i = 0; i < w*h; i++) {
-			bits[i] = 1.0f;
-		}
+        for (int i = 0; i < w*h; i++) {
+          bits[i] = 0.5f;
+        }
         grid_texture->set_subdata(0,0,w,h,bits);
         delete[] bits;
 
@@ -486,7 +486,6 @@ void WaveGPUSimulation::update(EntityManager& entities,
       apply_shader(screen_mesh, wave.height_fbo, height_shader);
 
 
-      
       // Reset viewport settings.
       glViewport(old_viewport[0],
                  old_viewport[1],
@@ -504,7 +503,7 @@ void WaveGPUSimulation::update(EntityManager& entities,
         //float k = wave.c*wave.c/(wave.gridsize*wave.gridsize);
         r.scene = scene_grid_shader;
         r.scene->use();
-        r.scene->set("ri_field", 0);
+        r.scene->set("r_field", 0);
         //r.scene->set("k", k);
         r.textures.push_back(grid_texture);
       }else{
@@ -535,6 +534,10 @@ void WaveGPUSimulation::add_ui(EntityManager& entities, EventManager& events){
     _ui_created = true;
     _ui = entities.create();
     entities.assign<component::ImGui>(_ui, [&](EventManager& e){
+        //ImGui::Begin("Debug");
+        //ImGui::Image((void*)grid_texture->handle(), ImVec2(200,200));
+        //ImGui::End();
+
         ImGui::Begin("Menu");
 
         ImGui::Separator();
@@ -546,6 +549,7 @@ void WaveGPUSimulation::add_ui(EntityManager& entities, EventManager& events){
           }
           set_c = true;
         }
+
 
         if(ImGui::Button("Clear waves")){
           clear_wave = true;
@@ -568,8 +572,8 @@ void WaveGPUSimulation::add_ui(EntityManager& entities, EventManager& events){
         // Set Grid resolution
         if(ImGui::Button("Set resolution")){
           resolution_changed = true;
-		  if (resolution < 16)resolution = 16;
-		  if (resolution > 2000)resolution = 2000;
+          if (resolution < 16)resolution = 16;
+          if (resolution > 2000)resolution = 2000;
         }
 
         // Boundary behaviour

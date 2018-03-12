@@ -49,6 +49,7 @@ public:
 
   void destroy(EntityId id){
     _entity_component_masks[id].reset();
+	_entity_component_masks.erase(id);
     _free_ids.push(id);
   }
 
