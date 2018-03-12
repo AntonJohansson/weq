@@ -513,6 +513,10 @@ void WaveGPUSimulation::update(EntityManager& entities,
         r.textures.push_back(wave.height_fbo.texture());
         r.scene->set("normal_field", 1);
         r.textures.push_back(wave.normal_fbo.texture());
+
+        // @TODO TEMP (add option?)
+        r.require_skybox = true;
+        r.require_camera_pos = true;
       }
 
       // Visualize the output from each shader.
