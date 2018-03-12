@@ -39,7 +39,7 @@ public:
           void* bits = nullptr);
 
   // Binds to an already existing texture.
-  Texture::Texture(const fs::path& path, GLuint texture, GLenum target);
+  Texture(const fs::path& path, GLuint texture, GLenum target);
 
   // Destorys the previously generated texture id.
   ~Texture();

@@ -89,6 +89,8 @@ std::shared_ptr<T> get(const std::string& id, Args&&... args){
   return std::dynamic_pointer_cast<T>(sp);
 }
 
+void load_tweak_file(const fs::path& id);
+
 std::shared_ptr<gl::ShaderProgram> load_shader_program(const fs::path& id);
 std::shared_ptr<gl::Shader>        load_shader(const fs::path& id);
 std::shared_ptr<gl::Texture>       load_texture(const fs::path& id);

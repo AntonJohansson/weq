@@ -9,6 +9,8 @@
 #include <weq/gl/ShaderProgram.hpp>
 #include <weq/gl/Cubemap.hpp>
 
+#include <weq/vars/Vars.hpp>
+
 #include <weq/event/Hotloader.hpp>
 
 #include <spdlog/spdlog.h>
@@ -42,6 +44,22 @@ void initialize(EventManager& events){
 
 void shutdown(){
 }
+
+
+
+
+
+void load_tweak_file(const fs::path& id){
+  auto path = _base_path/id;
+  vars::read_file(path.string());
+
+  _events->emit(weq::event::Track{path.string(), [](auto path){
+        weq::vars::read_file(path);
+      }});
+
+}
+
+
 
 std::shared_ptr<gl::ShaderProgram> load_shader_program(const fs::path& id){
   auto path = (_shader_path/id);

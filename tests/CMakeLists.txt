@@ -29,7 +29,7 @@ macro(create_test TARGET_NAME SOURCE)
     if(WIN32)
       target_compile_options(${TARGET_NAME} PRIVATE /std:c++latest)
     else()
-      target_compile_options(${TARGET_NAME} PRIVATE -stdlib=libc++ -std=c++1z -Wall -Wextra -Wfatal-errors -g)
+      target_compile_options(${TARGET_NAME} PRIVATE -std=c++1z -Wall -Wextra -Wfatal-errors -g)
     endif()
 
     target_include_directories(${TARGET_NAME} PUBLIC

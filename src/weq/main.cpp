@@ -54,13 +54,14 @@ public:
     _systems->configure(*_events);
 
     // Init vars
-    weq::vars::read_file("..\\res\\System.vars");
+    weq::resource_manager::load_tweak_file("System.vars");
+    //weq::vars::read_file("..\\res\\System.vars");
     //weq::hotloader::add_directory("..\\res");
     //weq::hotloader::add("..\\res\\System.vars", [](auto path){weq::vars::read_file(path);});
 
-    _events->emit(weq::event::Track{"..\\res\\System.vars", [](auto path){
-          weq::vars::read_file(path);
-        }});
+    //_events->emit(weq::event::Track{"..\\res\\System.vars", [](auto path){
+    //      weq::vars::read_file(path);
+    //    }});
   }
 
   void configure() override{
