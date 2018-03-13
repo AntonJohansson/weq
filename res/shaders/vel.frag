@@ -30,6 +30,7 @@ void main(){
 
     if(v_texcoord.x + pixelsize.x > 1.0){
       e = texture(edge_field, vec2(v_texcoord.y , 1.0*(1.0/4.0 + 0.5/4.0))).r;
+      //e = textureOffset(edge_field, vec2(v_texcoord.y, 0), ivec2(0,1)).r;
     }else{
       e = texture(height_field, vec2(v_texcoord.x + pixelsize.x,
                                      v_texcoord.y)).r;
@@ -37,6 +38,7 @@ void main(){
 
     if(v_texcoord.y - pixelsize.y < 0){
       n = texture(edge_field, vec2(v_texcoord.x, 2.0*(1.0/4.0) + 0.5/4.0)).r;
+      //n = textureOffset(edge_field, vec2(v_texcoord.x, 0), ivec2(0,2)).r;
     }else{
       n = texture(height_field, vec2(v_texcoord.x,
                                      v_texcoord.y - pixelsize.y)).r;
@@ -44,6 +46,7 @@ void main(){
 
     if(v_texcoord.y + pixelsize.y > 1.0){
       s = texture(edge_field, vec2(v_texcoord.x, 3.0*(1.0/4.0) + 0.5/4.0)).r;
+      //s = textureOffset(edge_field, vec2(v_texcoord.x, 0), ivec2(0,3)).r;
     }else{
       s = texture(height_field, vec2(v_texcoord.x,
                                      v_texcoord.y + pixelsize.y)).r;

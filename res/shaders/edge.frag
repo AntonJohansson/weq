@@ -31,6 +31,7 @@ void main(){
     u = texture(height_field, vec2(v_texcoord.x, 1)).r;
   }
 
-  g_new = (wave_v*dt*u + g*gridsize.x)/(gridsize.x + wave_v*dt);
+  float h = gridsize.x;
+  g_new = (wave_v*dt*u + g*h)/(h + wave_v*dt);
   frag_color = vec4(g_new, 0, 0, 0);
 }
