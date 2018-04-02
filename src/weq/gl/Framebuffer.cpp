@@ -69,6 +69,12 @@ void Framebuffer::resize(unsigned int w, unsigned int h){
   glBindRenderbuffer(GL_RENDERBUFFER, _rbo_depth);
   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, w, h);
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _rbo_depth);
+
+  // Check complete
+  if(!check_complete()){
+    spdlog::get("console")->error("Failed to create a complete frambuffer {}!", _id);
+  }
+  unbind();
 }
 
 void Framebuffer::bind(){

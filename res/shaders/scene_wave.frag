@@ -30,7 +30,9 @@ void main(){
     color += vec4(0, -h, 0.25, 1);
   }
 
-  vec3 normal_color = texture2D(normal_field, v_texcoord).rgb;
+  vec3 normal_color = texture(normal_field, v_texcoord).rgb;
+  // texture2D -> texure (on mac atleast)
+  //vec3 normal_color = texture2D(normal_field, v_texcoord).rgb;
   vec3 normal = (2*normal_color) - vec3(1,1,1);
 
   normal = mat3(transpose(inverse(model))) * normal;
@@ -42,9 +44,10 @@ void main(){
   // to get the ray to line up! :) anoying...
   R = vec3(R.x, R.z, -R.y);
 
-  frag_color = vec4(0.1, 0.1, 0.1, 1) + reflectivity*vec4(texture(skybox, R).rgb, 1.0) + color;
+  //frag_color = vec4(0.1, 0.1, 0.1, 1) + reflectivity*vec4(texture(skybox, R).rgb, 1.0) + color;
 //
 //
 //  color = vec4(normal, 1);
 //  frag_color = color;
+  frag_color = vec4(1,1,1,1);
 }

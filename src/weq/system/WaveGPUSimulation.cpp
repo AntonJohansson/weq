@@ -326,9 +326,10 @@ void WaveGPUSimulation::update(EntityManager& entities,
         grid_texture->resize(resolution, resolution);
 
         // Update grid mesh
-        wave.width = resolution;
-        wave.height = resolution;
+        wave.width    = resolution;
+        wave.height   = resolution;
         wave.gridsize = mesh_size/resolution;
+
         wave.height_fbo.resize(resolution, resolution);
         wave.vel_fbo.resize(resolution, resolution);
         wave.edge_fbo.resize(resolution, 4);
@@ -344,7 +345,7 @@ void WaveGPUSimulation::update(EntityManager& entities,
             // OpenGL is per thread, so this will be anoying to split out.
             mesh_data = primitive::plane::solid(resolution, resolution,
                                                 mesh_size/(float)resolution,
-                                                gl::format::VNCT);
+                                                gl::format::VT);
             mesh_updated = true;
           });
       }
