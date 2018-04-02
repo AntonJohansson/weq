@@ -193,18 +193,15 @@ public:
   void add_ui(){
     auto ui = _entities->create();
     auto func = [this](weq::EventManager& e){
-        //ImGui::ShowTestWindow();
-        ImGui::Begin("Debug", NULL, ImGuiWindowFlags_AlwaysAutoResize);
-        ImGui::SetWindowCollapsed("Debug", true, ImGuiSetCond_FirstUseEver);
-        ImGui::Text(_entities->debug_info().c_str());
-        ImGui::Text("Engine update frequency: %.1f/%.1f", _current_update_frequency, 1.0/_timestep_value);
-        ImGui::Text(_systems->debug_info().c_str());
-        ImGui::End();
+      //ImGui::ShowTestWindow();
 
-        ImGui::Begin("Menu", NULL, ImGuiWindowFlags_AlwaysAutoResize);
-        ImGui::SetWindowCollapsed("Menu", false, ImGuiSetCond_FirstUseEver);
-        ImGui::SetWindowPos("Menu", ImVec2(10,10), ImGuiSetCond_FirstUseEver);
-        ImGui::End();
+      ImGui::Begin("Debug", NULL, ImGuiWindowFlags_AlwaysAutoResize);
+      ImGui::SetWindowCollapsed("Debug", true, ImGuiSetCond_FirstUseEver);
+      ImGui::Text(_entities->debug_info().c_str());
+      ImGui::Text("Engine update frequency: %.1f/%.1f", _current_update_frequency, 1.0/_timestep_value);
+      ImGui::Text(_systems->debug_info().c_str());
+      ImGui::End();
+
     };
 
     _entities->assign<weq::component::ImGui>(ui, func);

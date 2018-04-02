@@ -142,6 +142,7 @@ void Renderer::update(EntityManager& entities,
 
   glDepthMask(GL_FALSE);
   skymap_p->use();
+  // Rotate due to different axes :)
   auto skymap_m = glm::rotate(glm::mat4(), glm::half_pi<float>(), {1,0,0});
   // Converting view to mat3 -> mat4 removes translation component!
   auto skymap_vp = active_camera.projection * glm::mat4(glm::mat3(active_camera.view)) * skymap_m;
@@ -237,6 +238,7 @@ void Renderer::update(EntityManager& entities,
   // Render UI
   ImGui::Render();
 
+  // Display
   _window->swap_buffers();
 
   // Check for OpenGL errors (TODO should be able to disable this?)

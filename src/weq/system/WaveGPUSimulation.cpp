@@ -545,7 +545,9 @@ void WaveGPUSimulation::add_ui(EntityManager& entities, EventManager& events){
         //ImGui::Image((void*)grid_texture->handle(), ImVec2(200,200));
         //ImGui::End();
 
-        ImGui::Begin("Menu");
+        ImGui::Begin("Menu", NULL, ImGuiWindowFlags_AlwaysAutoResize);
+        ImGui::SetWindowCollapsed("Menu", false, ImGuiSetCond_FirstUseEver);
+        ImGui::SetWindowPos("Menu", ImVec2(10,10), ImGuiSetCond_FirstUseEver);
 
         ImGui::Separator();
         if(ImGui::InputFloat("Wave velocity (c)", &c)){
