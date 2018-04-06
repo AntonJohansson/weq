@@ -1,5 +1,9 @@
 TODO
 
+- Something is really wonky with the dt independant systems
+  not sure what tho. Trying to run at 1k fps and failing should
+  run slower ex. 600 fps not 7000
+
 - MAC problem resolved when engine is slowing down.
   weeeeird as shit.
 
