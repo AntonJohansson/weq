@@ -42,6 +42,17 @@ std::shared_ptr<gl::Framebuffer> scene_fbo;
 glm::mat4 view;
 glm::mat4 proj;
 glm::mat4 model;
+
+void draw_mat(std::string name, glm::mat4 m){
+  spdlog::get("console")->info(
+    "{}\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n",
+    name,
+    m[0][0], m[1][0], m[2][0], m[3][0],
+    m[0][1], m[1][1], m[2][1], m[3][1],
+    m[0][2], m[1][2], m[2][2], m[3][2],
+    m[0][3], m[1][3], m[2][3], m[3][3]
+    );
+  }
 }
 
 using component::Renderable;
@@ -174,14 +185,8 @@ void Renderer::update(EntityManager& entities,
         tmp_model = t.model();
         // calculate mvp for each model
         mvp = active_camera.viewproj * t.model();
-        spdlog::get("console")->info(
-          "\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n",
-          mvp[0][0], mvp[1][0], mvp[2][0], mvp[3][0],
-          mvp[0][1], mvp[1][1], mvp[2][1], mvp[3][1],
-          mvp[0][2], mvp[1][2], mvp[2][2], mvp[3][2],
-          mvp[0][3], mvp[1][3], mvp[2][3], mvp[3][3]
-          );
-
+        draw_mat("viewproj", active_camera.viewproj);
+        draw_mat("model", t.model());
         r.scene->use();
         r.scene->set("mvp", mvp);
         r.scene->set("normal_matrix", active_camera.normal_matrix);
