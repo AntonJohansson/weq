@@ -9,7 +9,6 @@
 #include <queue>
 #include <vector>
 #include <unordered_map>
-#include <map>
 #include <bitset>
 
 // Temp
@@ -180,12 +179,9 @@ private:
 
   // Member variables
   // @TODO unordered_map -> map for debugging purposes
-  //std::unordered_map<EntityId, std::unordered_map<ComponentId, void*>>      _component_ptrs;
-  //std::unordered_map<EntityId, ComponentMask> _entity_component_masks;
-  //std::unordered_map<ComponentId, Allocator*> _component_pools;
-  std::map<EntityId, std::unordered_map<ComponentId, void*>>      _component_ptrs;
-  std::map<EntityId, ComponentMask> _entity_component_masks;
-  std::map<ComponentId, Allocator*> _component_pools;
+  std::unordered_map<EntityId, std::unordered_map<ComponentId, void*>>      _component_ptrs;
+  std::unordered_map<EntityId, ComponentMask> _entity_component_masks;
+  std::unordered_map<ComponentId, Allocator*> _component_pools;
 
   std::queue<u64> _free_ids;
 };
