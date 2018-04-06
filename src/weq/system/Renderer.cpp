@@ -3,6 +3,7 @@
 #include <weq/ecs/EventManager.hpp>
 #include <weq/ecs/EntityManager.hpp>
 
+#include <weq/utility/NumberTypes.hpp>
 #include <weq/gl/ShaderProgram.hpp>
 #include <weq/gl/Shader.hpp>
 #include <weq/gl/VertexFormat.hpp>
@@ -127,6 +128,8 @@ void Renderer::update(EntityManager& entities,
   component::Camera active_camera;
   component::Transform active_camera_transform;
   entities.each<component::Transform, component::Camera, component::ActiveCamera>([&](EntityId e, component::Transform& t, component::Camera& c, component::ActiveCamera& a){
+      (void)e;
+      (void)a;
       active_camera = c;
       active_camera_transform = t;
     });
@@ -192,7 +195,7 @@ void Renderer::update(EntityManager& entities,
         r.scene->set("normal_matrix", active_camera.normal_matrix);
 
         // Bind textures
-        for(int i = 0; i < r.textures.size(); i++){
+        for(u32 i = 0; i < r.textures.size(); i++){
           auto ptr = r.textures[i];
           if(ptr){
             ptr->bind(i);

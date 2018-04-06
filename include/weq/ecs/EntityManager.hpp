@@ -161,6 +161,7 @@ public:
 
 private:
   inline void assert_valid(EntityId id){
+    (void)id;
     //assert(id < _entity_component_masks.find(id)
   }
 
