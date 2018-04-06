@@ -1,5 +1,8 @@
 TODO
 
+- MAC problem resolved when engine is slowing down.
+  weeeeird as shit.
+
 - Add options for reflectivity :)
 
 - Add offscreen MSAA (learnopengl)

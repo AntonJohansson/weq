@@ -11,6 +11,7 @@
 
 //#include <entityx/entityx.h>
 #include <weq/ecs/Fwd.hpp>
+#include <weq/memory/Resource.hpp>
 
 #if __has_include(<filesystem>)
 #include <filesystem>
@@ -31,9 +32,9 @@ class Texture;
 class Cubemap;
 }
 
-namespace weq::memory{
-class Resource;
-}
+//namespace weq::memory{
+//class Resource;
+//}
 
 //class ResourceManager{
 //public:

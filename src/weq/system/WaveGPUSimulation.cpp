@@ -232,6 +232,8 @@ void WaveGPUSimulation::update(EntityManager& entities,
                                           component::Camera c,
                                           component::ActiveCamera& a,
                                           component::Transform& t){
+                      (void)e;
+                      (void)a;
                       camera = c;
                       transform = t;
                     });
@@ -241,6 +243,8 @@ void WaveGPUSimulation::update(EntityManager& entities,
     if(success && should_draw_brush_size){
       int brush_size = std::round(((float)brush_size_percent/100.0f)*resolution);
       glm::vec3 center = (resolution/mesh_size)*(intersect + glm::vec3(mesh_size/2.0f, mesh_size/2.0f, 0.0f));
+      (void)center;
+
       events.emit(event::DebugCircle((brush_size/2.0f)*(mesh_size/resolution), intersect + glm::vec3{0,0,0.1f}, {1,0,0,1}, 0.0f));
     }
 

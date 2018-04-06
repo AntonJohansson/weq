@@ -84,6 +84,10 @@ static void APIENTRY gl_error_callback( GLenum source,
                         GLsizei length,
                         const GLchar* message,
                         const void* userParam ){
+  (void)id;
+  (void)length;
+  (void)userParam;
+
   if(severity == GL_DEBUG_SEVERITY_NOTIFICATION)return;
   spdlog::get("console")->error("OpenGL debug message\nsource: {}\ntype: {}\nseverity: {}\nmessage: {}",
                                 gl_error_source_to_string(source),
@@ -104,8 +108,8 @@ Window::Window(EventManager& events, std::string title, unsigned int width,
     _y(0),
     _width(width),
     _height(height),
-    _mode(mode),
-    _refresh_rate(60){
+    _refresh_rate(60),
+    _mode(mode){
 
   // Load config file for window
   // Callback will never be called since hotloader system hasn't been created yet.
@@ -172,6 +176,7 @@ Window::Window(EventManager& events, std::string title, unsigned int width,
 
   // Calculate aspect ratio and send an update event.
   float aspect_ratio = static_cast<float>(_width)/static_cast<float>(_height);
+  (void)aspect_ratio;
   //_events.emit(event::WindowUpdate(_width, _height, _refresh_rate, aspect_ratio));
 
   //glEnable(GL_DEBUG_OUTPUT);

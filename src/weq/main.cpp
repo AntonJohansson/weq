@@ -96,6 +96,7 @@ public:
 
     auto e = _entities->create();
     auto t = _entities->assign<weq::component::Transform>(e)->_position = {2.0f, 0, 2.0f};
+    (void)t;
 	  auto r = _entities->assign<weq::component::Renderable>(e, mesh);
 	  r->scene = shader;
     r->require_camera_pos = true;
@@ -109,6 +110,7 @@ public:
 
     auto e = _entities->create();
     auto t = _entities->assign<weq::component::Transform>(e)->_position = {-2.0f, 0, 2.0f};
+    (void)t;
 	  auto r = _entities->assign<weq::component::Renderable>(e, mesh);
 	  r->scene = shader;
     r->require_camera_pos = true;

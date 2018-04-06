@@ -5,6 +5,8 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include <weq/utility/GlmHelper.hpp>
+
 namespace weq::component{
 
 // Component describing position, rotation, scale and look direction.

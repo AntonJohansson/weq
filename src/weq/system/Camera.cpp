@@ -22,6 +22,9 @@
 #include <algorithm>
 #include <cmath>
 
+// @TODO TEMP
+#include <weq/utility/GlmHelper.hpp>
+
 #ifdef _WIN32
 #undef near
 #undef far
@@ -40,16 +43,6 @@ namespace{
   bool fps_mode = false;
   Var(float, camera_speed, 0.5f);
   Var(float, camera_sensitivity, 1.0f);
-
-  void draw_mat(glm::mat4 m){
-    spdlog::get("console")->info(
-      "\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n",
-      m[0][0], m[1][0], m[2][0], m[3][0],
-      m[0][1], m[1][1], m[2][1], m[3][1],
-      m[0][2], m[1][2], m[2][2], m[3][2],
-      m[0][3], m[1][3], m[2][3], m[3][3]
-      );
-  }
 
   glm::vec3 orthogonal(glm::vec3 v){
     static glm::vec3 x_axis = {1,0,0};
@@ -94,6 +87,8 @@ void Camera::configure(EventManager& events){
 void Camera::update(EntityManager& entities,
                     EventManager& events,
                     f32 dt){
+  (void)events;
+  (void)dt;
 
   // TODO don't use glm lookat -> manual rot with quaternions.
   static auto mask = entities.generate_component_mask<component::Camera, component::Transform>();
@@ -169,14 +164,14 @@ void Camera::update_arcball(component::Camera* camera, component::Transform* t){
   // 3) rotate phi about +z-axis,
   // 4) translate to camera target,
 
-  auto view = glm::mat4();
+  auto view = glm::mat4(1.0);
   view = glm::translate(view, camera->target);
   view = glm::rotate(view, t->phi + glm::half_pi<float>(), glm::vec3(0,0,1));
   view = glm::rotate(view, t->theta, glm::vec3(1,0,0));
   view = glm::translate(view, glm::vec3(0,0,t->radius));
 
   // 5) the cameras position is then given as the 4th column in the matrix,
-  t->_position  = glm::vec3(view[3]);
+  t->_position  =  glm::vec3(view[3]);
   t->_direction = -glm::vec3(view[2]);
 
   // 6) inverse of this matrix gives the view matrix.
