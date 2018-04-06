@@ -211,7 +211,7 @@ void Renderer::update(EntityManager& entities,
                        r.mesh->ebo().size(), GL_UNSIGNED_INT, 0);
 
         ImGui::Begin("Debug");
-        //ImGui::Text();
+        ImGui::Text(r.scene->path().string().c_str());
         ImGui::Image((void*)scene_fbo->texture()->handle(), ImVec2(200,200));
         ImGui::End();
 
