@@ -174,6 +174,14 @@ void Renderer::update(EntityManager& entities,
         tmp_model = t.model();
         // calculate mvp for each model
         mvp = active_camera.viewproj * t.model();
+        spdlog::get("console")->info(
+          "\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n{}\t{}\t{}\t{}\n",
+          mvp[0][0], mvp[1][0], mvp[2][0], mvp[3][0],
+          mvp[0][1], mvp[1][1], mvp[2][1], mvp[3][1],
+          mvp[0][2], mvp[1][2], mvp[2][2], mvp[3][2],
+          mvp[0][3], mvp[1][3], mvp[2][3], mvp[3][3]
+          );
+
         r.scene->use();
         r.scene->set("mvp", mvp);
         r.scene->set("normal_matrix", active_camera.normal_matrix);
