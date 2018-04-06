@@ -210,6 +210,11 @@ void Renderer::update(EntityManager& entities,
         glDrawElements(GLenum(r.mesh->draw_mode()),
                        r.mesh->ebo().size(), GL_UNSIGNED_INT, 0);
 
+        ImGui::Begin("Debug");
+        //ImGui::Text();
+        ImGui::Image((void*)scene_fbo->texture()->handle(), ImVec2(200,200));
+        ImGui::End();
+
         // Unbind wireframe if it was requested
         if(r.wireframe){
           glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
