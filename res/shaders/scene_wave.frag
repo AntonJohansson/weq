@@ -44,10 +44,11 @@ void main(){
   // to get the ray to line up! :) anoying...
   R = vec3(R.x, R.z, -R.y);
 
-  frag_color = vec4(0.1, 0.1, 0.1, 1) + reflectivity*vec4(texture(skybox, R).rgb, 1.0) + color;
+  //frag_color = vec4(0.1, 0.1, 0.1, 1) + reflectivity*vec4(texture(skybox, R).rgb, 1.0) + color;
+  //frag_color = vec4(0,0,0,0);
 //
 //
 //  color = vec4(normal, 1);
 //  frag_color = color;
-  //frag_color = vec4(1,1,1,1);
+  frag_color = vec4(1,1,1,1);
 }

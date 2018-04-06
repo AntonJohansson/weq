@@ -138,30 +138,30 @@ void Renderer::update(EntityManager& entities,
 
 
   // Draw skybox
-  glEnable(GL_CULL_FACE);
+  //glEnable(GL_CULL_FACE);
 
-  glDepthMask(GL_FALSE);
-  skymap_p->use();
-  // Rotate due to different axes :)
-  auto skymap_m = glm::rotate(glm::mat4(), glm::half_pi<float>(), {1,0,0});
-  // Converting view to mat3 -> mat4 removes translation component!
-  auto skymap_vp = active_camera.projection * glm::mat4(glm::mat3(active_camera.view)) * skymap_m;
-  skymap_p->set("vp", skymap_vp);
-  screen_p->set("cube_texture", 0);
+  //glDepthMask(GL_FALSE);
+  //skymap_p->use();
+  //// Rotate due to different axes :)
+  //auto skymap_m = glm::rotate(glm::mat4(), glm::half_pi<float>(), {1,0,0});
+  //// Converting view to mat3 -> mat4 removes translation component!
+  //auto skymap_vp = active_camera.projection * glm::mat4(glm::mat3(active_camera.view)) * skymap_m;
+  //skymap_p->set("vp", skymap_vp);
+  //screen_p->set("cube_texture", 0);
 
-  skymap_mesh->vao(skymap_p).bind();
-  skymap_mesh->ebo().bind();
+  //skymap_mesh->vao(skymap_p).bind();
+  //skymap_mesh->ebo().bind();
 
-  cubemap->bind(0);
+  //cubemap->bind(0);
 
-  glDrawElements(GLenum(skymap_mesh->draw_mode()),
-                 skymap_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
+  //glDrawElements(GLenum(skymap_mesh->draw_mode()),
+  //               skymap_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
 
-  glDepthMask(GL_TRUE);
+  //glDepthMask(GL_TRUE);
 
-  // Assume entities won't need culling.
-  // Naive as fuck @TODO fix
-  glDisable(GL_CULL_FACE);
+  //// Assume entities won't need culling.
+  //// Naive as fuck @TODO fix
+  //glDisable(GL_CULL_FACE);
 
 
   // Move draw code out of entities loop, works fine since there's only a

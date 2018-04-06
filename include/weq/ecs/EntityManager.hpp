@@ -178,7 +178,6 @@ private:
   }
 
   // Member variables
-  // @TODO unordered_map -> map for debugging purposes
   std::unordered_map<EntityId, std::unordered_map<ComponentId, void*>>      _component_ptrs;
   std::unordered_map<EntityId, ComponentMask> _entity_component_masks;
   std::unordered_map<ComponentId, Allocator*> _component_pools;

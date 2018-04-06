@@ -24,6 +24,7 @@ void main(){
     (0, -1, 2)
    */
 
-  frag_color = vec4(0.1, 0.1, 0.1, 1) + 0.25*vec4(texture(skybox, R).rgb, 1.0);
+  //frag_color = vec4(0.1, 0.1, 0.1, 1) + 0.25*vec4(texture(skybox, R).rgb, 1.0);
   //frag_color = + vec4(v_normal,1);
+  //frag_color = vec4(0,0,0,0);
 }
