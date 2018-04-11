@@ -87,25 +87,38 @@ void Application::run(){
   nanoseconds accum{0s};
   float frames = 0.0f;
 
+
+  /*
+    TRY THIS
+
+    - update all systems with the same freqency 1000 hz
+    - see if the same problem remains
+    - do somethings else cuz this didn't work :)
+
+   */
+
   while(!_should_quit){
     // Handle window quit events.
     if(_window->should_close())_should_quit = true;
 
     // Update delta t.
+    spdlog::get("console")->info("update delta t");
     new_time = Clock::now();
     delta_time = new_time - start_time;
     start_time = new_time;
 
-    _lag += delta_time;
+    _lag  += delta_time;
     accum += delta_time;
 
     // Update lag time for all systems
+    spdlog::get("console")->info("update lag time for all systems");
     _systems->for_each([&delta_time](auto system){
         system->set_lag(system->get_lag() + delta_time);
       });
 
     // Update fps counters for all systems
     if(accum >= 1s){
+      spdlog::get("console")->info("update fps counters");
       frame_time.add(frames);
       _current_update_frequency = frame_time.average();
 
@@ -118,18 +131,23 @@ void Application::run(){
     }
 
     // Update systems
+    // - when trying to run at a high fps (ex. ~1000)
+    // - app gets stuck in this loop
     while(_lag >= _timestep){
+      spdlog::get("console")->info("lag: {}\t\t timestep{}", _lag.count()/1e9, _timestep.count()/1e9);
       frames++;
 
       _systems->for_each([&delta_time, this](auto system){
           // Check if increasing the engine fps is needed
           if(system->get_timestep() < _timestep){
+            spdlog::get("console")->info("increase engine fps");
             _timestep = system->get_timestep();
             _timestep_value = system->get_timestep_value();
           }
 
           // Update stuff
           if(system->get_lag() >= system->get_timestep()){
+            //spdlog::get("console")->info("do update");
             system->update(*_entities, *_events, system->get_timestep_value());
             system->set_lag(system->get_lag() - system->get_timestep());
             system->increment_frame_counter();
