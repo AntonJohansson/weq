@@ -59,6 +59,7 @@ Renderer::~Renderer(){
 
 void Renderer::configure(EventManager& events){
   System<Renderer>::configure(events);
+
   // Events
   events.subscribe<event::ActiveInput>(*this);
   events.subscribe<event::ActiveWindow>(*this);
@@ -218,10 +219,10 @@ void Renderer::update(EntityManager& entities,
         glDrawElements(GLenum(r.mesh->draw_mode()),
                        r.mesh->ebo().size(), GL_UNSIGNED_INT, 0);
 
-        ImGui::Begin("Debug");
-        ImGui::Text(r.scene->path().string().c_str());
-        ImGui::Image((void*)scene_fbo->texture()->handle(), ImVec2(200,200));
-        ImGui::End();
+        //ImGui::Begin("Debug");
+        //ImGui::Text(r.scene->path().string().c_str());
+        //ImGui::Image((void*)scene_fbo->texture()->handle(), ImVec2(200,200));
+        //ImGui::End();
 
         // Unbind wireframe if it was requested
         if(r.wireframe){

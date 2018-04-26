@@ -81,11 +81,10 @@ void Application::run(){
 
   auto start_time = Clock::now();
   auto new_time = start_time;
-  nanoseconds delta_time;
+  nanoseconds delta_time{ 0ns};
+  nanoseconds last_delta_time{ 0ns };
 
-  RunningAverage<double> frame_time;
   nanoseconds accum{0s};
-  float frames = 0.0f;
 
 
   /*
@@ -109,78 +108,69 @@ void Application::run(){
   // - test having a system have a target fps, slightly above what is capable
   //   see how it reacts, if it's fine, the above approach might work.
 
-  while(!_should_quit){
-    // Handle window quit events.
-    if(_window->should_close())_should_quit = true;
+  while (!_should_quit) {
+	  // Handle window quit events.
+	  if (_window->should_close())_should_quit = true;
 
-    // Update delta t.
-    //spdlog::get("console")->info("update delta t");
-    new_time = Clock::now();
-    delta_time = new_time - start_time;
-    start_time = new_time;
+	  // Update delta t.
+	  new_time = Clock::now();
+	  delta_time = new_time - start_time;
+	  start_time = new_time;
 
-    //_lag  += delta_time;
-    accum += delta_time;
+	  accum += delta_time;
 
-    // Update lag time for all systems
-    //spdlog::get("console")->info("update lag time for all systems");
-    _systems->for_each([&delta_time](auto system){
-        system->set_lag(system->get_lag() + delta_time);
-      });
+	  // Update lag time for all systems
+	  _systems->for_each([&delta_time](auto system) {
+		  system->set_lag(system->get_lag() + delta_time);
+	  });
 
-    // Update fps counters for all systems
-    // @@@@@@@@@@@NOTE
-    // - if we take longer than one s (ex. 2 s) to update (might be stuck in a lag loop)
-    // - divide frame number by that then :)
-    if(accum >= 1s){
-      spdlog::get("console")->info("update fps counters");
-      frame_time.add(frames);
-      _current_update_frequency = frame_time.average();
-	  int seconds = (int)std::chrono::duration_cast<std::chrono::seconds>(accum).count();
+	  // Update fps counters for all systems
+	  // @@@@@@@@@@@NOTE
+	  // - if we take longer than one s (ex. 2 s) to update (might be stuck in a lag loop)
+	  // - divide frame number by that then :)
+	  if (accum >= 1s) {
+		  int seconds = (int)std::chrono::duration_cast<std::chrono::seconds>(accum).count();
 
-      _systems->for_each([&seconds](auto system){
-          system->second_has_past(seconds);
-        });
+		  _systems->for_each([&seconds](auto system) {
+			  system->second_has_past(seconds);
+			  if (system->get_framerate() < 0.85*system->get_desired_framerate()) {
+          system->set_factor(1.2*system->get_factor());
+				  spdlog::get("console")->info("LAG {}", system->get_factor());
+			  }
+		  });
 
-      frames = 0.0f;
-      accum  = 0s;
-    }
+		  accum = 0s;
+	  }
 
-    // Update systems
-    // - when trying to run at a high fps (ex. ~1000)
-    // - app gets stuck in this loop
-    // Added extra check for _should_quit, since if the engine can't keep up,
-    // it will get stuck in the lag loop, thus never checking.
-    int number_of_systems = _systems->size();
-    //while(_lag >= _timestep && !_should_quit){
-    while(number_of_systems > 0 && !_should_quit){
-      //spdlog::get("console")->info("lag: {}\t\t timestep{}", _lag.count()/1e9, _timestep.count()/1e9);
-      //frames++;
+	  // Update systems
+	  // - when trying to run at a high fps (ex. ~1000)
+	  // - app gets stuck in this loop
+	  // Added extra check for _should_quit, since if the engine can't keep up,
+	  // it will get stuck in the lag loop, thus never checking.
+	  int number_of_systems = _systems->size();
+	  //while(_lag >= _timestep && !_should_quit){
+	  while (number_of_systems > 0 && !_should_quit) {
+		  _systems->for_each([&delta_time, &number_of_systems, this](auto system) {
+			  // Update stuff
+			  if (system->get_lag() >= system->get_timestep()) {
+				  //spdlog::get("console")->info("do update");
+				  system->update(*_entities, *_events, system->get_timestep_value());
+				  //system->update(*_entities, *_events, _timestep_value);
+				  system->update_lag();
+				  //system->set_lag(system->get_lag() - system->get_timestep());
+				  system->increment_frame_counter();
 
-      _systems->for_each([&delta_time, &number_of_systems, this](auto system){
-          // Check if increasing the engine fps is needed
-          //if(system->get_timestep() < _timestep){
-          //  spdlog::get("console")->info("increase engine fps");
-          //  _timestep = system->get_timestep();
-          //  _timestep_value = system->get_timestep_value();
-          //}
+			  }
+			  else if (system->active()) {
+				  number_of_systems--;
+				  system->set_active(false);
+			  }
+		  });
+	  }
 
-          // Update stuff
-          if(system->get_lag() >= system->get_timestep()){
-            //spdlog::get("console")->info("do update");
-            system->update(*_entities, *_events, system->get_timestep_value());
-            //system->update(*_entities, *_events, _timestep_value);
-            system->set_lag(system->get_lag() - system->get_timestep());
-            system->increment_frame_counter();
-          }else{
-            number_of_systems--;
-          }
-        });
-
-      //_lag -= _timestep;
-    }
+	  // Reactivate all systems
+	  _systems->for_each([](auto s) {s->set_active(true);});
   }
-
 }
 
 void Application::receive(event::Quit& q){

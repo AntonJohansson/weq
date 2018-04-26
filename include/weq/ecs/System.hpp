@@ -47,6 +47,10 @@ public:
     _lag = lag;
   }
 
+  void update_lag(){
+	  _lag = _lag - duration<long long, std::nano>((long long)_factor*_timestep.count());
+  }
+
   void increment_frame_counter(){_frame_counter++;}
   void clear_frame_counter(){_frame_counter = 0;}
   double get_framerate(){return _current_framerate;}
@@ -56,10 +60,16 @@ public:
   void set_debug_name(const std::string& str){_debug_name = str;}
   const std::string& get_debug_name(){return _debug_name;}
 
+  double get_desired_framerate(){return 1.0/duration_cast<duration<double>>(_timestep).count();}
   void set_timestep(nanoseconds timestep){
     _timestep = timestep;
     _timestep_value = duration_cast<duration<double>>(_timestep).count();
   }
+
+  bool active(){return _active;}
+  void set_active(bool b){_active = b;}
+  double get_factor(){return _factor;}
+  void set_factor(double d){_factor = d;}
 
 protected:
 
@@ -73,6 +83,8 @@ private:
   double _current_framerate = 0.0;
   unsigned int _frame_counter{0};
   std::string _debug_name;
+  bool _active = true;
+  double _factor = 1.0f;
 };
 
 template<typename S>

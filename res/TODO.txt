@@ -1,5 +1,8 @@
 TODO
 
+- In order to decouple ImGui from the renderer, render in the UI system (to a texture), and then
+  display it in the renderer.
+
 - Something is really wonky with the dt independant systems
   not sure what tho. Trying to run at 1k fps and failing should
   run slower ex. 600 fps not 7000
