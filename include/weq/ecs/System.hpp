@@ -48,7 +48,8 @@ public:
   }
 
   void update_lag(){
-	  _lag = _lag - duration<long long, std::nano>((long long)_factor*_timestep.count());
+	  //_lag = _lag - duration<long long, std::nano>((long long)_factor*_timestep.count());
+    _lag = _lag - _timestep;
   }
 
   void increment_frame_counter(){_frame_counter++;}

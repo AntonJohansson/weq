@@ -82,7 +82,6 @@ void Application::run(){
   auto start_time = Clock::now();
   auto new_time = start_time;
   nanoseconds delta_time{ 0ns};
-  nanoseconds last_delta_time{ 0ns };
 
   nanoseconds accum{0s};
 
@@ -133,10 +132,10 @@ void Application::run(){
 
 		  _systems->for_each([&seconds](auto system) {
 			  system->second_has_past(seconds);
-			  if (system->get_framerate() < 0.85*system->get_desired_framerate()) {
-          system->set_factor(1.2*system->get_factor());
-				  spdlog::get("console")->info("LAG {}", system->get_factor());
-			  }
+			  //if (system->get_framerate() < 0.85*system->get_desired_framerate()) {
+        //  system->set_factor(1.2*system->get_factor());
+				//  spdlog::get("console")->info("LAG {}", system->get_factor());
+			  //}
 		  });
 
 		  accum = 0s;
