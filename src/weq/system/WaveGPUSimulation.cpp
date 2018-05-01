@@ -61,6 +61,12 @@ namespace{
   int dt_item       = 0;        // 0 - variable dt, 1 - fix dt
   int boundary_item = 0;        // 0 - reflect, 1 - radiate
 
+  // Slit settings
+  float wall_pos   = 0.33f;
+  float slit_width = 0.1f;
+  float slit_sep   = 0.1f;
+  float wavelength = 0.1f;
+
   // Change refractive index
   int   brush_size_percent     = 16;
   float brush_refractive_index = 1.0f;
@@ -214,9 +220,11 @@ void WaveGPUSimulation::configure(EventManager& events){
   clear_ri = true;
 }
 
+static f32 time;
 void WaveGPUSimulation::update(EntityManager& entities,
                                EventManager& events,
                                f32 dt){
+  time += dt;
   (void)dt;
 
   // Add UI if it doesn't exist (!)
@@ -486,6 +494,18 @@ void WaveGPUSimulation::update(EntityManager& entities,
       height_shader->set("height_field", 0);
       height_shader->set("vel_field", 1);
       height_shader->set("dt", dt);
+
+      height_shader->set("t", time);
+
+      height_shader->set("c", wave.c);
+      height_shader->set("wavelength", wavelength);
+
+      height_shader->set("wall_item",  wall_item);
+      height_shader->set("wall_pos",   wall_pos);
+      height_shader->set("slit_sep",   slit_sep);
+      height_shader->set("slit_width", slit_width);
+      height_shader->set("amplitude",  droplet_amplitude);
+      height_shader->set("pixelsize", glm::vec2(1.0/wave.width, 1.0/wave.height));
       wave.height_fbo.texture()->bind(0);
       wave.vel_fbo.texture()->bind(1);
 
@@ -562,6 +582,7 @@ void WaveGPUSimulation::add_ui(EntityManager& entities, EventManager& events){
           }
           set_c = true;
         }
+        ImGui::InputFloat("Wavelength", &wavelength);
 
 
         if(ImGui::Button("Clear waves")){
@@ -593,7 +614,42 @@ void WaveGPUSimulation::add_ui(EntityManager& entities, EventManager& events){
         ImGui::Combo("Boundary behaviour", &boundary_item, "Reflect\0Radiate\0\0");
 
         // Wall type
+        ImGui::Separator();
         ImGui::Combo("Wall type", &wall_item, "None\0Single Slit\0Double Slit\0Custom\0\0");
+
+        // Slit settings
+        if(wall_item == 1 || wall_item == 2){
+          ImGui::InputFloat("Wall pos",   &wall_pos);
+          ImGui::InputFloat("slit width", &slit_width);
+          ImGui::InputFloat("slit sep.",  &slit_sep);
+
+          if(wall_item == 1){
+            // left wall
+            events.emit(event::DebugVector({(1.0f-slit_width)*mesh_size/2.0f,0,0},
+                                           {-0.5f*mesh_size, wall_pos*mesh_size - mesh_size/2.0f + 0.5f*5.0f/100.0f, 0.1f},
+                                           {1, 0, 0, 1}, 0.0f));
+            // right wall
+            events.emit(event::DebugVector({-(1.0f-slit_width)*mesh_size/2.0f,0,0},
+                                           {0.5f*mesh_size, wall_pos*mesh_size - mesh_size/2.0f + 0.5f*5.0f/100.0f, 0.1f},
+                                           {1, 0, 0, 1}, 0.0f));
+
+          }else if(wall_item == 2){
+            // left wall
+            events.emit(event::DebugVector({(1.0f-slit_width-slit_sep)*mesh_size/2.0f,0,0},
+                                           {-0.5f*mesh_size, wall_pos*mesh_size - mesh_size/2.0f + 0.5f*5.0f/100.0f, 0.1f},
+                                           {1, 0, 0, 1}, 0.0f));
+            // right wall
+            events.emit(event::DebugVector({-(1.0f-slit_width-slit_sep)*mesh_size/2.0f,0,0},
+                                           {0.5f*mesh_size, wall_pos*mesh_size - mesh_size/2.0f + 0.5f*5.0f/100.0f, 0.1f},
+                                           {1, 0, 0, 1}, 0.0f));
+            // slit wall
+            events.emit(event::DebugVector({(slit_sep)*mesh_size,0,0},
+                                           {-slit_sep*mesh_size/2.0f, wall_pos*mesh_size - mesh_size/2.0f + 0.5f*5.0f/100.0f, 0.1f},
+                                           {1, 0, 0, 1}, 0.0f));
+
+          }
+        }
+        ImGui::Separator();
 
         // Refractive index
         if(ImGui::CollapsingHeader("Refractive index")){
