@@ -82,7 +82,6 @@ void Application::run(){
   auto start_time = Clock::now();
   auto new_time = start_time;
   nanoseconds delta_time{ 0ns};
-  nanoseconds last_delta_time{ 0ns };
 
   nanoseconds accum{0s};
 
