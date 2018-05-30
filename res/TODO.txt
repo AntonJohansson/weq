@@ -1,5 +1,7 @@
 TODO
 
+- Removing the UI systems causes null ptr access violation
+
 - In order to decouple ImGui from the renderer, render in the UI system (to a texture), and then
   display it in the renderer.
 
