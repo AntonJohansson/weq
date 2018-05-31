@@ -12,8 +12,6 @@
 
 namespace weq::gl{
 
-namespace fs = std::experimental::filesystem;
-
 // Defined in <weq/gl/Shader.hpp>
 class Shader;
 

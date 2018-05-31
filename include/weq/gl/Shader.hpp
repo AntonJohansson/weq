@@ -9,8 +9,6 @@
 
 namespace weq::gl{
 
-namespace fs = std::experimental::filesystem;
-
 // Forward declare of shader program, needed for hot-reloading
 class ShaderProgram;
 

@@ -4,7 +4,7 @@
 #include <weq/ecs/EventManager.hpp>
 #include <weq/event/Input.hpp>
 
-#include <glfw/glfw3.h>
+#include <GLFW/glfw3.h>
 
 
 // COMMENT TO FUTURE SNYYGGING

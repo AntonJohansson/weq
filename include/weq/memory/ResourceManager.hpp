@@ -15,9 +15,12 @@
 
 #if __has_include(<filesystem>)
 #include <filesystem>
+namespace fs = std::filesystem;
 #elif __has_include(<experimental/filesystem>)
 #include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
 #endif
+
 
 #include <string>
 #include <memory>
@@ -69,7 +72,6 @@ class Cubemap;
 namespace weq::memory::resource_manager{
 
 //namespace ex = entityx;
-namespace fs = std::experimental::filesystem;
 
 extern std::unordered_map<std::string, std::weak_ptr<memory::Resource>> _memory;
 

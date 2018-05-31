@@ -130,7 +130,9 @@ Window::Window(EventManager& events, std::string title, unsigned int width,
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+
   if(gl_multisample.var > 0){
+		spdlog::get("console")->info("multisample enabled!");
     glfwWindowHint(GLFW_SAMPLES, gl_multisample.var);
   }
 

@@ -16,6 +16,14 @@ elseif(APPLE)
   set(EXTRA_LIBS "stdc++fs" ${cocoa} ${iokit} ${corevideo})
 
   add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
+elseif(UNIX)
+	set(CMAKE_CXX_COMPILER "g++")
+  set(EXTERNAL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../external/unix)
+  set(library_path ${EXTERNAL_PATH}/lib)
+  link_directories(${EXTERNAL_PATH}/lib)
+  set(EXTRA_LIBS "stdc++fs")
+
+  add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 endif()
 
 
@@ -28,7 +36,7 @@ macro(create_test TARGET_NAME SOURCE)
 
     if(WIN32)
       target_compile_options(${TARGET_NAME} PRIVATE /std:c++latest)
-    else()
+		elseif(APPLE OR UNIX)
       target_compile_options(${TARGET_NAME} PRIVATE -std=c++1z -Wall -Wextra -Wfatal-errors -g)
     endif()
 

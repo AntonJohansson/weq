@@ -71,7 +71,8 @@ namespace{
 
 namespace weq::system{
 
-Camera::Camera(){
+Camera::Camera()
+	: _movement_amount(0,0,0) {
 }
 
 Camera::~Camera(){
@@ -168,6 +169,7 @@ void Camera::update_arcball(component::Camera* camera, component::Transform* t){
   view = glm::translate(view, camera->target);
   view = glm::rotate(view, t->phi + glm::half_pi<float>(), glm::vec3(0,0,1));
   view = glm::rotate(view, t->theta, glm::vec3(1,0,0));
+  //view = glm::translate(view, glm::vec3(0,0,t->radius));
   view = glm::translate(view, glm::vec3(0,0,t->radius));
 
   // 5) the cameras position is then given as the 4th column in the matrix,

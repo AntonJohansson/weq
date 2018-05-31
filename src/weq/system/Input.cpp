@@ -38,7 +38,7 @@ namespace{
     (void)action;
     _ial->register_key(key, action, mods);
     // Connect to ImGui
-    ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mods);
+    //ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mods);
   }
 
   static void mouse_callback(GLFWwindow* window, double x, double y){

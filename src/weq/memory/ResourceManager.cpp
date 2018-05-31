@@ -29,9 +29,12 @@
 namespace weq::memory::resource_manager{
 
 namespace{
-  const fs::path _base_path     = "../res";
-  const fs::path _shader_path   = _base_path/fs::path("/shaders");
-  const fs::path _texture_path  = _base_path/fs::path("/textures");
+	// operator/ won't work on linux for some reason
+  const fs::path _base_path     = fs::path("../res");
+  const fs::path _shader_path   = fs::path("../res/shaders");
+  const fs::path _texture_path  = fs::path("../res/textures");
+  //const fs::path _shader_path   = _base_path/fs::path("/shaders");
+  //const fs::path _texture_path  = _base_path/fs::path("/textures");
 
   EventManager* _events;
 }

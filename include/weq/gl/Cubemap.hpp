@@ -8,14 +8,15 @@
 
 #if __has_include(<filesystem>)
 #include <filesystem>
+namespace fs = std::filesystem;
 #elif __has_include(<experimental/filesystem>)
 #include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
 #endif
 
 
 namespace weq::gl{
 
-namespace fs = std::experimental::filesystem;
 
 // TODO Merge Cubemap and Texture resources?
 

@@ -46,6 +46,25 @@ std::shared_ptr<gl::Framebuffer> scene_fbo;
 glm::mat4 view;
 glm::mat4 proj;
 glm::mat4 model;
+
+void display_debug_info(component::Renderable& r){
+	spdlog::get("console")->info("Mesh:\n\tis_valid: {}", r.mesh->is_valid());
+	spdlog::get("console")->info("Settings:\n\trequire_skybox: {}\n\trequire_camera_pos: {}\n\twireframe: {}\n", r.require_skybox, r.require_camera_pos, r.wireframe);
+}
+
+void check_4x4_mat_non_zero(glm::mat4 mat, std::string name){
+	bool all_zero = true;
+	for(int i = 0; i < 4; i++){
+		for(int j = 0; j < 4; j++){
+			if(mat[i][j] != 0)all_zero = false;
+		}
+	}
+
+	if(all_zero){
+		spdlog::get("console")->error("{} is zero!", name);
+	}
+}
+
 }
 
 using component::Renderable;
@@ -145,24 +164,24 @@ void Renderer::update(EntityManager& entities,
 
 
   // Draw skybox
-  glEnable(GL_CULL_FACE);
+  //glEnable(GL_CULL_FACE);
 
-  glDepthMask(GL_FALSE);
-  skymap_p->use();
-  // Rotate due to different axes :)
-  auto skymap_m = glm::rotate(glm::mat4(), glm::half_pi<float>(), {1,0,0});
-  // Converting view to mat3 -> mat4 removes translation component!
-  auto skymap_vp = active_camera.projection * glm::mat4(glm::mat3(active_camera.view)) * skymap_m;
-  skymap_p->set("vp", skymap_vp);
-  screen_p->set("cube_texture", 0);
+  //glDepthMask(GL_FALSE);
+  //skymap_p->use();
+  //// Rotate due to different axes :)
+  //auto skymap_m = glm::rotate(glm::mat4(), glm::half_pi<float>(), {1,0,0});
+  //// Converting view to mat3 -> mat4 removes translation component!
+  //auto skymap_vp = active_camera.projection * glm::mat4(glm::mat3(active_camera.view)) * skymap_m;
+  //skymap_p->set("vp", skymap_vp);
+  //screen_p->set("cube_texture", 0);
 
-  skymap_mesh->vao(skymap_p).bind();
-  skymap_mesh->ebo().bind();
+  //skymap_mesh->vao(skymap_p).bind();
+  //skymap_mesh->ebo().bind();
 
-  cubemap->bind(0);
+  //cubemap->bind(0);
 
-  glDrawElements(GLenum(skymap_mesh->draw_mode()),
-                 skymap_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
+  //glDrawElements(GLenum(skymap_mesh->draw_mode()),
+  //               skymap_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
 
   glDepthMask(GL_TRUE);
 
@@ -176,12 +195,15 @@ void Renderer::update(EntityManager& entities,
   entities.each<Renderable, Transform>([dt, &active_camera, &active_camera_transform](EntityId e,
                                                                                       Renderable& r,
                                                                                       Transform& t){
+			//display_debug_info(r);
       (void)e;
       // Draw the mesh if it is drawable.
       if(r.mesh->is_valid()){
         tmp_model = t.model();
         // calculate mvp for each model
         mvp = active_camera.viewproj * t.model();
+				// DEBUG
+				check_4x4_mat_non_zero(mvp, "mvp");
         //draw_mat("mvp", mvp);
         r.scene->use();
         r.scene->set("mvp", mvp);
@@ -200,7 +222,7 @@ void Renderer::update(EntityManager& entities,
           r.scene->set("skybox", (int)r.textures.size());
           cubemap->bind(r.textures.size());
         }
-        // Bind camera pos if requrested
+        // Bind camera pos if requested
         if(r.require_camera_pos){
           r.scene->set("camera_pos", active_camera_transform._position);
           r.scene->set("normal_mat", active_camera.normal_matrix);
@@ -216,14 +238,12 @@ void Renderer::update(EntityManager& entities,
         r.mesh->vao(r.scene).bind();
         r.mesh->ebo().bind();
 
+				spdlog::get("console")->info("DRAW_MODE: {}\nSIZE: {}", (int)r.mesh->draw_mode(), r.mesh->ebo().size());
+
         glDrawElements(GLenum(r.mesh->draw_mode()),
                        r.mesh->ebo().size(), GL_UNSIGNED_INT, 0);
 
-        //ImGui::Begin("Debug");
-        //ImGui::Text(r.scene->path().string().c_str());
-        //ImGui::Image((void*)scene_fbo->texture()->handle(), ImVec2(200,200));
-        //ImGui::End();
-
+        
         // Unbind wireframe if it was requested
         if(r.wireframe){
           glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
@@ -232,6 +252,11 @@ void Renderer::update(EntityManager& entities,
     });
 
   model = tmp_model;
+
+  ImGui::Begin("Debug");
+  ImGui::Text("SceneFBO");
+  ImGui::Image((void*)scene_fbo->texture()->handle(), ImVec2(200,200));
+  ImGui::End();
 
   glDisable(GL_DEPTH_TEST);
   scene_fbo->unbind();

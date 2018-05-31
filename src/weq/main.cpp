@@ -43,7 +43,7 @@ public:
   Simulation(int argc, char** argv)
     : Application(argc, argv){
 
-    _systems->add<weq::system::Hotloader,         0>()->set_debug_name("hotloader");
+    //_systems->add<weq::system::Hotloader,         0>()->set_debug_name("hotloader");
     _systems->add<weq::system::Input,             1>()->set_debug_name("input");
     _systems->add<weq::system::UserInterface,     2>()->set_debug_name("ui");
     //_systems->add<weq::system::WaveGPUSimulation, 3>()->set_debug_name("wave gpu");
@@ -68,9 +68,9 @@ public:
     // Draw axes
 
     // Configure stuff
-    configure_states();
+    //configure_states();
     add_camera();
-    add_wave();
+    //add_wave();
     add_ui();
     add_reflection_sphere();
     add_reflection_cube();
@@ -122,7 +122,7 @@ public:
     using namespace weq::component;
     auto c = _entities->create();
     _entities->assign<Camera>(c, LookMode::TARGET);
-    _entities->assign<Transform>(c)->spherical(10, 0, 0);
+    _entities->assign<Transform>(c)->spherical(10,0,0);
     _entities->assign<ActiveCamera>(c);
   }
 
