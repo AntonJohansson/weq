@@ -48,7 +48,7 @@ public:
     _systems->add<weq::system::UserInterface,     2>()->set_debug_name("ui");
     _systems->add<weq::system::WaveGPUSimulation, 3>()->set_debug_name("wave gpu");
     _systems->add<weq::system::Camera,            4>()->set_debug_name("camera");
-    //_systems->add<weq::system::DebugDraw,         5>()->set_debug_name("debug draw");
+    _systems->add<weq::system::DebugDraw,         5>()->set_debug_name("debug draw");
     _systems->add<weq::system::Renderer,          6>()->set_debug_name("renderer");
 
     _systems->configure(*_events);
