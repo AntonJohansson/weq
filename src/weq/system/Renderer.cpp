@@ -48,6 +48,8 @@ glm::mat4 proj;
 glm::mat4 model;
 
 void display_debug_info(component::Renderable& r){
+	spdlog::get("console")->info("Shader:\n\tname: {}\n\thandle: {}", r.scene->handle(), r.scene->path().string());
+	spdlog::get("console")->info("VAO:\n\thandle: {}\n\tsize: {}", r.mesh->vao(r.scene).object(), r.mesh->vao(r.scene).size());
 	spdlog::get("console")->info("Mesh:\n\tis_valid: {}\n\tvertices: {}", r.mesh->is_valid(), r.mesh->ebo().size());
 	spdlog::get("console")->info("Settings:\n\trequire_skybox: {}\n\trequire_camera_pos: {}\n\twireframe: {}\n", r.require_skybox, r.require_camera_pos, r.wireframe);
 }
@@ -229,6 +231,7 @@ void Renderer::update(EntityManager& entities,
           r.scene->set("normal_mat", active_camera.normal_matrix);
           r.scene->set("camera_model", active_camera_transform.model());
           r.scene->set("model", t.model());
+					draw_mat("t_model", t.model());
         }
         // Bind wireframe if requested
         if(r.wireframe){

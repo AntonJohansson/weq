@@ -19,6 +19,7 @@ struct Transform{
     : _direction(0.0f, 0.0f, -1.0f),
       _position(0.0f, 0.0f, 0.0f),
       _scale(1.0f, 1.0f, 1.0f),
+			_rotation(0.0f, 0.0f, 0.0f, 0.0f),
       radius(0.0f),
       theta(0.0f),
       phi(0.0f)
