@@ -46,27 +46,6 @@ std::shared_ptr<gl::Framebuffer> scene_fbo;
 glm::mat4 view;
 glm::mat4 proj;
 glm::mat4 model;
-
-void display_debug_info(component::Renderable& r){
-	spdlog::get("console")->info("Shader:\n\tname: {}\n\thandle: {}", r.scene->handle(), r.scene->path().string());
-	spdlog::get("console")->info("VAO:\n\thandle: {}\n\tsize: {}", r.mesh->vao(r.scene).object(), r.mesh->vao(r.scene).size());
-	spdlog::get("console")->info("Mesh:\n\tis_valid: {}\n\tvertices: {}", r.mesh->is_valid(), r.mesh->ebo().size());
-	spdlog::get("console")->info("Settings:\n\trequire_skybox: {}\n\trequire_camera_pos: {}\n\twireframe: {}\n", r.require_skybox, r.require_camera_pos, r.wireframe);
-}
-
-void check_4x4_mat_non_zero(glm::mat4 mat, std::string name){
-	bool all_zero = true;
-	for(int i = 0; i < 4; i++){
-		for(int j = 0; j < 4; j++){
-			if(mat[i][j] != 0)all_zero = false;
-		}
-	}
-
-	if(all_zero){
-		spdlog::get("console")->error("{} is zero!", name);
-	}
-}
-
 }
 
 using component::Renderable;
@@ -198,16 +177,12 @@ void Renderer::update(EntityManager& entities,
   entities.each<Renderable, Transform>([dt, &active_camera, &active_camera_transform](EntityId e,
                                                                                       Renderable& r,
                                                                                       Transform& t){
-			display_debug_info(r);
       (void)e;
       // Draw the mesh if it is drawable.
       if(r.mesh->is_valid()){
         tmp_model = t.model();
         // calculate mvp for each model
         mvp = active_camera.viewproj * t.model();
-				// DEBUG
-				check_4x4_mat_non_zero(mvp, "mvp");
-        //draw_mat("mvp", mvp);
         r.scene->use();
         r.scene->set("mvp", mvp);
         r.scene->set("normal_matrix", active_camera.normal_matrix);
@@ -231,7 +206,6 @@ void Renderer::update(EntityManager& entities,
           r.scene->set("normal_mat", active_camera.normal_matrix);
           r.scene->set("camera_model", active_camera_transform.model());
           r.scene->set("model", t.model());
-					draw_mat("t_model", t.model());
         }
         // Bind wireframe if requested
         if(r.wireframe){
@@ -257,11 +231,6 @@ void Renderer::update(EntityManager& entities,
 
   model = tmp_model;
 
-  ImGui::Begin("Debug");
-  ImGui::Text("SceneFBO");
-  ImGui::Image((void*)scene_fbo->texture()->handle(), ImVec2(200,200));
-  ImGui::End();
-  
   glDisable(GL_DEPTH_TEST);
   scene_fbo->unbind();
 

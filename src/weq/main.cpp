@@ -46,7 +46,7 @@ public:
     //_systems->add<weq::system::Hotloader,         0>()->set_debug_name("hotloader");
     _systems->add<weq::system::Input,             1>()->set_debug_name("input");
     _systems->add<weq::system::UserInterface,     2>()->set_debug_name("ui");
-    //_systems->add<weq::system::WaveGPUSimulation, 3>()->set_debug_name("wave gpu");
+    _systems->add<weq::system::WaveGPUSimulation, 3>()->set_debug_name("wave gpu");
     _systems->add<weq::system::Camera,            4>()->set_debug_name("camera");
     //_systems->add<weq::system::DebugDraw,         5>()->set_debug_name("debug draw");
     _systems->add<weq::system::Renderer,          6>()->set_debug_name("renderer");
@@ -70,10 +70,10 @@ public:
     // Configure stuff
     //configure_states();
     add_camera();
-    //add_wave();
+    add_wave();
     add_ui();
-    add_reflection_sphere();
-    add_reflection_cube();
+    //add_reflection_sphere();
+    //add_reflection_cube();
   }
 
   void configure_states(){
