@@ -15,7 +15,11 @@
 
 #if __has_include(<filesystem>)
 #include <filesystem>
+#ifdef _WIN32
+namespace fs = std::experimental::filesystem;
+#else
 namespace fs = std::filesystem;
+#endif
 #elif __has_include(<experimental/filesystem>)
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;

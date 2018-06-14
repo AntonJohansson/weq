@@ -76,10 +76,12 @@ protected:
 
 private:
   // Extending to support multiple dts
+  //nanoseconds   _timestep{33333333ns};
   nanoseconds _timestep{16666667ns};
   //nanoseconds _timestep{1000000ns};
   nanoseconds _lag{0ns};
   double _timestep_value{0.01666667};
+  //double _timestep_value{0.03333333};
   //double _timestep_value{0.001};
   double _current_framerate = 0.0;
   unsigned int _frame_counter{0};
