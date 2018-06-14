@@ -1,0 +1,11 @@
+- when screen is black, scene_fbo is blank
+- Radien på kameran ändras då bilden blir svart.
+- addressen för transform komponenten är densamma.
+
+
+- EBO size and DRAW mode are not a problem
+- It is only drawing the first mesh that it finds
+
+- i think its finding them in the reverse order they were added
+- It doesnt matter if we loop forward or backwards, only the latest added item is drawn
+- Drawing only the second thing in the list shows that the data is corrupt somehow
