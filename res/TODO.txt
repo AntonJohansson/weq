@@ -1,5 +1,9 @@
 TODO
 
+- VECTORIZATION should be used were same type of calculations are made on lots of data
+	- use SOA
+	- gives little benefit for m4 transforms
+
 - Removing the UI systems causes null ptr access violation
 
 - In order to decouple ImGui from the renderer, render in the UI system (to a texture), and then
@@ -8,9 +12,6 @@ TODO
 - Something is really wonky with the dt independant systems
   not sure what tho. Trying to run at 1k fps and failing should
   run slower ex. 600 fps not 7000
-
-- MAC problem resolved when engine is slowing down.
-  weeeeird as shit.
 
 - Add options for reflectivity :)
 
@@ -30,12 +31,9 @@ TODO
   const reference would be more logical and much safer.
   One should not ve able to alter the data of an event.
 
-- FreeImage is removed,
-  - replace with stb_* library
-
 - Use <glm/fwd.hpp> instead of <glm/glm.hpp> in headers :)
 
-- Forward declare headers?
+- Forward declare in headers?
 
 - Currently supports variable dt for wave sim
   - problem with ui variables because if the sim updates at 1k fps,

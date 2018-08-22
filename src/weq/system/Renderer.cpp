@@ -40,7 +40,7 @@ namespace{
 std::shared_ptr<gl::Cubemap> cubemap;
 std::shared_ptr<gl::ShaderProgram> screen_p;
 std::shared_ptr<gl::ShaderProgram> skymap_p;
-std::shared_ptr<Mesh> screen_mesh;
+std::shared_ptr<Mesh> renderer_screen_mesh;
 std::shared_ptr<Mesh> skymap_mesh;
 std::shared_ptr<gl::Framebuffer> scene_fbo;
 glm::mat4 view;
@@ -76,22 +76,22 @@ void Renderer::configure(EventManager& events){
       {"texcoord", gl::Type::FLOAT, 2}
     }};
 
-  MeshData screen_mesh_data(VT2);
-  screen_mesh_data.interleaved = {
+  MeshData renderer_screen_mesh_data(VT2);
+  renderer_screen_mesh_data.interleaved = {
     -1.0f,  1.0f,  0.0f, 1.0f, // top left
     1.0f,  1.0f,  1.0f, 1.0f, // top right
     1.0f, -1.0f,  1.0f, 0.0f, // bottom right
     -1.0f, -1.0f,  0.0f, 0.0f, // bottom left
   };
 
-  screen_mesh_data.elements = {
+  renderer_screen_mesh_data.elements = {
     0, 1, 2,
     2, 3, 0
   };
 
-  screen_mesh = std::make_shared<Mesh>(screen_mesh_data,
+  renderer_screen_mesh = std::make_shared<Mesh>(renderer_screen_mesh_data,
                                        gl::DrawMode::TRIANGLES);
-  screen_mesh->generate_vao(screen_p);
+  renderer_screen_mesh->generate_vao(screen_p);
 
 
   // Setup cubemap
@@ -237,13 +237,13 @@ void Renderer::update(EntityManager& entities,
   screen_p->use();
   screen_p->set("framebuffer", 0);
 
-  screen_mesh->vao(screen_p).bind();
-  screen_mesh->ebo().bind();
+  renderer_screen_mesh->vao(screen_p).bind();
+  renderer_screen_mesh->ebo().bind();
 
   scene_fbo->texture()->bind(0);
 
-  glDrawElements(GLenum(screen_mesh->draw_mode()),
-                 screen_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
+  glDrawElements(GLenum(renderer_screen_mesh->draw_mode()),
+                 renderer_screen_mesh->ebo().size(), GL_UNSIGNED_INT, 0);
 
   // Render UI
   ImGui::Render();

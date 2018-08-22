@@ -716,9 +716,4 @@ void WaveGPUSimulation::receive(event::ActiveInput& event){
   }
 }
 
-// There is another way to do this
-//void WaveGPUSimulation::receive(const event::ActiveCamera& event){
-//  if()
-//}
-
 }

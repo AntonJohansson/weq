@@ -15,8 +15,8 @@
 #include <vector>
 
 namespace{
-  unsigned int window_height;
-  unsigned int window_width;
+  //unsigned int window_height;
+  //unsigned int window_width;
   std::vector<ImVec2> menu_pos;
   std::vector<ImVec2> menu_size;
 }
@@ -127,8 +127,8 @@ void UserInterface::receive(event::ActiveInput& event){
 }
 
 void UserInterface::receive(event::ActiveWindow& event){
-  window_width = event.window->width();
-  window_height = event.window->height();
+  //window_width = event.window->width();
+  //window_height = event.window->height();
 }
 
 }

@@ -3,6 +3,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
+#undef STB_IMAGE_IMPLEMENTATION // to support unity-build
 
 #include <spdlog/spdlog.h>
 

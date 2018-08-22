@@ -24,6 +24,10 @@
 
 // @TODO TEMP
 #include <weq/utility/GlmHelper.hpp>
+#include <weq/utility/Profiler.hpp>
+#include <imgui/imgui.h>
+#include <weq/simd/matrix.hpp>
+#include <weq/simd/constants.hpp>
 
 #ifdef _WIN32
 #undef near
@@ -43,30 +47,6 @@ namespace{
   bool fps_mode = false;
   Var(float, camera_speed, 0.5f);
   Var(float, camera_sensitivity, 1.0f);
-
-  glm::vec3 orthogonal(glm::vec3 v){
-    static glm::vec3 x_axis = {1,0,0};
-    static glm::vec3 y_axis = {0,1,0};
-    static glm::vec3 z_axis = {0,0,1};
-
-    float x = glm::abs(v.x);
-    float y = glm::abs(v.y);
-    float z = glm::abs(v.z);
-
-    glm::vec3 other = (x < y) ? (x < z ? x_axis : z_axis) : (y < z ? y_axis : z_axis);
-    return glm::cross(v, other);
-  }
-
-  glm::quat rotate_between(glm::vec3 start, glm::vec3 end){
-    float cos_theta = glm::dot(start, end);
-    float k = glm::sqrt(glm::length2(start)*glm::length2(end));
-
-    if(cos_theta / k == -1){
-      return glm::quat(0, glm::normalize(orthogonal(start)));
-    }
-
-    return glm::normalize(glm::quat(cos_theta + k, glm::cross(start, end)));
-  }
 }
 
 namespace weq::system{
@@ -152,12 +132,15 @@ void Camera::update_direction(component::Camera* camera, component::Transform* t
 }
 
 void Camera::update_arcball(component::Camera* camera, component::Transform* t){
+	auto min   = [](float a, float b){return (b < a) ? b : a;};
+	auto max   = [](float a, float b){return (a < b) ? b : a;};
+	auto clamp = [&max,&min](float f, float a, float b){return min(max(f,a), b);};
   // radius
-  t->radius = glm::max(t->radius + _movement_amount.z, 0.0f);
+  t->radius = max(t->radius + _movement_amount.z, 0.0f);
   // theta
-  t->theta = glm::clamp<float>(t->theta - _delta_cursor.y, 0.0f, glm::pi<float>());
+  t->theta = clamp(t->theta - _delta_cursor.y, 0.0f, glm::pi<float>());
   // phi
-  t->phi = std::fmod(t->phi - _delta_cursor.x, 360.0f);
+  t->phi = std::fmod(t->phi - _delta_cursor.x, 2.0f*glm::pi<float>());
 
   // In order to get from camera to world space:
   // 1) translate radius in +z-axis,
@@ -165,20 +148,61 @@ void Camera::update_arcball(component::Camera* camera, component::Transform* t){
   // 3) rotate phi about +z-axis,
   // 4) translate to camera target,
 
-  auto view = glm::mat4(1.0);
-  view = glm::translate(view, camera->target);
-  view = glm::rotate(view, t->phi + glm::half_pi<float>(), glm::vec3(0,0,1));
-  view = glm::rotate(view, t->theta, glm::vec3(1,0,0));
-  //view = glm::translate(view, glm::vec3(0,0,t->radius));
-  view = glm::translate(view, glm::vec3(0,0,t->radius));
+#define USE_SIMD 0
+	{PROFILE("arcball")
+#if !USE_SIMD
+		auto view = glm::mat4(1.0);
+		view = glm::translate(view, camera->target);
+		view = glm::rotate(view, t->phi + glm::half_pi<float>(), glm::vec3(0,0,1));
+		view = glm::rotate(view, t->theta, glm::vec3(1,0,0));
+		view = glm::translate(view, glm::vec3(0,0,t->radius));
+		// REVERSE ORDER
+		//view = glm::translate(view, glm::vec3(0,0,t->radius));
+		//view = glm::rotate(view, t->theta, glm::vec3(1,0,0));
+		//view = glm::rotate(view, t->phi + glm::half_pi<float>(), glm::vec3(0,0,1));
+		//view = glm::translate(view, camera->target);
 
-  // 5) the cameras position is then given as the 4th column in the matrix,
-  t->_position  =  glm::vec3(view[3]);
-  t->_direction = -glm::vec3(view[2]);
+		// 5) the cameras position is then given as the 4th column in the matrix,
+		t->_position  =  glm::vec3(view[3]);
+		t->_direction = -glm::vec3(view[2]);
 
-  // 6) inverse of this matrix gives the view matrix.
-  camera->view = glm::inverse(view);
+		// 6) inverse of this matrix gives the view matrix.
+		camera->view = glm::inverse(view);
+#else
+		simd::v3 camera_target(camera->target.x, camera->target.y, camera->target.z);
+		simd::m4 inv;
+		simd::v4 pos;
+		simd::v4 dir;
 
+		using namespace simd;
+		m4 view = identity_m4;
+		view = mul(translate(v3(0,0,t->radius)), view);
+		view = mul(axis_angle(v3(1,0,0), t->theta), view);
+		view = mul(axis_angle(v3(0,0,1), t->phi + constants::half_pi), view);
+		view = mul(translate(camera_target), view);
+
+		pos = view.w;
+		dir = -view.z;
+		inv = transform_inverse_no_scale(view);
+
+		t->_position  = glm::vec3(get_x(pos), get_y(pos), get_z(pos));
+		t->_direction = glm::vec3(get_x(dir), get_y(dir), get_z(dir));
+		camera->view = glm::mat4(
+			glm::vec4(get_x(inv.x), get_y(inv.x), get_z(inv.x), get_w(inv.x)),
+			glm::vec4(get_x(inv.y), get_y(inv.y), get_z(inv.y), get_w(inv.y)),
+			glm::vec4(get_x(inv.z), get_y(inv.z), get_z(inv.z), get_w(inv.z)),
+			glm::vec4(get_x(inv.w), get_y(inv.w), get_z(inv.w), get_w(inv.w))
+			);
+
+#endif
+	}
+
+	ImGui::Begin("benchmark");
+	for(auto& [what, entry] : utility::Profiler::entries){
+		ImGui::Text("%10s: avg: %10u min: %10u max: %10u (ns)", what.c_str(), entry.time, entry.min, entry.max);
+	}
+	ImGui::End();
+  
   // Reset mouse variables.
   _delta_cursor = {0,0};
   _movement_amount = {0,0,0};
@@ -193,8 +217,9 @@ void Camera::receive(event::ActiveInput& event){
   if(event.has(InputState::CURSOR_DOWN)){
     // Update mouse delta position
     if(event.has(InputRange::CURSOR_DX) && event.has(InputRange::CURSOR_DY)){
-      _delta_cursor.x = event.ranges.at(InputRange::CURSOR_DX);
-      _delta_cursor.y = event.ranges.at(InputRange::CURSOR_DY);
+			// TODO: DOES THIS COUNT AS SENSITIVITY?
+      _delta_cursor.x = 10.0f * event.ranges.at(InputRange::CURSOR_DX);
+      _delta_cursor.y = 10.0f * event.ranges.at(InputRange::CURSOR_DY);
     }
   }
 
