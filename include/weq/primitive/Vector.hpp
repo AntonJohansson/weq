@@ -1,7 +1,7 @@
 #pragma once
 
 #include <weq/MeshData.hpp>
-#include <glm/glm.hpp>
+//#include <glm/glm.hpp>
 
 namespace weq::primitive::vector{
 

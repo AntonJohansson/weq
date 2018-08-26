@@ -1,8 +1,8 @@
 #pragma once
 
-#include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtc/quaternion.hpp>
+//#include <glm/glm.hpp>
+//#include <glm/gtx/transform.hpp>
+//#include <glm/gtc/quaternion.hpp>
 
 #include <weq/utility/GlmHelper.hpp>
 

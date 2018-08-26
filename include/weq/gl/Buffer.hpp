@@ -1,9 +1,9 @@
 #pragma once
 
-#include <glad/glad.h>
+//#include <glad/glad.h>
 //#include <spdlog/spdlog.h>
 
-#include <vector>
+//#include <vector>
 
 namespace weq::gl{
 

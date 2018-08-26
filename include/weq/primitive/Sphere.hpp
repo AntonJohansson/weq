@@ -1,8 +1,8 @@
 #pragma once
 
 #include <weq/MeshData.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
+//#include <glm/glm.hpp>
+//#include <glm/gtc/constants.hpp>
 
 namespace weq::primitive::sphere{
 

@@ -3,10 +3,10 @@
 #include <weq/ecs/System.hpp>
 #include <weq/utility/NumberTypes.hpp>
 #include <weq/memory/CircularList.hpp>
-#include <unordered_map>
-#include <sstream>
-#include <iomanip>
-#include <memory>
+//#include <unordered_map>
+//#include <sstream>
+//#include <iomanip>
+//#include <memory>
 
 namespace weq{
 

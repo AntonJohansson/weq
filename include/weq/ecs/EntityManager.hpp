@@ -4,12 +4,12 @@
 #include <weq/memory/PoolAllocator.hpp>
 #include <weq/ecs/Component.hpp>
 
-#include <functional>
-#include <string>
-#include <queue>
-#include <vector>
-#include <unordered_map>
-#include <bitset>
+//#include <functional>
+//#include <string>
+//#include <queue>
+//#include <vector>
+//#include <unordered_map>
+//#include <bitset>
 
 // Temp
 #include <iostream>

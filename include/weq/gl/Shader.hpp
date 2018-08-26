@@ -2,10 +2,10 @@
 
 #include <weq/memory/Resource.hpp>
 
-#include <glad/glad.h>
+//#include <glad/glad.h>
 
-#include <string>
-#include <filesystem>
+//#include <string>
+//#include <filesystem>
 
 namespace weq::gl{
 

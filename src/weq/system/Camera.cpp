@@ -12,27 +12,26 @@
 
 #include <weq/vars/Vars.hpp>
 
-#include <spdlog/spdlog.h>
-#include <glm/gtx/rotate_vector.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtc/constants.hpp>
-#include <glm/ext.hpp>
-
-#include <algorithm>
-#include <cmath>
-
+//#include <spdlog/spdlog.h>
+//#include <glm/gtx/rotate_vector.hpp>
+//#include <glm/gtc/matrix_transform.hpp>
+//#include <glm/gtc/quaternion.hpp>
+//#include <glm/gtc/constants.hpp>
+//#include <glm/ext.hpp>
+//
+//#include <algorithm>
+//#include <cmath>
+//
 // @TODO TEMP
 #include <weq/utility/GlmHelper.hpp>
 #include <weq/utility/Profiler.hpp>
-#include <imgui/imgui.h>
 #include <weq/simd/matrix.hpp>
 #include <weq/simd/constants.hpp>
-
-#ifdef _WIN32
-#undef near
-#undef far
-#endif
+//
+//#ifdef _WIN32
+//#undef near
+//#undef far
+//#endif
 
 //#include <glm/gtx/quaternion.hpp>
 

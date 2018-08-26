@@ -1,7 +1,7 @@
 #pragma once
 
 #include <weq/Window.hpp>
-#include <memory>
+//#include <memory>
 
 namespace weq::event{
 

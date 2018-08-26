@@ -3,6 +3,18 @@ cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 #set(CXX "cc_args.py clang++")
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
 
+# -cc1 flag for clang causes a lot of standard headers to not be found
+# Xclang forces -emit-pch to be passed to -cc1
+add_custom_target(pch ALL 
+	clang++ -Xclang
+	-emit-pch
+	${CMAKE_CURRENT_SOURCE_DIR}/include/weq/precompiled.hpp 
+	-o ${CMAKE_CURRENT_SOURCE_DIR}/include/weq/precompiled.hpp.pch
+	-I${CMAKE_CURRENT_SOURCE_DIR}/external/unix/include
+	-I${CMAKE_CURRENT_SOURCE_DIR}/include
+	-std=c++1z)
+
+
 project(weq CXX)
 
 #add_subdirectory(tests)
@@ -45,9 +57,12 @@ endif()
 #find_library(entityx HINTS ${library_path} NAMES entityx REQUIRED)
 find_library(glfw HINTS ${library_path} NAMES glfw3 REQUIRED)
 #find_package(glfw3 3.2 REQUIRED)
+set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED)
 
 add_executable(weq
+	src/weq/precompiled.cpp
+
   src/weq/Window.cpp
   src/weq/main.cpp
   src/weq/Application.cpp
@@ -89,9 +104,11 @@ if(WIN32)
   target_compile_options(weq PRIVATE /std:c++latest)
 elseif(APPLE OR UNIX)
   # -stdlib=libc++ ?
-	target_compile_options(weq PRIVATE -O3 -fcolor-diagnostics -std=c++1z -Wall -Wextra -Wfatal-errors -g -pg)
-	#target_compile_options(weq PRIVATE -fcolor-diagnostics -std=c++1z -Wall -Wextra -Wfatal-errors -g -pg)
-	set_target_properties(weq PROPERTIES LINK_FLAGS "-pg")
+	#target_compile_options(weq PRIVATE -O3 -fcolor-diagnostics -std=c++1z -Wall -Wextra -Wfatal-errors -g -pg)
+	target_compile_options(weq PRIVATE 
+		#-include-pch ${CMAKE_CURRENT_SOURCE_DIR}/include/weq/precompiled.hpp.pch 
+		-fcolor-diagnostics -std=c++1z -Wall -Wextra -Wfatal-errors -g)
+	#set_target_properties(weq PROPERTIES LINK_FLAGS "-pg")
 endif()
 
 set_target_properties(weq PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
@@ -109,5 +126,7 @@ target_link_libraries(weq
   ${OPENGL_gl_LIBRARY}
   ${EXTRA_LIBS}
   )
+
+set_target_properties(weq PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "include/weq/precompiled.hpp")
 cotire(weq)
 

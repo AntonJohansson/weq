@@ -28,11 +28,11 @@
 // @TODO TEMP
 #include <weq/utility/GlmHelper.hpp>
 
-#include <glad/glad.h>
-#include <glm/gtc/matrix_transform.hpp>
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw_gl3.h>
-#include <spdlog/spdlog.h>
+//#include <glad/glad.h>
+//#include <glm/gtc/matrix_transform.hpp>
+//#include <imgui/imgui.h>
+//#include <imgui/imgui_impl_glfw_gl3.h>
+//#include <spdlog/spdlog.h>
 
 namespace weq::system{
 

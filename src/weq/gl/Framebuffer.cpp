@@ -1,7 +1,7 @@
 #include <weq/gl/Framebuffer.hpp>
 #include <weq/gl/Texture.hpp>
 
-#include <spdlog/spdlog.h>
+//#include <spdlog/spdlog.h>
 
 namespace weq::gl{
 

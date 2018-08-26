@@ -2,13 +2,13 @@
 
 #include <weq/memory/Resource.hpp>
 
-#include <glad/glad.h>
-#include <glm/glm.hpp>
-
-#include <unordered_map>
-#include <memory>
-#include <vector>
-#include <filesystem>
+//#include <glad/glad.h>
+//#include <glm/glm.hpp>
+//
+//#include <unordered_map>
+//#include <memory>
+//#include <vector>
+//#include <filesystem>
 
 namespace weq::gl{
 

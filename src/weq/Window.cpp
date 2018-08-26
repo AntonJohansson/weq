@@ -5,10 +5,10 @@
 #include <weq/memory/ResourceManager.hpp>
 #include <weq/vars/Vars.hpp>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-//#include <entityx/entityx.h>
-#include <spdlog/spdlog.h>
+//#include <glad/glad.h>
+//#include <GLFW/glfw3.h>
+////#include <entityx/entityx.h>
+//#include <spdlog/spdlog.h>
 
 namespace{
   bool glfw_initialized;

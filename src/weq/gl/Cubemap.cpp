@@ -1,9 +1,9 @@
 #include <weq/gl/Cubemap.hpp>
 #include <weq/utility/NumberTypes.hpp>
 
-#include <stb/stb_image.h>
+//#include <stb/stb_image.h>
 
-#include <spdlog/spdlog.h>
+//#include <spdlog/spdlog.h>
 
 namespace weq::gl{
 Cubemap::Cubemap(const fs::path& id,

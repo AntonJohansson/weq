@@ -2,10 +2,10 @@
 
 #include <weq/memory/PoolAllocator.hpp>
 #include <weq/utility/NumberTypes.hpp>
-// temp
-#include <functional>
-#include <iostream>
-#include <iomanip>
+//// temp
+//#include <functional>
+//#include <iostream>
+//#include <iomanip>
 
 namespace weq::memory{
 

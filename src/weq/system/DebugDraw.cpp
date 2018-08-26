@@ -18,9 +18,9 @@
 #include <weq/primitive/Circle.hpp>
 #include <weq/primitive/Sphere.hpp>
 
-#include <spdlog/spdlog.h>
-
-#include <algorithm>
+//#include <spdlog/spdlog.h>
+//
+//#include <algorithm>
 
 namespace weq::system{
 

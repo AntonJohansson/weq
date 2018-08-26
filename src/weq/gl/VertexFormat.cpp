@@ -1,6 +1,6 @@
 #include <weq/gl/VertexFormat.hpp>
 
-#include <algorithm>
+//#include <algorithm>
 
 namespace weq::gl{
 

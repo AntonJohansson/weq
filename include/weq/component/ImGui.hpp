@@ -1,8 +1,8 @@
 #pragma once
 
 #include <weq/ecs/Fwd.hpp>
-#include <imgui/imgui.h>
-#include <functional>
+//#include <imgui/imgui.h>
+//#include <functional>
 
 namespace weq::component{
 

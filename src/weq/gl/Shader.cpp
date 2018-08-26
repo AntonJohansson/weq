@@ -3,10 +3,10 @@
 #include <weq/event/Hotloader.hpp>
 //#include <weq/Hotloader.hpp>
 
-#include <spdlog/spdlog.h>
-
-#include <fstream>
-#include <sstream>
+//#include <spdlog/spdlog.h>
+//
+//#include <fstream>
+//#include <sstream>
 
 namespace weq::gl{
 

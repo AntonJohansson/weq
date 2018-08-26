@@ -1,10 +1,10 @@
 #pragma once
 
-#ifdef _WIN32
-#include <Windows.h> // lol wtf... required by spdlog
-#undef near
-#undef far
-#endif
+//#ifdef _WIN32
+//#include <Windows.h> // lol wtf... required by spdlog
+//#undef near
+//#undef far
+//#endif
 
 #include <weq/memory/ResourceManager.hpp>
 #include <weq/state/StateManager.hpp>
@@ -12,15 +12,15 @@
 #include <weq/ecs/Fwd.hpp>
 #include <weq/ecs/Receiver.hpp>
 //#include <entityx/entityx.h>
-#include <spdlog/spdlog.h>
+//#include <spdlog/spdlog.h>
 
-#include <string>
+//#include <string>
 
-#include <chrono>
-using namespace std::chrono_literals;
-using std::chrono::nanoseconds;
-using std::chrono::duration_cast;
-using std::chrono::duration;
+//#include <chrono>
+//using namespace std::chrono_literals;
+//using std::chrono::nanoseconds;
+//using std::chrono::duration_cast;
+//using std::chrono::duration;
 
 
 

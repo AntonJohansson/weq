@@ -1,8 +1,8 @@
 #include <weq/gl/ShaderProgram.hpp>
 #include <weq/gl/Shader.hpp>
 
-#include <glm/gtc/type_ptr.hpp>
-#include <spdlog/spdlog.h>
+//#include <glm/gtc/type_ptr.hpp>
+//#include <spdlog/spdlog.h>
 
 namespace weq::gl{
 

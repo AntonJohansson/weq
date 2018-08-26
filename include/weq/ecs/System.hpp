@@ -2,14 +2,14 @@
 
 #include <weq/utility/NumberTypes.hpp>
 
-#include <chrono> // needed for multiple dts
-using namespace std::chrono_literals;
-using std::chrono::nanoseconds;
-using std::chrono::duration_cast;
-using std::chrono::duration;
-
-// @TODO Temp?
-#include <spdlog/spdlog.h>
+//#include <chrono> // needed for multiple dts
+//using namespace std::chrono_literals;
+//using std::chrono::nanoseconds;
+//using std::chrono::duration_cast;
+//using std::chrono::duration;
+//
+//// @TODO Temp?
+//#include <spdlog/spdlog.h>
 
 
 namespace weq{

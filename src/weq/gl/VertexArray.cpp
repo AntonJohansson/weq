@@ -3,7 +3,7 @@
 #include <weq/gl/Buffer.hpp>
 #include <weq/gl/VertexFormat.hpp>
 
-#include <spdlog/spdlog.h>
+//#include <spdlog/spdlog.h>
 
 namespace weq::gl{
 

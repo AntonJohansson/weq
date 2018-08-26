@@ -4,9 +4,9 @@
 #include <weq/ecs/Event.hpp>
 #include <weq/ecs/Receiver.hpp>
 #include <weq/ecs/Signal.hpp>
-#include <memory>
-#include <vector>
-#include <unordered_map>
+//#include <memory>
+//#include <vector>
+//#include <unordered_map>
 
 namespace weq{
 

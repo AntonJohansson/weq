@@ -11,10 +11,10 @@
 
 #include <weq/memory/ResourceManager.hpp>
 
-#include <string>
-
-#include <iostream>
-#include <iomanip>
+//#include <string>
+//
+//#include <iostream>
+//#include <iomanip>
 
 namespace weq{
 

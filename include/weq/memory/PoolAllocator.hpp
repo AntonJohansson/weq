@@ -1,16 +1,16 @@
 #pragma once
 
 #include <weq/utility/NumberTypes.hpp>
-#include <utility>
-#include <queue>
-#include <vector>
-#include <cstdlib>
-
-#include <new>
-
-#include <iostream>
-#include <iomanip>
-#include <cassert>
+//#include <utility>
+//#include <queue>
+//#include <vector>
+//#include <cstdlib>
+//
+//#include <new>
+//
+//#include <iostream>
+//#include <iomanip>
+//#include <cassert>
 
 namespace weq::memory{
 

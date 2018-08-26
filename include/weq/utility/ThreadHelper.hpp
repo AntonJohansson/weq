@@ -1,7 +1,7 @@
 #pragma once
 
-#include <functional>
-#include <thread>
+//#include <functional>
+//#include <thread>
 
 namespace weq{
 

@@ -13,18 +13,18 @@
 
 #include <weq/event/Hotloader.hpp>
 
-#include <spdlog/spdlog.h>
+//#include <spdlog/spdlog.h>
 
 //#define STB_IMAGE_IMPLEMENTATION
 //#include <stb/stb_image.h>
 
-#if __has_include(<filesystem>)
-#include <filesystem>
-#elif __has_include(<experimental/filesystem>)
-#include <experimental/filesystem>
-#endif
-
-#include <unordered_map>
+//#if __has_include(<filesystem>)
+//#include <filesystem>
+//#elif __has_include(<experimental/filesystem>)
+//#include <experimental/filesystem>
+//#endif
+//
+//#include <unordered_map>
 
 namespace weq::memory::resource_manager{
 

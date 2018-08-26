@@ -1,7 +1,7 @@
 #pragma once
 
 #include <weq/ecs/Fwd.hpp>
-#include <string>
+//#include <string>
 
 // Defined in <glfw/glfw.h>
 struct GLFWwindow;

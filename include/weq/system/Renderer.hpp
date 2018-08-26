@@ -4,7 +4,7 @@
 #include <weq/ecs/System.hpp>
 #include <weq/ecs/Receiver.hpp>
 //#include <entityx/entityx.h>
-#include <memory>
+//#include <memory>
 
 //namespace ex = entityx;
 

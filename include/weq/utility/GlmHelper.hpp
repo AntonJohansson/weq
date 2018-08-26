@@ -1,8 +1,8 @@
 #pragma once
 
-#include <spdlog/spdlog.h>
-#include <glm/glm.hpp>
-#include <string>
+//#include <spdlog/spdlog.h>
+//#include <glm/glm.hpp>
+//#include <string>
 
 namespace weq{
 static void draw_mat(std::string name, glm::mat4 m){

@@ -1,10 +1,10 @@
 #pragma once
 
 #include "Defines.hpp"
-#include <xmmintrin.h>
-#include <stdint.h>
-#include <cstdio>
-#include <cstdlib>
+//#include <xmmintrin.h>
+//#include <stdint.h>
+//#include <cstdio>
+//#include <cstdlib>
 
 #define MATH_SHUFFLE3(a, b, x, y, z)    _mm_shuffle_ps(a, b, _MM_SHUFFLE(3, z, y, x))
 #define MATH_SHUFFLE4(a, b, x, y, z, w) _mm_shuffle_ps(a, b, _MM_SHUFFLE(w, z, y, x))
@@ -179,7 +179,7 @@ FORCE_INLINE v4 set_w(v4 a, float w){
 
 // Useful functions
 // TODO: allocators
-const char* to_string(v3 v){
+FORCE_INLINE const char* to_string(v3 v){
 	constexpr int whole_precision   = 4;
 	constexpr int decimal_precision = 2;
 	constexpr int constant_bytes    = 6;// (, , )
@@ -194,7 +194,7 @@ const char* to_string(v3 v){
 	return buffer;
 }
 
-const char* to_string(v4 v){
+FORCE_INLINE const char* to_string(v4 v){
 	constexpr int whole_precision   = 4;
 	constexpr int decimal_precision = 2;
 	constexpr int constant_bytes    = 8;// (, , , )

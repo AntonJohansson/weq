@@ -5,7 +5,7 @@
 #include <weq/ecs/Receiver.hpp>
 //#include <entityx/entityx.h>
 
-#include <memory>
+//#include <memory>
 
 namespace weq::system{
 

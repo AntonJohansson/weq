@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+//#include <vector>
 #include <weq/gl/VertexFormat.hpp>
 
 namespace weq{

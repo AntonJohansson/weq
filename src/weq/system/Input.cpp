@@ -10,14 +10,14 @@
 #include <weq/event/Window.hpp>
 #include <weq/Window.hpp>
 
-#include <spdlog/spdlog.h>
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw_gl3.h>
+//#include <spdlog/spdlog.h>
+//#include <imgui/imgui.h>
+//#include <imgui/imgui_impl_glfw_gl3.h>
 
-#include <GLFW/glfw3.h>
-
-#include <memory>
-#include <initializer_list>
+//#include <GLFW/glfw3.h>
+//
+//#include <memory>
+//#include <initializer_list>
 
 // TODO read input from config file instead of hard coded.
 

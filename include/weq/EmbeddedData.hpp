@@ -3,7 +3,7 @@
 // This file defines resources that should be included in the the generated
 // executable.
 
-#include <string>
+//#include <string>
 
 namespace data{
 

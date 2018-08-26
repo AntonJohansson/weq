@@ -1,7 +1,7 @@
 #pragma once
 
 #include <weq/MeshData.hpp>
-#include <spdlog/spdlog.h>
+//#include <spdlog/spdlog.h>
 
 namespace weq::primitive::plane{
 

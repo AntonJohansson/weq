@@ -3,7 +3,7 @@
 #include <weq/gl/ShaderProgram.hpp>
 #include <weq/gl/Framebuffer.hpp>
 #include <weq/gl/Texture.hpp>
-#include <memory>
+//#include <memory>
 
 namespace weq::component{
 

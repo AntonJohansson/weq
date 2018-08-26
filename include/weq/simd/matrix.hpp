@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Defines.hpp"
-#include <xmmintrin.h>
-#include <pmmintrin.h> // needed for hadd in inverse(...)
-#include <smmintrin.h> // needed for blendv in transform_inverse(...)
+//#include <xmmintrin.h>
+//#include <pmmintrin.h> // needed for hadd in inverse(...)
+//#include <smmintrin.h> // needed for blendv in transform_inverse(...)
 #include "vector.hpp"
-#include <cmath>
-#include <cassert>
+//#include <cmath>
+//#include <cassert>
 
 #define MATH_SHUFFLE3(a, b, x, y, z)    _mm_shuffle_ps(a, b, _MM_SHUFFLE(3, z, y, x))
 #define MATH_SHUFFLE4(a, b, x, y, z, w) _mm_shuffle_ps(a, b, _MM_SHUFFLE(w, z, y, x))
@@ -50,7 +50,7 @@ struct m4{
 
 // Useful functions
 // TODO: allocators
-const char* to_string(m3 a){
+FORCE_INLINE const char* to_string(m3 a){
 	constexpr int decimals = 2;
 	constexpr int width = 7;
 	constexpr int constant_bytes = 20;
@@ -66,7 +66,7 @@ const char* to_string(m3 a){
 	return buffer;
 }
 
-const char* to_string(m4 a){
+FORCE_INLINE const char* to_string(m4 a){
 	constexpr int decimals = 2;
 	constexpr int width = 7;
 	constexpr int constant_bytes = 20;

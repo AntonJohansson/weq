@@ -4,7 +4,7 @@
 #include <weq/ecs/System.hpp>
 #include <weq/ecs/Receiver.hpp>
 //#include <entityx/entityx.h>
-#include <glm/glm.hpp> //TODO temp
+//#include <glm/glm.hpp> //TODO temp
 
 //namespace ex = entityx;
 

@@ -1,11 +1,11 @@
 #include <weq/gl/Texture.hpp>
 #include <weq/utility/NumberTypes.hpp>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb_image.h>
-#undef STB_IMAGE_IMPLEMENTATION // to support unity-build
-
-#include <spdlog/spdlog.h>
+//#define STB_IMAGE_IMPLEMENTATION
+//#include <stb/stb_image.h>
+//#undef STB_IMAGE_IMPLEMENTATION // to support unity-build
+//
+//#include <spdlog/spdlog.h>
 
 namespace weq::gl{
 

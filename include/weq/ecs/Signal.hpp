@@ -2,7 +2,7 @@
 
 #include <weq/utility/NumberTypes.hpp>
 #include <weq/memory/CircularList.hpp>
-#include <functional>
+//#include <functional>
 
 namespace weq{
 

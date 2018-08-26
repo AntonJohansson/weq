@@ -1,7 +1,7 @@
 #pragma once
 
 #include <weq/utility/NumberTypes.hpp>
-#include <memory>
+//#include <memory>
 
 namespace weq{
 class EventManager;
