@@ -149,7 +149,7 @@ void Camera::update_arcball(component::Camera* camera, component::Transform* t){
   // 4) translate to camera target,
 
 #define USE_SIMD 0
-	{PROFILE("arcball")
+	//{PROFILE("arcball")
 #if !USE_SIMD
 		auto view = glm::mat4(1.0);
 		view = glm::translate(view, camera->target);
@@ -195,14 +195,9 @@ void Camera::update_arcball(component::Camera* camera, component::Transform* t){
 			);
 
 #endif
-	}
+	//}
 
-	ImGui::Begin("benchmark");
-	for(auto& [what, entry] : utility::Profiler::entries){
-		ImGui::Text("%10s: avg: %10u min: %10u max: %10u (ns)", what.c_str(), entry.time, entry.min, entry.max);
-	}
-	ImGui::End();
-  
+	  
   // Reset mouse variables.
   _delta_cursor = {0,0};
   _movement_amount = {0,0,0};

@@ -14,11 +14,11 @@
 #define PROFILE(what) 
 #endif
 
-namespace utility{
+namespace weq::utility{
 
 struct Profiler{
 	using Clock = std::chrono::high_resolution_clock;
-	struct time_entry{long long time; long long min; long long max;};
+	struct time_entry{long long time{0}; long long min; long long max{0};};
 
 	Profiler(const std::string& what) : what(what) {
 		start = Clock::now();
@@ -36,8 +36,8 @@ struct Profiler{
 		};
 	}
 
-	const std::string& what;
-	Clock::time_point start;
+	const std::string what{""};
+	Clock::time_point start{};
 	static std::unordered_map<std::string, time_entry> entries;
 };
 

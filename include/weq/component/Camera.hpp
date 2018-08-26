@@ -42,6 +42,11 @@ struct Camera{
       target(target),
       up({0, 0, 1}),
       direction({0,0,0}),
+			orientation(0,0,0,0),
+			view(1.0f),
+			projection(1.0f),
+			normal_matrix(1.0f),
+			viewproj(1.0f),
       update_projection(true),
       inherit_aspect(false){
     if(aspect_ratio == 0.0f){

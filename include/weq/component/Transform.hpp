@@ -21,8 +21,7 @@ struct Transform{
 			_rotation(0.0f, 0.0f, 0.0f, 0.0f),
       radius(0.0f),
       theta(0.0f),
-      phi(0.0f)
-  {}
+      phi(0.0f){}
 
   // Updates the quaternion by adding a relative rotation given in
   // Euler angles. Note: this also updates the direction vector.

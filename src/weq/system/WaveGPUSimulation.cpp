@@ -41,6 +41,8 @@
 #include <thread>
 #include <atomic>
 
+#include <weq/utility/Profiler.hpp>
+
 
 namespace weq::system{
 using weq::component::Renderable;
@@ -150,7 +152,6 @@ namespace{
   std::shared_ptr<gl::ShaderProgram> scene_wave_shader;
   std::shared_ptr<gl::Texture> grid_texture;
   bool spawn_drop = false;
-  bool spawn_ray = false;
 
   glm::vec2 mouse;
 }
@@ -224,15 +225,17 @@ static f32 time;
 void WaveGPUSimulation::update(EntityManager& entities,
                                EventManager& events,
                                f32 dt){
+	{PROFILE("WAVEGPU")
   time += dt;
   (void)dt;
 
   // Add UI if it doesn't exist (!)
   add_ui(entities, events);
-
+	
   if(should_raycast){
     component::Transform transform;
     component::Camera camera;
+
     entities.each<component::Camera,
                   component::ActiveCamera,
                   component::Transform>(
@@ -558,6 +561,7 @@ void WaveGPUSimulation::update(EntityManager& entities,
       //  ImGui::Image((void*)grid_texture->handle(), ImVec2(200, 200));
       //ImGui::End();
     });
+	}
 }
 
 void WaveGPUSimulation::add_ui(EntityManager& entities, EventManager& events){
@@ -568,6 +572,12 @@ void WaveGPUSimulation::add_ui(EntityManager& entities, EventManager& events){
         //ImGui::Begin("Debug");
         //ImGui::Image((void*)grid_texture->handle(), ImVec2(200,200));
         //ImGui::End();
+				//
+				ImGui::Begin("benchmark");
+				for(auto& [what, entry] : utility::Profiler::entries){
+					ImGui::Text("%10s: avg: %10u min: %10u max: %10u (ns)", what.c_str(), entry.time, entry.min, entry.max);
+				}
+				ImGui::End();
 
         ImGui::Begin("Menu", NULL, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::SetWindowCollapsed("Menu", false, ImGuiSetCond_FirstUseEver);
