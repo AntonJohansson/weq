@@ -12,6 +12,7 @@
 //#include <entityx/entityx.h>
 #include <weq/ecs/Fwd.hpp>
 #include <weq/memory/Resource.hpp>
+#include <weq/utility/HashMap.hpp>
 
 #if __has_include(<filesystem>)
 #include <filesystem>
@@ -28,7 +29,7 @@ namespace fs = std::experimental::filesystem;
 
 #include <string>
 #include <memory>
-#include <unordered_map>
+//#include <unordered_map>
 #include <functional>
 
 // Forward declarations
@@ -39,45 +40,9 @@ class Texture;
 class Cubemap;
 }
 
-//namespace weq::memory{
-//class Resource;
-//}
-
-//class ResourceManager{
-//public:
-//  ResourceManager(){
-//    FreeImage_Initialise();
-//  }
-//
-//  ~ResourceManager(){
-//    FreeImage_DeInitialise();
-//  }
-//
-//  template<typename T, typename... Args>
-//  std::shared_ptr<T> get(std::string id, Args&&... args){
-//    static_assert(std::is_base_of<Resource, T>::value, "T should inherit from resource");
-//
-//    auto& wp = _memory[id];
-//    auto sp = wp.lock();
-//
-//    if(!sp){
-//      wp = sp = std::make_shared<T>(id, std::forward<Args>(args)...);
-//      sp->load();
-//    }
-//
-//    return std::dynamic_pointer_cast<T>(sp);
-//  }
-//
-//private:
-//  std::unordered_map<std::string,
-//                     std::weak_ptr<Resource>> _memory;
-//};
-
 namespace weq::memory::resource_manager{
 
-//namespace ex = entityx;
-
-extern std::unordered_map<std::string, std::weak_ptr<memory::Resource>> _memory;
+extern HashMap<std::string, std::weak_ptr<memory::Resource>> _memory;
 
 void initialize(EventManager& events);
 void shutdown();
@@ -86,11 +51,12 @@ template<typename T, typename... Args>
 std::shared_ptr<T> get(const std::string& id, Args&&... args){
   static_assert(std::is_base_of<Resource, T>::value, "T should inherit from Resource");
 
-  auto& wp = _memory[id];
-  auto  sp = wp.lock();
+	auto& wp = _memory[id];	
+	auto sp = wp.lock();
 
   if(!sp){
-    wp = sp = std::make_shared<T>(std::forward<Args>(args)...);
+    sp = std::make_shared<T>(std::forward<Args>(args)...);
+		wp = sp;
     sp->load();
   }
 

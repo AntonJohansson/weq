@@ -54,7 +54,7 @@ public:
 	}
 
 	template<typename... Args>
-	Pair& emplace(Key& k, Args&&... args){
+	Pair& emplace(const Key& k, Args&&... args){
 		assert(k != _empty_key && "Empty key should not be used");
 		resize_if_necessary();
 
@@ -115,7 +115,7 @@ public:
 	// Access
 	// 
 	
-	std::optional<size_t> find(Key& k){
+	std::optional<size_t> find(const Key& k){
 		assert(k != _empty_key && "empty key should not be used");
 		for(auto i = key_to_index(k); ; i = probe_next(i)){
 			auto& pair = _pairs[i];
@@ -131,14 +131,14 @@ public:
 		return find(k);
 	}
 	
-	std::optional<Value&> at(Key& k){
+	std::optional<Value&> at(const Key& k){
 		if(auto i = find(k)){
 			return _pairs[i];
 		}
 		return {};
 	}
 
-	std::optional<Value&> at(Key&& k){
+	std::optional<Value&> at(const Key&& k){
 		return at(k);
 	}
 
@@ -146,7 +146,15 @@ public:
 		return emplace(k).value;
 	}
 
+	Value& operator[] (const Key& k) {
+		return emplace(k).value;
+	}
+
 	Value& operator[] (Key&& k){
+		return operator[](k);
+	}
+
+	Value& operator[] (const Key&& k) {
 		return operator[](k);
 	}
 
