@@ -1,18 +1,24 @@
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 
+set(WEQ_INCLUDE_DIRS "")
+add_subdirectory(third_party)
+
 #set(CXX "cc_args.py clang++")
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
+message(STATUS ${THIRD_PARTY_INCLUDE_DIRS})
+message(STATUS ${THIRD_PARTY_LIBS})
 
 # -cc1 flag for clang causes a lot of standard headers to not be found
 # Xclang forces -emit-pch to be passed to -cc1
-add_custom_target(pch ALL 
-	clang++ -Xclang
-	-emit-pch
-	${CMAKE_CURRENT_SOURCE_DIR}/include/weq/precompiled.hpp 
-	-o ${CMAKE_CURRENT_SOURCE_DIR}/include/weq/precompiled.hpp.pch
-	-I${CMAKE_CURRENT_SOURCE_DIR}/external/unix/include
-	-I${CMAKE_CURRENT_SOURCE_DIR}/include
-	-std=c++1z)
+##add_custom_target(pch ALL 
+##	clang++ -Xclang
+##	-emit-pch
+##	${CMAKE_CURRENT_SOURCE_DIR}/include/weq/precompiled.hpp 
+##	-o ${CMAKE_CURRENT_SOURCE_DIR}/include/weq/precompiled.hpp.pch
+##	-I${CMAKE_CURRENT_SOURCE_DIR}/external/unix/include
+##	-I${WEQ_INCLUDE_DIRS}
+##	-I${CMAKE_CURRENT_SOURCE_DIR}/include
+##	-std=c++1z)
 
 
 project(weq CXX)
@@ -52,15 +58,10 @@ elseif(APPLE)
   add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 endif()
 
-#find_library(glfw HINTS ${library_path} NAMES glfw3 REQUIRED)
-#find_library(freeimage HINTS ${library_path} NAMES FreeImage REQUIRED)
-#find_library(entityx HINTS ${library_path} NAMES entityx REQUIRED)
-find_library(glfw HINTS ${library_path} NAMES glfw3 REQUIRED)
-#find_package(glfw3 3.2 REQUIRED)
 set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED)
 
-add_executable(weq
+set(WEQ_SOURCES
 	src/weq/precompiled.cpp
 
   src/weq/Window.cpp
@@ -90,16 +91,16 @@ add_executable(weq
 
   src/weq/memory/ResourceManager.cpp
 
+	src/weq/imgui_impl_glfw_gl3.cpp 
+
   src/weq/ecs/Event.cpp
   src/weq/ecs/System.cpp
-  src/weq/ecs/Component.cpp
+  src/weq/ecs/Component.cpp)
+  
 
-  src/glad/glad.cpp
-  src/imgui/imgui.cpp
-  src/imgui/imgui_demo.cpp
-  src/imgui/imgui_draw.cpp
-  src/imgui/imgui_impl_glfw_gl3.cpp)
 
+add_executable(weq ${WEQ_SOURCES})
+	
 if(WIN32)
   target_compile_options(weq PRIVATE /std:c++latest)
 elseif(APPLE OR UNIX)
@@ -107,7 +108,8 @@ elseif(APPLE OR UNIX)
 	#target_compile_options(weq PRIVATE -O3 -fcolor-diagnostics -std=c++1z -Wall -Wextra -Wfatal-errors -g -pg)
 	target_compile_options(weq PRIVATE 
 		#-include-pch ${CMAKE_CURRENT_SOURCE_DIR}/include/weq/precompiled.hpp.pch 
-		-fcolor-diagnostics -std=c++1z -Wall -Wextra -Wfatal-errors -g)
+		#-fcolor-diagnostics 
+		-std=c++1z -Wall -Wextra -Wfatal-errors -g)
 	#set_target_properties(weq PROPERTIES LINK_FLAGS "-pg")
 endif()
 
@@ -115,6 +117,8 @@ set_target_properties(weq PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SO
 target_compile_definitions(weq PRIVATE GLFW_INCLUDE_NONE GLM_FORCE_RADIANS)
 target_include_directories(weq PUBLIC
   $<BUILD_INTERFACE:${EXTERNAL_PATH}/include> # SHOULD ONLY BE ADDED ON WINDOWS
+	$<BUILD_INTERFACE: ${THIRD_PARTY_INCLUDE_DIRS}
+	$<BUILD_INTERFACE: ${WEQ_INCLUDE_DIRS}
   #$<BUILD_INTERFACE:/usr/local/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE: include>)
@@ -122,7 +126,7 @@ target_include_directories(weq PUBLIC
 #target_compile_definitions(weq PRIVATE FREEIMAGE_LIB)
 
 target_link_libraries(weq
-  ${glfw}
+	${THIRD_PARTY_LIBS}
   ${OPENGL_gl_LIBRARY}
   ${EXTRA_LIBS}
   )

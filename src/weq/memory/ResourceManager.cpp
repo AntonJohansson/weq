@@ -13,19 +13,6 @@
 
 #include <weq/event/Hotloader.hpp>
 
-//#include <spdlog/spdlog.h>
-
-//#define STB_IMAGE_IMPLEMENTATION
-//#include <stb/stb_image.h>
-
-//#if __has_include(<filesystem>)
-//#include <filesystem>
-//#elif __has_include(<experimental/filesystem>)
-//#include <experimental/filesystem>
-//#endif
-//
-//#include <unordered_map>
-
 namespace weq::memory::resource_manager{
 
 namespace{
@@ -39,7 +26,7 @@ namespace{
   EventManager* _events;
 }
 
-std::unordered_map<std::string, std::weak_ptr<Resource>> _memory;
+HashMap<std::string, std::weak_ptr<Resource>> _memory;
 
 void initialize(EventManager& events){
   _events = &events;
