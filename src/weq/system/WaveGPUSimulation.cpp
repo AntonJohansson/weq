@@ -721,8 +721,8 @@ void WaveGPUSimulation::receive(event::ActiveInput& event){
 
   }
   if(event.has(InputRange::CURSOR_X) && event.has(InputRange::CURSOR_Y)){
-    mouse.x = event.ranges.at(InputRange::CURSOR_X);
-    mouse.y = event.ranges.at(InputRange::CURSOR_Y);
+    mouse.x = event.range_values.at(static_cast<int>(InputRange::CURSOR_X));
+    mouse.y = event.range_values.at(static_cast<int>(InputRange::CURSOR_Y));
   }
 }
 

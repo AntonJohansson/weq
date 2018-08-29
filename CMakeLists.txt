@@ -81,7 +81,6 @@ set(WEQ_SOURCES
   src/weq/system/Camera.cpp
   src/weq/system/Hotloader.cpp
   src/weq/system/Input.cpp
-  src/weq/system/InputAbstractionLayer.cpp
   src/weq/system/UserInterface.cpp
   src/weq/system/Renderer.cpp
   src/weq/system/WaveGPUSimulation.cpp
@@ -108,7 +107,7 @@ elseif(APPLE OR UNIX)
 	#target_compile_options(weq PRIVATE -O3 -fcolor-diagnostics -std=c++1z -Wall -Wextra -Wfatal-errors -g -pg)
 	target_compile_options(weq PRIVATE 
 		#-include-pch ${CMAKE_CURRENT_SOURCE_DIR}/include/weq/precompiled.hpp.pch 
-		#-fcolor-diagnostics 
+		-fcolor-diagnostics 
 		-std=c++1z -Wall -Wextra -Wfatal-errors -g)
 	#set_target_properties(weq PROPERTIES LINK_FLAGS "-pg")
 endif()

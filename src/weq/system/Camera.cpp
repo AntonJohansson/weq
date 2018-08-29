@@ -207,20 +207,34 @@ void Camera::receive(event::ActiveWindow& event){
 }
 
 void Camera::receive(event::ActiveInput& event){
+	// TEMP
+	
+	//spdlog::get("console")->info("actions:");
+	//for(auto key : event.actions){
+	//	spdlog::get("console")->info(key);
+	//}
+	//spdlog::get("console")->info("states:");
+	//for(auto key : event.states){
+	//	spdlog::get("console")->info(key);
+	//}
+	//spdlog::get("console")->info("ranges:");
+	//for(auto key : event.ranges){
+	//	spdlog::get("console")->info(key);
+	//}
   // Only update mouse camera direction when mouse is down
   if(event.has(InputState::CURSOR_DOWN)){
     // Update mouse delta position
     if(event.has(InputRange::CURSOR_DX) && event.has(InputRange::CURSOR_DY)){
 			// TODO: DOES THIS COUNT AS SENSITIVITY?
-      _delta_cursor.x = 10.0f * event.ranges.at(InputRange::CURSOR_DX);
-      _delta_cursor.y = 10.0f * event.ranges.at(InputRange::CURSOR_DY);
+      _delta_cursor.x = 10.0f * event.range_values.at(static_cast<int>(InputRange::CURSOR_DX));
+      _delta_cursor.y = 10.0f * event.range_values.at(static_cast<int>(InputRange::CURSOR_DY));
     }
   }
 
   // Update camera distance with scroll
   if(event.has(InputRange::CURSOR_SCROLL_X) && event.has(InputRange::CURSOR_SCROLL_Y)){
     //double x = event.ranges.at(InputRange::CURSOR_SCROLL_X);
-    _movement_amount.z = -0.5*event.ranges.at(InputRange::CURSOR_SCROLL_Y);
+    _movement_amount.z = -0.5*event.range_values.at(static_cast<int>(InputRange::CURSOR_SCROLL_Y));
   }
 
   // First person

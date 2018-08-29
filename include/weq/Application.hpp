@@ -77,7 +77,6 @@ protected:
   //SystemManager _systems{_entities, _events};
 
   //ResourceManager _resource_manager;
-  state::StateManager _state_manager; // TODO not functioning
 
   std::shared_ptr<spdlog::logger> _console;
   std::shared_ptr<Window> _window;

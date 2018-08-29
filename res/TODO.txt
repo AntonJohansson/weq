@@ -1,5 +1,11 @@
 TODO
 
+- unordered_map -> HashMap
+
+- hotload res/input.config
+- simplify code for current input system
+	- is currently a messy convertion of previous system
+
 - VECTORIZATION should be used were same type of calculations are made on lots of data
 	- use SOA
 	- gives little benefit for m4 transforms

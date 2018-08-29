@@ -2,8 +2,8 @@
 
 namespace weq::system{
 
-enum class InputAction{
-  SPAWN_PLANE_WAVE,
+enum class InputAction : int{
+  SPAWN_PLANE_WAVE = 0,
   SPAWN_WAVELET,
   UPDATE_COLOR,
   CLEAR,
@@ -23,8 +23,8 @@ enum class InputAction{
   UNKNOWN,
 };
 
-enum class InputState{
-  MOVE_FORWARD,
+enum class InputState : int{
+  MOVE_FORWARD = 20,
   MOVE_BACK,
   MOVE_UP,
   MOVE_DOWN,
@@ -35,8 +35,8 @@ enum class InputState{
   UNKNOWN,
 };
 
-enum class InputRange{
-  CURSOR_X,
+enum class InputRange : int{
+  CURSOR_X = 40,
   CURSOR_Y,
   CURSOR_DX,
   CURSOR_DY,

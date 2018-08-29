@@ -271,6 +271,12 @@ void Renderer::receive(event::ActiveInput& event){
   //  //spdlog::get("console")->info("{}, {}, {} - depth {}", vec.x, vec.y, vec.z, z);
   //  scene_fbo->unbind();
   //}
+	//
+	//
+	//
+	//
+	//
+	//
 
   if(event.has(InputState::CURSOR_DOWN)){
     _window->set_cursor_mode(CursorMode::DISABLED);
