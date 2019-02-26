@@ -1,1 +1,1 @@
-# weq
+# Wave Equation Solver
