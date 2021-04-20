@@ -31,6 +31,7 @@ enum class InputState : int{
   MOVE_LEFT,
   MOVE_RIGHT,
   CURSOR_DOWN,
+  CURSOR_DOWN_IN_UI,
   SPAWN_RAY,
   UNKNOWN,
 };

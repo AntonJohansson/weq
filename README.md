@@ -1,8 +1,8 @@
 # Wave Equation Solver
 
 ## Libraries uses
-- GLFW
-- glad
-- glm
-- imgui
-- spdlog
+* GLFW
+* glad
+* glm
+* imgui
+* spdlog

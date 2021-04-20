@@ -10,7 +10,7 @@
 #include <weq/Window.hpp>
 
 //#include <spdlog/spdlog.h>
-//#include <imgui/imgui.h>
+#include <imgui/imgui.h>
 //#include <imgui/imgui_impl_glfw_gl3.h>
 
 //#include <GLFW/glfw3.h>
@@ -23,6 +23,7 @@
 namespace{
   unsigned int window_width;
   unsigned int window_height;
+  bool in_ui;
 }
 
 namespace weq::system{
@@ -75,7 +76,7 @@ namespace{
 				it != context_map.end()){
 			return it->second.type == RANGE;
 		}
-	
+
 		return false;
 	}
 	static bool is_action(int key){
@@ -83,7 +84,7 @@ namespace{
 				it != context_map.end()){
 			return it->second.type == ACTION;
 		}
-	
+
 		return false;
 	}
 	static bool is_state(int key){
@@ -91,7 +92,7 @@ namespace{
 				it != context_map.end()){
 			return it->second.type == STATE;
 		}
-	
+
 		return false;
 	}
 
@@ -126,11 +127,13 @@ namespace{
   }
 
   static void mouse_callback(GLFWwindow* window, double x, double y){
-    (void)window;
-    (void)x;
-    (void)y;
+	  (void)window;
+	  (void)x;
+	  (void)y;
 		static double last_x = 0.0;
 		static double last_y = 0.0;
+
+		in_ui = ImGui::IsPosHoveringAnyWindow({x, y});
 
 		if(is_range(raw::Axes::MOUSE_X)){
 			double normalized_x 	= 2.0*x/window_width - 1.0; // also flips axis
@@ -142,7 +145,7 @@ namespace{
 			_event.range_values[static_cast<int>(InputRange::CURSOR_X)]  = normalized_x;
 			_event.range_values[static_cast<int>(InputRange::CURSOR_DX)] = normalized_dx;
 		}
-		
+
 		if(is_range(raw::Axes::MOUSE_Y)){
 			double normalized_y = 1.0 - 2.0f*y/window_height; // also flips axis
 			double normalized_dy = normalized_y - last_y;
@@ -165,7 +168,10 @@ namespace{
 		}else if(is_state(button)){
 			if(action == GLFW_PRESS){
 				_event.states.push_back(context_map[button].key);
+				if (in_ui)
+					_event.states.push_back(static_cast<int>(InputState::CURSOR_DOWN_IN_UI));
 			}else if (action == GLFW_RELEASE){
+				// Clear pressed button state
 				auto it = std::find(
 						_event.states.begin(),
 						_event.states.end(),
@@ -173,6 +179,18 @@ namespace{
 
 				if(it != _event.states.end()){
 					_event.states.erase(it);
+				}
+
+				// Clear CURSOR_DONW_IN_UI
+				{
+					auto it = std::find(
+							_event.states.begin(),
+							_event.states.end(),
+							static_cast<int>(InputState::CURSOR_DOWN_IN_UI));
+
+					if(it != _event.states.end()){
+						_event.states.erase(it);
+					}
 				}
 			}
 		}
@@ -209,14 +227,14 @@ namespace{
     (void)mods;
   }
 
-	
+
 
 	static bool starts_with(const std::string_view& view, const std::string& value){
 		return view.substr(0, value.size()).compare(value) == 0;
 	}
 
-	static void process_line(std::string_view line_view, 
-			const std::string& file, 
+	static void process_line(std::string_view line_view,
+			const std::string& file,
 			unsigned int line_number){
 
 		// Trim leading and trailing whitespace

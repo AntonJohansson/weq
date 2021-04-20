@@ -28,8 +28,8 @@ bool aabb(float l, float r, float u, float d){
 }
 
 bool single_slit(){
-  if(aabb(0,0.5 - slit_width/2, wall_pos, wall_pos) ||
-     aabb(0.5 + slit_width/2, 1, wall_pos, wall_pos)){
+  if(aabb(0,0.5 - slit_width/2, wall_pos+0.01, wall_pos) ||
+     aabb(0.5 + slit_width/2, 1, wall_pos+0.01, wall_pos)){
     frag_color = vec4(0,0,0,0);
     return true;
   }
@@ -37,9 +37,9 @@ bool single_slit(){
 }
 
 bool double_slit(){
-  if(aabb(0,0.5 - slit_width/2 - slit_sep/2, wall_pos, wall_pos)  ||
-     aabb(0.5 + slit_width/2 + slit_sep/2, 1, wall_pos, wall_pos) ||
-     aabb(0.5 - slit_sep/2, 0.5 + slit_sep/2, wall_pos, wall_pos)){
+  if(aabb(0,0.5 - slit_width/2 - slit_sep/2, wall_pos+0.01, wall_pos)  ||
+     aabb(0.5 + slit_width/2 + slit_sep/2, 1, wall_pos+0.01, wall_pos) ||
+     aabb(0.5 - slit_sep/2, 0.5 + slit_sep/2, wall_pos+0.01, wall_pos)){
     frag_color = vec4(0,0,0,0);
     return true;
   }

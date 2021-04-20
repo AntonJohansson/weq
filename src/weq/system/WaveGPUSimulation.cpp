@@ -231,7 +231,7 @@ void WaveGPUSimulation::update(EntityManager& entities,
 
   // Add UI if it doesn't exist (!)
   add_ui(entities, events);
-	
+
   if(should_raycast){
     component::Transform transform;
     component::Camera camera;
@@ -573,11 +573,11 @@ void WaveGPUSimulation::add_ui(EntityManager& entities, EventManager& events){
         //ImGui::Image((void*)grid_texture->handle(), ImVec2(200,200));
         //ImGui::End();
 				//
-				ImGui::Begin("benchmark");
-				for(auto& [what, entry] : utility::Profiler::entries){
-					ImGui::Text("%10s: avg: %10u min: %10u max: %10u (ns)", what.c_str(), entry.time, entry.min, entry.max);
-				}
-				ImGui::End();
+				//ImGui::Begin("benchmark");
+				//for(auto& [what, entry] : utility::Profiler::entries){
+				//	ImGui::Text("%10s: avg: %10u min: %10u max: %10u (ns)", what.c_str(), entry.time, entry.min, entry.max);
+				//}
+				//ImGui::End();
 
         ImGui::Begin("Menu", NULL, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::SetWindowCollapsed("Menu", false, ImGuiSetCond_FirstUseEver);

@@ -143,7 +143,6 @@ void Renderer::update(EntityManager& entities,
   glClearDepth(1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
   // Draw skybox
   glFrontFace(GL_CW);
   glEnable(GL_CULL_FACE);
@@ -170,7 +169,6 @@ void Renderer::update(EntityManager& entities,
   // Assume entities won't need culling.
   // Naive as fuck @TODO fix
   glDisable(GL_CULL_FACE);
-
 
   // Move draw code out of entities loop, works fine since there's only a
   // single entity.
@@ -212,8 +210,6 @@ void Renderer::update(EntityManager& entities,
           glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         }
 
-
-
         r.mesh->vao(r.scene).bind();
         r.mesh->ebo().bind();
 
@@ -233,7 +229,6 @@ void Renderer::update(EntityManager& entities,
   scene_fbo->unbind();
 
   // Draw screen from fbo
-
   screen_p->use();
   screen_p->set("framebuffer", 0);
 
@@ -248,14 +243,8 @@ void Renderer::update(EntityManager& entities,
   // Render UI
   ImGui::Render();
 
-  // Display
+  // Display the actual framebuffer
   _window->swap_buffers();
-
-  // Check for OpenGL errors (TODO should be able to disable this?)
-  GLenum err;
-  while((err = glGetError()) != GL_NO_ERROR){
-    spdlog::get("console")->error("GL-error: {}", err);
-  }
 }
 
 void Renderer::receive(event::ActiveInput& event){
@@ -278,7 +267,7 @@ void Renderer::receive(event::ActiveInput& event){
 	//
 	//
 
-  if(event.has(InputState::CURSOR_DOWN)){
+  if(event.has(InputState::CURSOR_DOWN) && !event.has(InputState::CURSOR_DOWN_IN_UI)){
     _window->set_cursor_mode(CursorMode::DISABLED);
 
   }else{

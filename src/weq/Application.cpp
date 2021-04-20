@@ -11,6 +11,8 @@
 
 #include <weq/memory/ResourceManager.hpp>
 
+#include <weq/gl/ErrorHandler.hpp>
+
 //#include <string>
 //
 //#include <iostream>
@@ -67,6 +69,7 @@ Application::Application(int argc, char** argv){
 
   // Create window (TODO Move!!)
   _window = std::make_shared<Window>(*_events, "Wave Simulation", width, height, mode); // Will also initlize glfw/glad
+  setup_gl_error_callback();
 }
 
 Application::~Application(){

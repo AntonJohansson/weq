@@ -196,7 +196,7 @@ void Camera::update_arcball(component::Camera* camera, component::Transform* t){
 #endif
 	//}
 
-	  
+
   // Reset mouse variables.
   _delta_cursor = {0,0};
   _movement_amount = {0,0,0};
@@ -208,7 +208,7 @@ void Camera::receive(event::ActiveWindow& event){
 
 void Camera::receive(event::ActiveInput& event){
 	// TEMP
-	
+
 	//spdlog::get("console")->info("actions:");
 	//for(auto key : event.actions){
 	//	spdlog::get("console")->info(key);
@@ -224,10 +224,10 @@ void Camera::receive(event::ActiveInput& event){
   // Only update mouse camera direction when mouse is down
   if(event.has(InputState::CURSOR_DOWN)){
     // Update mouse delta position
-    if(event.has(InputRange::CURSOR_DX) && event.has(InputRange::CURSOR_DY)){
-			// TODO: DOES THIS COUNT AS SENSITIVITY?
-      _delta_cursor.x = 10.0f * event.range_values.at(static_cast<int>(InputRange::CURSOR_DX));
-      _delta_cursor.y = 10.0f * event.range_values.at(static_cast<int>(InputRange::CURSOR_DY));
+	if(!event.has(InputState::CURSOR_DOWN_IN_UI) && event.has(InputRange::CURSOR_DX) && event.has(InputRange::CURSOR_DY)){
+		// TODO: DOES THIS COUNT AS SENSITIVITY?
+		_delta_cursor.x = 10.0f * event.range_values.at(static_cast<int>(InputRange::CURSOR_DX));
+		_delta_cursor.y = 10.0f * event.range_values.at(static_cast<int>(InputRange::CURSOR_DY));
     }
   }
 
